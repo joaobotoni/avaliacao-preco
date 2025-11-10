@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">avaliacaoDePreco</string>
+    <string name="greeting">Seja bem vindo a minha tela!</string>
+    <string name="error_value_solicited">Preencher todos os campos!!!</string>
+    <string name="title_calculate">Calcule o valor do bezerro com ágio</string>
+    <string name="subtitle_fill_fields">Preencha os campos abaixo</string>
+    <string name="label_arroba_weight">Arroba (kg)</string>
+    <string name="default_arroba_weight">30 kg</string>
+    <string name="hint_arroba_price">Valor da arroba</string>
+    <string name="hint_weight">Peso do bezerro</string>
+    <string name="hint_percentage">Percentual de ágio</string>
+    <string name="button_calculate">Calcular Valor</string>
+    <string name="label_result">Valor do Bezerro</string>
+    <string name="prefix_currency">R$ </string>
+    <string name="prefix_weight">Kg </string>
+    <string name="prefix_percentage">% </string>
+    <string name="title_analysis">Análise</string>
+    <string name="hint_proposed_value">Valor Proposto</string>
+    <string name="label_var_percentage">Variação Percentual %</string>
+</resources>
