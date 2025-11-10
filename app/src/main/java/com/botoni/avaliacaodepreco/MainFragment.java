@@ -383,8 +383,6 @@ public class MainFragment extends Fragment {
         hideAnalysisCard();
     }
 
-    // === UTILIDADES ===
-
     @NonNull
     private String extractTextFrom(@NonNull EditText editText) {
         return editText.getText().toString().trim();

@@ -25,7 +25,6 @@
                 android:id="@+id/card_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_large"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/spacing_medium"
                         android:hint="@string/hint_arroba_price"
-                        app:prefixText="@string/prefix_currency">
+                        app:prefixText="R$ ">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_arroba_price"
@@ -82,9 +81,9 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_large"
+                        android:layout_marginBottom="@dimen/spacing_medium"
                         android:hint="@string/hint_percentage"
-                        app:prefixText="@string/prefix_percentage">
+                        app:suffixText=" %">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_percentage"
@@ -99,9 +98,9 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
+                        android:layout_marginBottom="@dimen/spacing_large"
                         android:hint="@string/hint_weight"
-                        app:prefixText="@string/prefix_weight">
+                        app:suffixText=" kg">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_weight"
@@ -204,7 +203,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/spacing_medium"
                         android:hint="@string/hint_proposed_value"
-                        app:prefixText="@string/prefix_currency">
+                        app:prefixText="R$ ">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_proposed_value"
@@ -239,6 +238,71 @@
                             android:textStyle="bold"
                             tools:text="+15,5%" />
                     </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card Frete -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_frete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:visibility="visible"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_analysis">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Título do Frete -->
+                    <TextView
+                        android:id="@+id/frete_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_medium"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        android:text="@string/title_frete"
+                        android:textSize="@dimen/text_size_title"
+                        android:textStyle="bold" />
+
+                    <!-- Campo: Cidade -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_layout_city"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_medium"
+                        android:hint="Cidade de destino">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/field_city"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Campo: Quantidade KM -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_layout_qtd_km"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Distância em KM"
+                        app:suffixText=" km">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/field_qtd_km"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

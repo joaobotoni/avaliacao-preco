@@ -17,4 +17,5 @@
     <string name="title_analysis">Análise</string>
     <string name="hint_proposed_value">Valor Proposto</string>
     <string name="label_var_percentage">Variação Percentual %</string>
+    <string name="title_frete">Calcular o frete</string>
 </resources>
