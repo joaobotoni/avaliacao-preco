@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-android {
+ android {
     namespace = "com.botoni.avaliacaodepreco"
 
     compileSdk {

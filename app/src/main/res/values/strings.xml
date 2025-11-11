@@ -2,7 +2,7 @@
     <string name="app_name">avaliacaoDePreco</string>
     <string name="greeting">Seja bem vindo a minha tela!</string>
     <string name="error_value_solicited">Preencher todos os campos!!!</string>
-    <string name="title_calculate">Calcule o valor do bezerro com ágio</string>
+    <string name="title_calculate">Calcule o valor do bezerro</string>
     <string name="subtitle_fill_fields">Preencha os campos abaixo</string>
     <string name="label_arroba_weight">Arroba (kg)</string>
     <string name="default_arroba_weight">30 kg</string>
@@ -18,4 +18,7 @@
     <string name="hint_proposed_value">Valor Proposto</string>
     <string name="label_var_percentage">Variação Percentual %</string>
     <string name="title_frete">Calcular o frete</string>
+    <string name="label_city">Cidade de destino</string>
+    <string name="label_qtd_km">Distância em KM</string>
+    <string name="label_qtd_animal">Quantidade de animais</string>
 </resources>

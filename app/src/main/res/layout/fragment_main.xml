@@ -5,307 +5,503 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- ScrollView para suportar conteúdo maior que a tela -->
     <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:scrollbars="none">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/screen_padding">
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <!-- Card Container Principal -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_container"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif"
+                    android:letterSpacing="0.01"
+                    android:text="@string/subtitle_fill_fields"
+                    android:textColor="#86868B"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="24dp">
 
-                    <!-- Título -->
                     <TextView
-                        android:id="@+id/text_header"
+                        android:id="@+id/calculate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_small"
+                        android:layout_marginBottom="24dp"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
+                        android:letterSpacing="-0.02"
                         android:text="@string/title_calculate"
-                        android:textSize="@dimen/text_size_title"
+                        android:textColor="#1D1D1F"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
-                    <!-- Subtítulo -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_large"
-                        android:gravity="center"
-                        android:text="@string/subtitle_fill_fields"
-                        android:textSize="@dimen/text_size_body" />
-
-                    <!-- Campo: Valor da Arroba -->
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_layout_arroba_price"
+                        android:id="@+id/input_nodes_arroba_price"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
-                        android:hint="@string/hint_arroba_price"
+                        android:layout_marginBottom="14dp"
+                        android:hint="Valor da arroba"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintAnimationEnabled="true"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" 0,00"
+                        app:placeholderTextColor="#C7C7CC"
+                        app:prefixTextColor="#C7C7CC"
                         app:prefixText="R$ ">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_arroba_price"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
+                            android:inputType="numberDecimal"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Campo: Percentual de Ágio -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_layout_percentage"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
-                        android:hint="@string/hint_percentage"
-                        app:suffixText=" %">
+                        android:layout_marginBottom="14dp"
+                        android:hint="Percentual de ágio"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintAnimationEnabled="true"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" 0,0%"
+                        app:placeholderTextColor="#C7C7CC">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_percentage"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
+                            android:inputType="numberDecimal"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Campo: Peso do Bezerro -->
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_layout_qtd"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
+                        android:hint="@string/label_qtd_animal"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintAnimationEnabled="true"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" 123"
+                        app:placeholderTextColor="#C7C7CC">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/field_qtd"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_layout_weight"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_large"
-                        android:hint="@string/hint_weight"
-                        app:suffixText=" kg">
+                        android:layout_marginBottom="0dp"
+                        android:hint="Peso do bezerro"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintAnimationEnabled="true"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" 000 kg"
+                        app:placeholderTextColor="#C7C7CC">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_weight"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
+                            android:inputType="numberDecimal"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Botão Calcular -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_calculate"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/button_height"
-                        android:text="@string/button_calculate"
-                        android:textAllCaps="false"
-                        android:textSize="@dimen/text_size_button"
-                        android:textStyle="bold"
-                        app:cornerRadius="@dimen/button_corner_radius" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card de Resultado -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card_result"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_large"
-                android:visibility="gone"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_container">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="@dimen/result_card_padding">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_small"
-                        android:text="@string/label_result"
-                        android:textSize="@dimen/text_size_body" />
-
-                    <TextView
-                        android:id="@+id/text_result_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:textSize="@dimen/text_size_result"
-                        android:textStyle="bold"
-                        tools:text="R$ 2.657,14" />
-
-                    <View
-                        android:layout_width="@dimen/divider_width"
-                        android:layout_height="@dimen/divider_height"
-                        android:layout_marginTop="@dimen/spacing_medium" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Card de Análise (Valor Proposto e VAR%) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_analysis"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_large"
-                android:visibility="gone"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_result">
+                android:layout_marginBottom="16dp"
+                android:visibility="visible"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="24dp">
 
-                    <!-- Título da Análise -->
-                    <TextView
+                    <!-- Valor do Bezerro -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:text="@string/title_analysis"
-                        android:textSize="@dimen/text_size_title"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="#ffff"
+                        >
 
-                    <!-- Campo: Valor Proposto -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_layout_proposed_value"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
-                        android:hint="@string/hint_proposed_value"
-                        app:prefixText="R$ ">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/field_proposed_value"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:orientation="vertical"
+                            android:padding="20dp">
 
-                    <!-- Resultado VAR% -->
-                    <LinearLayout
-                        android:id="@+id/container_var_result"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginBottom="8dp"
+                                android:alpha="0.9"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.05"
+                                android:text="Valor do Bezerro"
+                                android:textColor="#000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/text_calf_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
+                                android:textColor="#000"
+                                android:textSize="32sp"
+                                android:textStyle="bold"
+                                tools:text="R$ 1.850,00" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Linha divisória -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="#E5E5EA" />
+
+                    <!-- Valor Total -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_small"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:visibility="gone">
+                        android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="#ffff"
+                        >
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="@dimen/spacing_small"
-                            android:text="@string/label_var_percentage"
-                            android:textSize="@dimen/text_size_body" />
+                            android:orientation="vertical"
+                            android:padding="20dp">
 
-                        <TextView
-                            android:id="@+id/text_var_percentage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:textSize="@dimen/text_size_large"
-                            android:textStyle="bold"
-                            tools:text="+15,5%" />
-                    </LinearLayout>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginBottom="8dp"
+                                android:alpha="0.9"
+                                android:fontFamily="sans-serif"
+                                android:letterSpacing="0.05"
+                                android:text="Valor Total"
+                                android:textColor="#000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/text_result_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
+                                android:textColor="#000"
+                                android:textSize="36sp"
+                                android:textStyle="bold"
+                                tools:text="R$ 2.657,14" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card Frete -->
-            <androidx.cardview.widget.CardView
+
+            <!--            <com.google.android.material.card.MaterialCardView-->
+            <!--                android:id="@+id/card_analysis"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginBottom="16dp"-->
+            <!--                android:visibility="gone"-->
+            <!--                app:cardCornerRadius="20dp"-->
+            <!--                app:cardElevation="0dp"-->
+            <!--                app:strokeWidth="0dp"-->
+            <!--                app:cardBackgroundColor="#FFFFFF">-->
+
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:orientation="vertical"-->
+            <!--                    android:padding="24dp">-->
+
+            <!--                    <TextView-->
+            <!--                        android:layout_width="match_parent"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:layout_marginBottom="24dp"-->
+            <!--                        android:fontFamily="sans-serif-medium"-->
+            <!--                        android:gravity="center"-->
+            <!--                        android:text="@string/title_analysis"-->
+            <!--                        android:textSize="22sp"-->
+            <!--                        android:textColor="#1D1D1F"-->
+            <!--                        android:letterSpacing="-0.02"-->
+            <!--                        android:textStyle="bold" />-->
+
+            <!--                    <com.google.android.material.textfield.TextInputLayout-->
+            <!--                        android:id="@+id/input_layout_proposed_value"-->
+            <!--                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"-->
+            <!--                        android:layout_width="match_parent"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:layout_marginBottom="20dp"-->
+            <!--                        android:hint="Valor proposto"-->
+            <!--                        app:prefixText="R$ "-->
+            <!--                        app:boxStrokeColor="#007AFF"-->
+            <!--                        app:boxStrokeWidth="1dp"-->
+            <!--                        app:hintTextColor="#007AFF"-->
+            <!--                        app:cursorColor="#007AFF"-->
+            <!--                        app:placeholderText=" 0,00"-->
+            <!--                        app:placeholderTextColor="#C7C7CC"-->
+            <!--                        app:boxCornerRadiusTopStart="14dp"-->
+            <!--                        app:boxCornerRadiusTopEnd="14dp"-->
+            <!--                        app:boxCornerRadiusBottomStart="14dp"-->
+            <!--                        app:boxCornerRadiusBottomEnd="14dp">-->
+
+            <!--                        <com.google.android.material.textfield.TextInputEditText-->
+            <!--                            android:id="@+id/field_proposed_value"-->
+            <!--                            android:layout_width="match_parent"-->
+            <!--                            android:layout_height="wrap_content"-->
+            <!--                            android:inputType="numberDecimal"-->
+            <!--                            android:textSize="17sp"-->
+            <!--                            android:textColor="#1D1D1F"-->
+            <!--                            android:paddingVertical="14dp" />-->
+            <!--                    </com.google.android.material.textfield.TextInputLayout>-->
+
+            <!--                    <com.google.android.material.card.MaterialCardView-->
+            <!--                        android:layout_width="match_parent"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        app:cardCornerRadius="16dp"-->
+            <!--                        app:cardElevation="0dp"-->
+            <!--                        app:strokeWidth="0dp"-->
+            <!--                        app:cardBackgroundColor="#F5F5F7">-->
+
+            <!--                        <LinearLayout-->
+            <!--                            android:id="@+id/container_var_result"-->
+            <!--                            android:layout_width="match_parent"-->
+            <!--                            android:layout_height="wrap_content"-->
+            <!--                            android:gravity="center"-->
+            <!--                            android:orientation="vertical"-->
+            <!--                            android:paddingVertical="24dp"-->
+            <!--                            android:paddingHorizontal="20dp"-->
+            <!--                            android:visibility="gone">-->
+
+            <!--                            <TextView-->
+            <!--                                android:layout_width="wrap_content"-->
+            <!--                                android:layout_height="wrap_content"-->
+            <!--                                android:layout_marginBottom="4dp"-->
+            <!--                                android:text="@string/label_var_percentage"-->
+            <!--                                android:textSize="11sp"-->
+            <!--                                android:textColor="#86868B"-->
+            <!--                                android:letterSpacing="0.08"-->
+            <!--                                android:textAllCaps="true"-->
+            <!--                                android:fontFamily="sans-serif-medium" />-->
+
+            <!--                            <TextView-->
+            <!--                                android:id="@+id/text_var_percentage"-->
+            <!--                                android:layout_width="wrap_content"-->
+            <!--                                android:layout_height="wrap_content"-->
+            <!--                                android:fontFamily="sans-serif-medium"-->
+            <!--                                android:textSize="40sp"-->
+            <!--                                android:textColor="#34C759"-->
+            <!--                                android:letterSpacing="-0.02"-->
+            <!--                                android:textStyle="bold"-->
+            <!--                                tools:text="+15,5%" />-->
+            <!--                        </LinearLayout>-->
+            <!--                    </com.google.android.material.card.MaterialCardView>-->
+            <!--                </LinearLayout>-->
+            <!--            </com.google.android.material.card.MaterialCardView>-->
+
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_frete"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_large"
+                android:layout_marginBottom="20dp"
                 android:visibility="visible"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_analysis">
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="24dp">
 
-                    <!-- Título do Frete -->
                     <TextView
                         android:id="@+id/frete_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
+                        android:layout_marginBottom="24dp"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
+                        android:letterSpacing="-0.02"
                         android:text="@string/title_frete"
-                        android:textSize="@dimen/text_size_title"
+                        android:textColor="#1D1D1F"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
-                    <!-- Campo: Cidade -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_layout_city"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_medium"
-                        android:hint="Cidade de destino">
+                        android:layout_marginBottom="14dp"
+                        android:hint="Cidade de destino"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" Ex: São Paulo"
+                        app:placeholderTextColor="#C7C7CC">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_city"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text" />
+                            android:inputType="text"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Campo: Quantidade KM -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_layout_qtd_km"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Distância em KM"
-                        app:suffixText=" km">
+                        android:hint="Distância em quilômetros"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="#007AFF"
+                        app:boxStrokeWidth="1dp"
+                        app:cursorColor="#007AFF"
+                        app:hintAnimationEnabled="true"
+                        app:hintTextColor="#007AFF"
+                        app:placeholderText=" 000 km"
+                        app:placeholderTextColor="#C7C7CC">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/field_qtd_km"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal" />
+                            android:inputType="numberDecimal"
+                            android:paddingVertical="14dp"
+                            android:textColor="#1D1D1F"
+                            android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_calculate"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="8dp"
+                android:letterSpacing="0"
+                android:text="@string/button_calculate"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:backgroundTint="#007AFF"
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
+
+        </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
