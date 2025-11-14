@@ -187,64 +187,50 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="16dp">
 
                     <!-- Valor do Bezerro -->
-                    <com.google.android.material.card.MaterialCardView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:cardBackgroundColor="#ffff"
-                        >
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:text="Valor do Bezerro"
+                            android:textColor="#666666"
+                            android:fontFamily="sans-serif-medium" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginBottom="8dp"
-                                android:alpha="0.9"
-                                android:fontFamily="sans-serif-medium"
-                                android:letterSpacing="0.05"
-                                android:text="Valor do Bezerro"
-                                android:textColor="#000"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/text_calf_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:fontFamily="sans-serif-medium"
-                                android:letterSpacing="-0.01"
-                                android:textColor="#000"
-                                android:textSize="32sp"
-                                android:textStyle="bold"
-                                tools:text="R$ 1.850,00" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:id="@+id/text_calf_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#000000"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:fontFamily="sans-serif-medium"
+                            tools:text="R$ 1.850,00" />
+                    </LinearLayout>
 
                     <!-- Linha divisória -->
                     <View
@@ -254,45 +240,32 @@
                         android:background="#E5E5EA" />
 
                     <!-- Valor Total -->
-                    <com.google.android.material.card.MaterialCardView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardBackgroundColor="#ffff"
-                        >
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:text="Valor Total"
+                            android:textColor="#666666"
+                            android:fontFamily="sans-serif-medium" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginBottom="8dp"
-                                android:alpha="0.9"
-                                android:fontFamily="sans-serif"
-                                android:letterSpacing="0.05"
-                                android:text="Valor Total"
-                                android:textColor="#000"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/text_result_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:fontFamily="sans-serif-medium"
-                                android:letterSpacing="-0.01"
-                                android:textColor="#000"
-                                android:textSize="36sp"
-                                android:textStyle="bold"
-                                tools:text="R$ 2.657,14" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:id="@+id/text_result_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#2E7D32"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:fontFamily="sans-serif-medium"
+                            tools:text="R$ 2.657,14" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -399,11 +372,12 @@
             <!--                </LinearLayout>-->
             <!--            </com.google.android.material.card.MaterialCardView>-->
 
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_frete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="visible"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
@@ -417,51 +391,50 @@
                     android:padding="24dp">
 
                     <TextView
-                        android:id="@+id/frete_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="24dp"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:letterSpacing="-0.02"
-                        android:text="@string/title_frete"
+                        android:text="Cálculo de Frete"
                         android:textColor="#1D1D1F"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
+                    <!-- Tipo de Transporte (Spinner/Dropdown) -->
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_layout_city"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:id="@+id/input_layout_transport_type"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="14dp"
-                        android:hint="Cidade de destino"
+                        android:hint="Tipo de transporte"
                         app:boxCornerRadiusBottomEnd="14dp"
                         app:boxCornerRadiusBottomStart="14dp"
                         app:boxCornerRadiusTopEnd="14dp"
                         app:boxCornerRadiusTopStart="14dp"
                         app:boxStrokeColor="#007AFF"
                         app:boxStrokeWidth="1dp"
-                        app:cursorColor="#007AFF"
-                        app:hintTextColor="#007AFF"
-                        app:placeholderText=" Ex: São Paulo"
-                        app:placeholderTextColor="#C7C7CC">
+                        app:hintTextColor="#007AFF">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/field_city"
+                        <AutoCompleteTextView
+                            android:id="@+id/field_transport_type"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text"
+                            android:inputType="none"
                             android:paddingVertical="14dp"
                             android:textColor="#1D1D1F"
                             android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Distância em KM -->
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_layout_qtd_km"
+                        android:id="@+id/input_layout_distance_km"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
                         android:hint="Distância em quilômetros"
                         app:boxCornerRadiusBottomEnd="14dp"
                         app:boxCornerRadiusBottomStart="14dp"
@@ -473,17 +446,238 @@
                         app:hintAnimationEnabled="true"
                         app:hintTextColor="#007AFF"
                         app:placeholderText=" 000 km"
-                        app:placeholderTextColor="#C7C7CC">
+                        app:placeholderTextColor="#C7C7CC"
+                        app:suffixText=" km"
+                        app:suffixTextColor="#C7C7CC">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/field_qtd_km"
+                            android:id="@+id/field_distance_km"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
+                            android:inputType="number"
                             android:paddingVertical="14dp"
                             android:textColor="#1D1D1F"
                             android:textSize="17sp" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Card de Capacidade (Info) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_capacity_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="#F5F5F7"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Capacidade do Transporte"
+                                android:textColor="#1D1D1F"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Bois:"
+                                    android:textColor="#86868B"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/text_capacity_bois"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="#1D1D1F"
+                                    android:textSize="14sp"
+                                    tools:text="18" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Vacas:"
+                                    android:textColor="#86868B"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/text_capacity_vacas"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="#1D1D1F"
+                                    android:textSize="14sp"
+                                    tools:text="20" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Bezerros:"
+                                    android:textColor="#86868B"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/text_capacity_bezerros"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="#1D1D1F"
+                                    android:textSize="14sp"
+                                    tools:text="35 - 38" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card de Resultado do Frete -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_frete_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Tipo de Transporte -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Tipo de Transporte"
+                            android:textColor="#666666"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/text_frete_transport_type"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="#1D1D1F"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="TRUCK" />
+                    </LinearLayout>
+
+                    <!-- Linha divisória -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="#E5E5EA" />
+
+                    <!-- Distância -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Distância"
+                            android:textColor="#666666"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/text_frete_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="#1D1D1F"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="150 km" />
+                    </LinearLayout>
+
+                    <!-- Linha divisória -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="#E5E5EA" />
+
+                    <!-- Valor do Frete -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Valor do Frete"
+                            android:textColor="#666666"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/text_frete_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="#007AFF"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            tools:text="R$ 1.980,00" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -501,7 +695,6 @@
                 app:backgroundTint="#007AFF"
                 app:cornerRadius="14dp"
                 app:elevation="0dp" />
-
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
