@@ -4,30 +4,28 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "frete")
+@Entity(tableName = "xgp_frete")
 public class Frete {
+    @ColumnInfo(name = "id_frete")
     @PrimaryKey(autoGenerate = true)
     private long id;
-    @ColumnInfo(name = "tipo_transporte")
-    private TipoTransporte tipoTransporte;
+    @ColumnInfo(name = "id_tipo_veiculo_frete")
+    private Integer idTipoVeiculoFrete;
+    @ColumnInfo(name = "km_inicial")
+    private int kmInicial;
+    @ColumnInfo(name = "km_final")
+    private int kmFinal;
+    @ColumnInfo(name = "valor")
+    private double valor;
 
-    @ColumnInfo(name = "distancia_km")
-    private int distanciaKm;
+    public Frete() {
+    }
 
-    @ColumnInfo(name = "valor_calculado")
-    private double valorCalculado;
-
-    @ColumnInfo(name = "data_frete")
-    private long dataFrete;
-
-    @ColumnInfo(name = "observacoes")
-    private String observacoes;
-
-    public Frete(TipoTransporte tipoTransporte, int distanciaKm, double valorCalculado) {
-        this.tipoTransporte = tipoTransporte;
-        this.distanciaKm = distanciaKm;
-        this.valorCalculado = valorCalculado;
-        this.dataFrete = System.currentTimeMillis();
+    public Frete(Integer idTipoVeiculoFrete, int kmInicial, int kmFinal, double valor) {
+        this.idTipoVeiculoFrete = idTipoVeiculoFrete;
+        this.kmInicial = kmInicial;
+        this.kmFinal = kmFinal;
+        this.valor = valor;
     }
 
     public long getId() {
@@ -38,43 +36,35 @@ public class Frete {
         this.id = id;
     }
 
-    public TipoTransporte getTipoTransporte() {
-        return tipoTransporte;
+    public Integer getIdTipoVeiculoFrete() {
+        return idTipoVeiculoFrete;
     }
 
-    public void setTipoTransporte(TipoTransporte tipoTransporte) {
-        this.tipoTransporte = tipoTransporte;
+    public void setIdTipoVeiculoFrete(Integer idTipoVeiculoFrete) {
+        this.idTipoVeiculoFrete = idTipoVeiculoFrete;
     }
 
-    public int getDistanciaKm() {
-        return distanciaKm;
+    public int getKmInicial() {
+        return kmInicial;
     }
 
-    public void setDistanciaKm(int distanciaKm) {
-        this.distanciaKm = distanciaKm;
+    public void setKmInicial(int kmInicial) {
+        this.kmInicial = kmInicial;
     }
 
-    public double getValorCalculado() {
-        return valorCalculado;
+    public int getKmFinal() {
+        return kmFinal;
     }
 
-    public void setValorCalculado(double valorCalculado) {
-        this.valorCalculado = valorCalculado;
+    public void setKmFinal(int kmFinal) {
+        this.kmFinal = kmFinal;
     }
 
-    public long getDataFrete() {
-        return dataFrete;
+    public double getValor() {
+        return valor;
     }
 
-    public void setDataFrete(long dataFrete) {
-        this.dataFrete = dataFrete;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
+    public void setValor(double valor) {
+        this.valor = valor;
     }
 }
