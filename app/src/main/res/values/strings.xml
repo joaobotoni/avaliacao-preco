@@ -1,24 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">avaliacaoDePreco</string>
-    <string name="greeting">Seja bem vindo a minha tela!</string>
-    <string name="error_value_solicited">Preencher todos os campos!!!</string>
-    <string name="title_calculate">Calcule o valor do bezerro</string>
-    <string name="subtitle_fill_fields">Preencha os campos abaixo</string>
-    <string name="label_arroba_weight">Arroba (kg)</string>
-    <string name="default_arroba_weight">30 kg</string>
-    <string name="hint_arroba_price">Valor da arroba</string>
-    <string name="hint_weight">Peso do bezerro</string>
-    <string name="hint_percentage">Percentual de ágio</string>
-    <string name="button_calculate">Calcular Valor</string>
-    <string name="label_result">Valor do Bezerro</string>
-    <string name="prefix_currency">R$ </string>
-    <string name="prefix_weight">Kg </string>
-    <string name="prefix_percentage">% </string>
-    <string name="title_analysis">Análise</string>
-    <string name="hint_proposed_value">Valor Proposto</string>
-    <string name="label_var_percentage">Variação Percentual %</string>
-    <string name="title_frete">Calcular o frete</string>
-    <string name="label_city">Cidade de destino</string>
-    <string name="label_qtd_km">Distância em KM</string>
-    <string name="label_qtd_animal">Quantidade de animais</string>
+
+    <string name="app_name">Calculadora de Gado</string>
+
+    <string name="title_calculo_valor">Calcular Valor</string>
+    <string name="title_calculo_frete">Calcular Frete</string>
+    <string name="title_recomendacao_transporte">Recomendação de Transporte</string>
+
+    <string name="subtitle_preencha_campos">Preencha os campos abaixo</string>
+
+    <string name="label_categoria_animal">Categoria do Animal</string>
+    <string name="label_preco_arroba">Preço da Arroba</string>
+    <string name="label_percentual_agio">Percentual de Ágio (%)</string>
+    <string name="label_quantidade_animais">Quantidade de Animais</string>
+    <string name="label_peso_animal">Peso do Animal (kg)</string>
+    <string name="label_distancia_km">Distância (km)</string>
+
+    <string name="placeholder_preco">0,00</string>
+    <string name="placeholder_percentual">0,00</string>
+    <string name="placeholder_quantidade">0</string>
+    <string name="placeholder_peso">0,00</string>
+    <string name="placeholder_distancia">0</string>
+
+    <string name="resultado_valor_por_cabeca">Valor por Cabeça</string>
+    <string name="resultado_valor_total">Valor Total</string>
+    <string name="resultado_tipo_transporte">Tipo de Transporte</string>
+    <string name="resultado_distancia">Distância</string>
+    <string name="resultado_valor_frete">Valor do Frete</string>
+
+    <string name="recomendacao_transporte">Recomendação de Transporte</string>
+    <string name="recomendado_para">Recomendado para</string>
+    <string name="animais_suffix">animais</string>
+    <string name="bois_suffix">bois</string>
+    <string name="vacas_suffix">vacas</string>
+    <string name="bezerros_suffix">bezerros</string>
+
+    <string name="categoria_bezerro">Bezerro</string>
+    <string name="categoria_garrote">Garrote</string>
+    <string name="categoria_novilho">Novilho</string>
+    <string name="categoria_boi_gordo">Boi Gordo</string>
+    <string name="categoria_vaca_gorda">Vaca Gorda</string>
+    <string name="categoria_touro">Touro</string>
+
+    <string name="transporte_truck">TRUCK - Caminhão Truck</string>
+    <string name="transporte_carreta_baixa">CARRETA BAIXA - 2 eixos</string>
+    <string name="transporte_carreta_alta">CARRETA ALTA - 3 eixos</string>
+    <string name="transporte_bitrem">BITREM - 9 eixos</string>
+
+    <string name="btn_calcular">Calcular</string>
+    <string name="btn_limpar">Limpar</string>
+    <string name="btn_analisar">Analisar Proposta</string>
+
+    <string name="prefix_moeda">R$ </string>
+    <string name="suffix_km"> km</string>
+    <string name="suffix_porcentagem">%</string>
+
+    <string name="erro_campo_vazio">Preencha todos os campos obrigatórios</string>
+    <string name="erro_valor_invalido">Digite um valor válido</string>
+    <string name="erro_calculo">Erro ao realizar cálculo</string>
+    <string name="sucesso_calculo">Cálculo realizado com sucesso!</string>
+    <string name="info_sem_recomendacao">Selecione a categoria para ver a recomendação</string>
+
+    <string name="formato_moeda">R$ %s</string>
+    <string name="formato_moeda_sem_simbolo">%s</string>
+    <string name="formato_porcentagem">%s%%</string>
+    <string name="formato_distancia">%s km</string>
+    <string name="formato_peso">%.2f kg</string>
+    <string name="formato_quantidade">%d animais</string>
+
+    <string name="desc_icone_info">Informação sobre recomendação de transporte</string>
+    <string name="desc_botao_calcular">Botão para calcular valor e frete</string>
 </resources>

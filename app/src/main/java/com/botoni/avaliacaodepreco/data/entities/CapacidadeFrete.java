@@ -9,51 +9,62 @@ public class CapacidadeFrete {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_capacidade_frete")
-    private long id;
+    private Long id;
+    @ColumnInfo(name = "id_categoria_frete")
+    private Long idCategoriaFrete;
     @ColumnInfo(name = "id_tipo_veiculo_frete")
-    private Integer idTipoVeiculoFrete;
+    private Long idTipoVeiculoFrete;
     @ColumnInfo(name = "qtde_inicial")
-    private Double qtdeInicial;
+    private Integer qtdeInicial;
     @ColumnInfo(name = "qtde_final")
-    private Double qtdeFinal;
+    private Integer qtdeFinal;
 
     public CapacidadeFrete() {
     }
-    public CapacidadeFrete(Integer idTipoVeiculoFrete, Double qtdeInicial, Double qtdeFinal) {
+
+    public CapacidadeFrete(Long id, Long idCategoriaFrete, Long idTipoVeiculoFrete, Integer qtdeInicial, Integer qtdeFinal) {
+        this.id = id;
+        this.idCategoriaFrete = idCategoriaFrete;
         this.idTipoVeiculoFrete = idTipoVeiculoFrete;
         this.qtdeInicial = qtdeInicial;
         this.qtdeFinal = qtdeFinal;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
+    public Long getIdCategoriaFrete() {
+        return idCategoriaFrete;
+    }
 
-    public Integer getIdTipoVeiculoFrete() {
+    public void setIdCategoriaFrete(Long idCategoriaFrete) {
+        this.idCategoriaFrete = idCategoriaFrete;
+    }
+    public Long getIdTipoVeiculoFrete() {
         return idTipoVeiculoFrete;
     }
 
-    public void setIdTipoVeiculoFrete(Integer idTipoVeiculoFrete) {
+    public void setIdTipoVeiculoFrete(Long idTipoVeiculoFrete) {
         this.idTipoVeiculoFrete = idTipoVeiculoFrete;
     }
 
-    public Double getQtdeInicial() {
+    public Integer getQtdeInicial() {
         return qtdeInicial;
     }
 
-    public void setQtdeInicial(Double qtdeInicial) {
+    public void setQtdeInicial(Integer qtdeInicial) {
         this.qtdeInicial = qtdeInicial;
     }
 
-    public Double getQtdeFinal() {
+    public Integer getQtdeFinal() {
         return qtdeFinal;
     }
 
-    public void setQtdeFinal(Double qtdeFinal) {
+    public void setQtdeFinal(Integer qtdeFinal) {
         this.qtdeFinal = qtdeFinal;
     }
 }

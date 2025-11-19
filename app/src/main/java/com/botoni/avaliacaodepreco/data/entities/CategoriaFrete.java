@@ -2,13 +2,15 @@ package com.botoni.avaliacaodepreco.data.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "xgp_categoria_frete")
+
 public class CategoriaFrete {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_categoria_frete")
-    private Integer id;
+    private Long id;
     @ColumnInfo(name = "descricao")
     private String descricao;
 
@@ -19,11 +21,11 @@ public class CategoriaFrete {
         this.descricao = descricao;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

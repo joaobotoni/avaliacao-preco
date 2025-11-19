@@ -8,55 +8,55 @@ import androidx.room.PrimaryKey;
 public class Frete {
     @ColumnInfo(name = "id_frete")
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    private Long id;
     @ColumnInfo(name = "id_tipo_veiculo_frete")
-    private Integer idTipoVeiculoFrete;
+    private Long idTipoVeiculoFrete;
     @ColumnInfo(name = "km_inicial")
-    private int kmInicial;
+    private double kmInicial;
     @ColumnInfo(name = "km_final")
-    private int kmFinal;
+    private double kmFinal;
     @ColumnInfo(name = "valor")
     private double valor;
 
     public Frete() {
     }
 
-    public Frete(Integer idTipoVeiculoFrete, int kmInicial, int kmFinal, double valor) {
+    public Frete(Long idTipoVeiculoFrete, double kmInicial, double kmFinal, double valor) {
         this.idTipoVeiculoFrete = idTipoVeiculoFrete;
         this.kmInicial = kmInicial;
         this.kmFinal = kmFinal;
         this.valor = valor;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Integer getIdTipoVeiculoFrete() {
+    public Long getIdTipoVeiculoFrete() {
         return idTipoVeiculoFrete;
     }
 
-    public void setIdTipoVeiculoFrete(Integer idTipoVeiculoFrete) {
+    public void setIdTipoVeiculoFrete(Long idTipoVeiculoFrete) {
         this.idTipoVeiculoFrete = idTipoVeiculoFrete;
     }
 
-    public int getKmInicial() {
+    public double getKmInicial() {
         return kmInicial;
     }
 
-    public void setKmInicial(int kmInicial) {
+    public void setKmInicial(double kmInicial) {
         this.kmInicial = kmInicial;
     }
 
-    public int getKmFinal() {
+    public double getKmFinal() {
         return kmFinal;
     }
 
-    public void setKmFinal(int kmFinal) {
+    public void setKmFinal(double kmFinal) {
         this.kmFinal = kmFinal;
     }
 
