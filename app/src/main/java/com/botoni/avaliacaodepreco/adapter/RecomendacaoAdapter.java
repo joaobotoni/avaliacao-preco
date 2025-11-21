@@ -36,6 +36,7 @@ public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapte
     public int getItemCount() {
         return recomendacoes.size();
     }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView quantidade;
         private TextView tipoTransporte;
@@ -47,8 +48,8 @@ public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapte
         }
 
         public void bind(Recomendacao recomendacao) {
-           quantidade.setText(recomendacao.getQtdeRecomendada());
-           quantidade.setText(recomendacao.getTipoTransporte());
+            quantidade.setText(String.valueOf(recomendacao.getQtdeRecomendada()));
+            tipoTransporte.setText(recomendacao.getTipoTransporte());
         }
     }
 }

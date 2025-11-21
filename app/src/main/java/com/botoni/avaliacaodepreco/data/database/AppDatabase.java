@@ -89,22 +89,22 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static void populateCapacidadeFrete(SupportSQLiteDatabase db) {
         //CAPACIDADE DE BOIS
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (1,1,1,18)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (1,2,19,26)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (1,3,27,36)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (1,4,37,45)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (1,1,1,18)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (1,2,19,26)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (1,3,27,36)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (1,4,37,45)");
 
         //CAPACIDADE DE VACAS
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (2,1,1,20)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (2,2,21,28)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (2,3,29,38)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (2,4,39,50)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final)VALUES (2,1,1,20)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (2,2,21,28)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (2,3,29,38)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (2,4,39,50)");
 
         //CAPACIDADE DE BEZERROS
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (3,1,1,38)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (3,2,39,55)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (3,3,56,75)");
-        db.execSQL("INSERT INTO xgp_capacidade_frete VALUES (3,4,76,110)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (3,1,1,38)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (3,2,39,55)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (3,3,56,75)");
+        db.execSQL("INSERT INTO xgp_capacidade_frete(id_categoria_frete, id_tipo_veiculo_frete, qtde_icnial, qtde_final) VALUES (3,4,76,110)");
     }
 
     private static void populateFrete(SupportSQLiteDatabase db) {

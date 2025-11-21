@@ -20,7 +20,7 @@ public interface CapacidadeFreteDao {
     @Query("SELECT * FROM xgp_capacidade_frete WHERE id_capacidade_frete = :id")
     CapacidadeFrete findById(long id);
 
-    @Query("SELECT * FROM xgp_capacidade_frete WHERE id_categoria_frete = :id_categoria_frete")
+    @Query("SELECT * FROM xgp_capacidade_frete WHERE id_categoria_frete = :id_categoria_frete ORDER BY qtde_final DESC")
     List<CapacidadeFrete> findByCategoria(long id_categoria_frete);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
