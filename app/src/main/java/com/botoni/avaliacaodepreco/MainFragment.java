@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.botoni.avaliacaodepreco.data.database.AppDatabase;
 import com.botoni.avaliacaodepreco.data.entities.CapacidadeFrete;
+import com.botoni.avaliacaodepreco.data.entities.Frete;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -56,6 +57,7 @@ public class MainFragment extends Fragment {
     private static final int ESCALA_CALCULO = 15;
     private static final int ESCALA_RESULTADO = 2;
     private static final RoundingMode MODO_ARREDONDAMENTO = RoundingMode.HALF_EVEN;
+
 
     // ========== CONSTANTES DE FORMATAÇÃO ==========
     private static final DecimalFormatSymbols SIMBOLOS_BRASILEIROS = new DecimalFormatSymbols(new Locale("pt", "BR"));
@@ -149,7 +151,6 @@ public class MainFragment extends Fragment {
         campoDistanciaKm = raiz.findViewById(R.id.et_distancia_km);
 
         cardResultadoFrete = raiz.findViewById(R.id.card_resultado_frete);
-        textoTipoTransporteFrete = raiz.findViewById(R.id.tv_tipo_transporte);
         textoDistanciaFrete = raiz.findViewById(R.id.tv_distancia_frete);
         textoValorFrete = raiz.findViewById(R.id.tv_valor_frete);
 
@@ -323,7 +324,6 @@ public class MainFragment extends Fragment {
                         .findFirst()
                         .orElse("Desconhecido");
     }
-
     private boolean possuiTodosCamposBezerroPreenchidos() {
         return estaCampoPreenchido(camposPesoBezerro)
                 && estaCampoPreenchido(campoPercentualAgio)

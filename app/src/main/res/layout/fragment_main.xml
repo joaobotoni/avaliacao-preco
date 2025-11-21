@@ -482,40 +482,6 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/tv_label_tipo_transporte"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/resultado_tipo_transporte"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_tipo_transporte"
-                        app:layout_constraintTop_toTopOf="@id/tv_tipo_transporte"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_tipo_transporte" />
-
-                    <TextView
-                        android:id="@+id/tv_tipo_transporte"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textSize="14sp"
-                        android:textColor="#1D1D1F"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="TRUCK" />
-
-                    <View
-                        android:id="@+id/divider_frete_1"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="16dp"
-                        android:background="#E5E5EA"
-                        app:layout_constraintTop_toBottomOf="@id/tv_tipo_transporte"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <TextView
                         android:id="@+id/tv_label_distancia"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -536,7 +502,6 @@
                         android:layout_marginTop="16dp"
                         android:textSize="14sp"
                         android:textColor="#1D1D1F"
-                        app:layout_constraintTop_toBottomOf="@id/divider_frete_1"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:text="150 km" />
 

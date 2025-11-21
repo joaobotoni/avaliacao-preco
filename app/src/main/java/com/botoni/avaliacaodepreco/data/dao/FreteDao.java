@@ -17,6 +17,8 @@ public interface FreteDao {
     List<Frete> getAll();
     @Query("SELECT * FROM xgp_frete WHERE id_frete = :id LIMIT 1")
     Frete findById(long id);
+    @Query("SELECT * FROM xgp_frete WHERE :range BETWEEN km_inicial AND km_final")
+    Frete findByValueInRange(double range);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(Frete frete);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
