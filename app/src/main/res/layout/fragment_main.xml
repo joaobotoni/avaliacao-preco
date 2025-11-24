@@ -228,17 +228,17 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
             <!-- Card Resultado Valor -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_resultado"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:visibility="gone" tools:visibility="visible"
+                android:visibility="gone"
+                tools:visibility="visible"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
+                app:cardElevation="4dp"
                 app:strokeWidth="0dp"
                 app:layout_constraintTop_toBottomOf="@id/card_container"
                 app:layout_constraintStart_toStartOf="parent"
@@ -247,69 +247,186 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:id="@+id/tv_label_valor_cabeca"
+                    <!-- Container para Valor Cabeça e Valor KG lado a lado -->
+                    <LinearLayout
+                        android:id="@+id/container_valores"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/resultado_valor_por_cabeca"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_valor_cabeca"
-                        app:layout_constraintTop_toTopOf="@id/tv_valor_cabeca"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_valor_cabeca" />
-
-                    <TextView
-                        android:id="@+id/tv_valor_cabeca"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textSize="18sp"
-                        android:textColor="#000000"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="4dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="R$ 1.850,00" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
 
+                        <!-- Card para Label e Valor Cabeça -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_valor_cabeca"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardBackgroundColor="#E3F2FD"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="#90CAF9"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:id="@+id/tv_label_valor_cabeca"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Valor Cabeça"
+                                    android:textSize="11sp"
+                                    android:textColor="#64B5F6"
+                                    android:textStyle="bold"
+                                    android:letterSpacing="0.05"/>
+
+                                <TextView
+                                    android:id="@+id/tv_valor_cabeca"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="R$ 2.500,00"
+                                    android:textSize="18sp"
+                                    android:textColor="#1976D2"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="6dp"/>
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Card para Valor por KG -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_valor_kg"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardBackgroundColor="#E3F2FD"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="#90CAF9"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:id="@+id/tv_label_valor_kg"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Valor por KG"
+                                    android:textSize="11sp"
+                                    android:textColor="#64B5F6"
+                                    android:textStyle="bold"
+                                    android:letterSpacing="0.05"/>
+
+                                <TextView
+                                    android:id="@+id/tv_valor_kg"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="R$ 15,50/kg"
+                                    android:textSize="18sp"
+                                    android:textColor="#1976D2"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="6dp"/>
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                    <!-- Divisor -->
                     <View
                         android:id="@+id/divider_resultado"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_marginTop="16dp"
-                        android:background="#E5E5EA"
-                        app:layout_constraintTop_toBottomOf="@id/tv_valor_cabeca"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        app:layout_constraintTop_toBottomOf="@id/container_valores"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
-                    <TextView
-                        android:id="@+id/tv_label_valor_total"
+                    <!-- Card do Valor Total -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_valor_total"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/resultado_valor_total"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_valor_total"
-                        app:layout_constraintTop_toTopOf="@id/tv_valor_total"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_valor_total" />
-
-                    <TextView
-                        android:id="@+id/tv_valor_total"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:textSize="18sp"
-                        android:textColor="#2E7D32"
+                        app:cardBackgroundColor="#E8F5E9"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#81C784"
+                        app:strokeWidth="1dp"
                         app:layout_constraintTop_toBottomOf="@id/divider_resultado"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="R$ 2.657,14" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/icon_valor_total"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money"
+                                android:tint="#4CAF50"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <TextView
+                                android:id="@+id/tv_label_valor_total"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="Valor Total"
+                                android:textSize="14sp"
+                                android:textColor="#66BB6A"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.03"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="16dp"
+                                app:layout_constraintStart_toEndOf="@id/icon_valor_total"
+                                app:layout_constraintEnd_toStartOf="@id/tv_valor_total"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_valor_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="20sp"
+                                android:textColor="#2E7D32"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                tools:text="R$ 2.657,14" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
             </com.google.android.material.card.MaterialCardView>
+            //
 
             <!-- Card Frete -->
             <com.google.android.material.card.MaterialCardView

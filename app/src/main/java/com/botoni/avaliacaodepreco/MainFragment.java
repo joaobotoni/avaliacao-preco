@@ -1,49 +1,50 @@
 package com.botoni.avaliacaodepreco;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
-import com.botoni.avaliacaodepreco.data.database.AppDatabase;
-import com.botoni.avaliacaodepreco.data.entities.CapacidadeFrete;
-import com.botoni.avaliacaodepreco.data.entities.Frete;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.botoni.avaliacaodepreco.adapter.RecomendacaoAdapter;
+import com.botoni.avaliacaodepreco.data.database.AppDatabase;
+import com.botoni.avaliacaodepreco.data.entities.CapacidadeFrete;
 import com.botoni.avaliacaodepreco.data.entities.CategoriaFrete;
 import com.botoni.avaliacaodepreco.data.entities.Recomendacao;
 import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
-
-import android.widget.ArrayAdapter;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment {
 
@@ -57,6 +58,7 @@ public class MainFragment extends Fragment {
     private static final int ESCALA_CALCULO = 15;
     private static final int ESCALA_RESULTADO = 2;
     private static final RoundingMode MODO_ARREDONDAMENTO = RoundingMode.HALF_EVEN;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
 
     // ========== CONSTANTES DE FORMATAÇÃO ==========
@@ -70,6 +72,7 @@ public class MainFragment extends Fragment {
     private EditText campoQuantidade;
     private Button botaoCalcular;
     private TextView textoValorBezerro;
+    private TextView textoValorPorKg;
     private TextView textoValorTotal;
     private CardView cardResultado;
 
@@ -122,15 +125,16 @@ public class MainFragment extends Fragment {
         executor.shutdown();
     }
 
-    // ========== INICIALIZAÇÃO ==========
+    // ========== INICIALIZAÇÃO ========
 
     private void inicializarComponentes(@NonNull View view) {
         database = AppDatabase.getDatabase(requireContext());
         vincularViewsBezerro(view);
         vincularViewsFrete(view);
         vincularViewsRecomendacao(view);
-        configurarRecyclerView();
         carregarDados();
+        configurarRecyclerView();
+        dialogPermission();
     }
 
     private void vincularViewsBezerro(@NonNull View raiz) {
@@ -143,6 +147,7 @@ public class MainFragment extends Fragment {
         cardResultado = raiz.findViewById(R.id.card_resultado);
         textoValorBezerro = raiz.findViewById(R.id.tv_valor_cabeca);
         textoValorTotal = raiz.findViewById(R.id.tv_valor_total);
+        textoValorPorKg = raiz.findViewById(R.id.tv_valor_kg);
     }
 
     private void vincularViewsFrete(@NonNull View raiz) {
@@ -228,26 +233,27 @@ public class MainFragment extends Fragment {
         Integer qtd = converterParaInt(campoQuantidade);
         if (qtd == null || qtd <= 0) return;
 
-        List<Recomendacao> lista = calcularRecomendacaoInteligente(qtd, categoriaAtual.getId());
+        List<Recomendacao> lista = calcularRecomendacao(qtd, categoriaAtual.getId());
         if (lista.isEmpty()) {
             textoMotivoRecomendacao.setText(String.format(Locale.getDefault(),
                     "Nenhuma recomendação encontrada para %d %s.", qtd, categoriaAtual.getDescricao().toLowerCase()));
             textoMotivoRecomendacao.setVisibility(View.VISIBLE);
+            mostrarView(cardRecomendacaoTransporte);
             return;
         }
 
         listaRecomendacoes.setAdapter(new RecomendacaoAdapter(lista));
         int totalVeiculos = lista.stream().mapToInt(Recomendacao::getQtdeRecomendada).sum();
-        String msg = String.format(Locale.getDefault(),
-                "Para %d %s, requer %d veículo(s).", qtd,
-                categoriaAtual.getDescricao().toLowerCase(), totalVeiculos);
+        String msg = String.format(Locale.getDefault(), "Para %d %s(s), requer %d veículo(s).", qtd,
+                categoriaAtual.getDescricao().substring(0, 1).toUpperCase()
+                        .concat(categoriaAtual.getDescricao().substring(1)), totalVeiculos);
 
         textoMotivoRecomendacao.setText(msg);
         textoMotivoRecomendacao.setVisibility(View.VISIBLE);
         mostrarView(cardRecomendacaoTransporte);
     }
 
-    private List<Recomendacao> calcularRecomendacaoInteligente(int totalAnimais, Long idCategoria) {
+    private List<Recomendacao> calcularRecomendacao(int totalAnimais, Long idCategoria) {
         if (totalAnimais <= 0 || capacidadesFrete == null || capacidadesFrete.isEmpty()) {
             return new ArrayList<>();
         }
@@ -324,6 +330,7 @@ public class MainFragment extends Fragment {
                         .findFirst()
                         .orElse("Desconhecido");
     }
+
     private boolean possuiTodosCamposBezerroPreenchidos() {
         return estaCampoPreenchido(camposPesoBezerro)
                 && estaCampoPreenchido(campoPercentualAgio)
@@ -348,9 +355,10 @@ public class MainFragment extends Fragment {
             BigDecimal qtd = new BigDecimal(quantidade);
 
             BigDecimal valorBezerro = calcularValorTotalBezerro(pesoKg, precoPorArroba, percentualAgio);
+            BigDecimal valorPorKg  = calcularValorPorKgBezerro(pesoKg, precoPorArroba, percentualAgio);
             BigDecimal valorTotal = valorBezerro.multiply(qtd).setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
 
-            exibirResultadoBezerro(valorBezerro, valorTotal);
+            exibirResultadoBezerro(valorBezerro, valorTotal, valorPorKg);
         } catch (NumberFormatException e) {
             exibirMensagemErro("Valores inválidos");
             ocultarResultadoBezerro();
@@ -369,6 +377,13 @@ public class MainFragment extends Fragment {
     }
 
     // ========== CÁLCULOS DE BEZERRO ==========
+
+
+    private BigDecimal calcularValorPorKgBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+        return calcularValorTotalBezerro(pesoKg, precoPorArroba, percentualAgio)
+                .divide(converterKgParaArrobas(pesoKg), ESCALA_CALCULO, MODO_ARREDONDAMENTO)
+                .divide(new BigDecimal(30), ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    }
 
     private BigDecimal calcularValorTotalBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
         BigDecimal valorBase = calcularValorBasePorPeso(pesoKg, precoPorArroba);
@@ -510,11 +525,12 @@ public class MainFragment extends Fragment {
 
     // ========== EXIBIÇÃO DE RESULTADOS ==========
 
-    private void exibirResultadoBezerro(BigDecimal valorBezerro, BigDecimal valorTotal) {
+    private void exibirResultadoBezerro(BigDecimal valorBezerro, BigDecimal valorTotal, BigDecimal valorPorKg) {
         valorBezerroCalculado = valorBezerro;
         valorTotalCalculado = valorTotal;
         textoValorBezerro.setText(formatarMoeda(valorBezerro));
         textoValorTotal.setText(formatarMoeda(valorTotal));
+        textoValorPorKg.setText(formatarMoeda(valorPorKg));
         exibirResultadoBezerro();
     }
 
@@ -578,6 +594,35 @@ public class MainFragment extends Fragment {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private final ActivityResultLauncher<String[]> locationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), callback -> {
+        if (Boolean.FALSE.equals(callback.get(Manifest.permission.ACCESS_FINE_LOCATION))
+                || Boolean.FALSE.equals(callback.get(Manifest.permission.ACCESS_COARSE_LOCATION))) {
+            onPermissionsDenied();
+        }
+    });
+
+    private void dialogPermission() {
+        if (!hasLocationPermissions()) {
+            locationPermissionLauncher.launch(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+        }
+    }
+
+    private void onPermissionsDenied() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage(R.string.permission_denied).setTitle(R.string.permission_denied_title);
+        builder.show();
+    }
+
+    private boolean hasLocationPermissions() {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private static class ObservadorTextoSimples implements TextWatcher {

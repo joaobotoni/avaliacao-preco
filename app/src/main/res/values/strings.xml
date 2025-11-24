@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Calculadora de Gado</string>
+    <string name="app_name">Alguma coisa</string>
 
     <string name="title_calculo_valor">Calcular Valor</string>
     <string name="title_calculo_frete">Calcular Frete</string>
@@ -70,4 +70,7 @@
 
     <string name="desc_icone_info">Informação sobre recomendação de transporte</string>
     <string name="desc_botao_calcular">Botão para calcular valor e frete</string>
+    <string name="permission_denied_title">Permissão de localização</string>
+    <string name="permission_denied">A permissão de localização é obrigatoria</string>
+    <string name="cancel">cancelar</string>
 </resources>
