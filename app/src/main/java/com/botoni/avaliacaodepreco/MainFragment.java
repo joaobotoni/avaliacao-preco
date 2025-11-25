@@ -54,6 +54,7 @@ public class MainFragment extends Fragment {
     private static final BigDecimal PESO_BASE_KG = new BigDecimal("180.0");
     private static final BigDecimal TAXA_FIXA_ABATE = new BigDecimal("69.70");
     private static final BigDecimal TAXA_FUNRURAL = new BigDecimal("0.015");
+    private static final BigDecimal AGIO = new BigDecimal("30");
     private static final BigDecimal CEM = new BigDecimal("100");
     private static final int ESCALA_CALCULO = 15;
     private static final int ESCALA_RESULTADO = 2;
@@ -67,7 +68,6 @@ public class MainFragment extends Fragment {
 
     // ========== VIEWS - BEZERRO ==========
     private EditText camposPesoBezerro;
-    private EditText campoPercentualAgio;
     private EditText campoPrecoArroba;
     private EditText campoQuantidade;
     private Button botaoCalcular;
@@ -139,7 +139,6 @@ public class MainFragment extends Fragment {
 
     private void vincularViewsBezerro(@NonNull View raiz) {
         campoPrecoArroba = raiz.findViewById(R.id.et_preco_arroba);
-        campoPercentualAgio = raiz.findViewById(R.id.et_percentual_agio);
         campoQuantidade = raiz.findViewById(R.id.et_quantidade_animais);
         camposPesoBezerro = raiz.findViewById(R.id.et_peso_animal);
         botaoCalcular = raiz.findViewById(R.id.btn_calcular);
@@ -151,14 +150,7 @@ public class MainFragment extends Fragment {
     }
 
     private void vincularViewsFrete(@NonNull View raiz) {
-
         campoTipoTransporte = raiz.findViewById(R.id.actv_categoria_animal);
-        campoDistanciaKm = raiz.findViewById(R.id.et_distancia_km);
-
-        cardResultadoFrete = raiz.findViewById(R.id.card_resultado_frete);
-        textoDistanciaFrete = raiz.findViewById(R.id.tv_distancia_frete);
-        textoValorFrete = raiz.findViewById(R.id.tv_valor_frete);
-
     }
 
     private void vincularViewsRecomendacao(@NonNull View raiz) {
@@ -186,7 +178,6 @@ public class MainFragment extends Fragment {
 
         camposPesoBezerro.addTextChangedListener(observadorCalculoAuto);
         campoPrecoArroba.addTextChangedListener(observadorCalculoAuto);
-        campoPercentualAgio.addTextChangedListener(observadorCalculoAuto);
         campoQuantidade.addTextChangedListener(observadorCalculoAuto);
     }
 
@@ -333,29 +324,27 @@ public class MainFragment extends Fragment {
 
     private boolean possuiTodosCamposBezerroPreenchidos() {
         return estaCampoPreenchido(camposPesoBezerro)
-                && estaCampoPreenchido(campoPercentualAgio)
                 && estaCampoPreenchido(campoPrecoArroba)
                 && estaCampoPreenchido(campoQuantidade);
     }
 
     private void executarCalculoBezerro() {
         String peso = obterTextoDe(camposPesoBezerro);
-        String percentual = obterTextoDe(campoPercentualAgio);
         String precoArroba = obterTextoDe(campoPrecoArroba);
         String quantidade = obterTextoDe(campoQuantidade);
 
-        if (!validarTodosCamposPreenchidos(peso, percentual, precoArroba, quantidade)) {
+        if (!validarTodosCamposPreenchidos(peso, precoArroba, quantidade)) {
             return;
         }
 
         try {
             BigDecimal pesoKg = new BigDecimal(peso);
-            BigDecimal percentualAgio = new BigDecimal(percentual);
+
             BigDecimal precoPorArroba = new BigDecimal(precoArroba);
             BigDecimal qtd = new BigDecimal(quantidade);
 
-            BigDecimal valorBezerro = calcularValorTotalBezerro(pesoKg, precoPorArroba, percentualAgio);
-            BigDecimal valorPorKg  = calcularValorPorKgBezerro(pesoKg, precoPorArroba, percentualAgio);
+            BigDecimal valorBezerro = calcularValorTotalBezerro(pesoKg, precoPorArroba, AGIO);
+            BigDecimal valorPorKg  = calcularValorPorKgBezerro(pesoKg, precoPorArroba, AGIO);
             BigDecimal valorTotal = valorBezerro.multiply(qtd).setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
 
             exibirResultadoBezerro(valorBezerro, valorTotal, valorPorKg);

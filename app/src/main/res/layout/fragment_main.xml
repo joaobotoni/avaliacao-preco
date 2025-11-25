@@ -1,74 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F8FA">
 
     <ScrollView
         android:id="@+id/scroll_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:fillViewport="true"
-        android:scrollbars="none"
-        app:layout_constraintTop_toTopOf="parent"
+        android:overScrollMode="never"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_principal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="32dp">
 
             <!-- Subtítulo -->
             <TextView
                 android:id="@+id/tv_subtitulo"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginTop="0dp"
+                android:contentDescription="@string/subtitle_preencha_campos"
+                android:gravity="center"
+                android:letterSpacing="0.01"
                 android:text="@string/subtitle_preencha_campos"
-                android:textSize="14sp"
-                android:textColor="#86868B"
-                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#546E7A"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Card Principal de Cálculo -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_subtitulo"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/tv_subtitulo"
+                app:strokeColor="#E3F2FD"
+                app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="24dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:id="@+id/tv_titulo_calcular"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="24dp"
-                        android:gravity="center"
+                        android:contentDescription="@string/title_calculo_valor"
+                        android:gravity="start"
+                        android:letterSpacing="0.005"
                         android:text="@string/title_calculo_valor"
-                        android:textSize="18sp"
-                        android:textColor="#1D1D1F"
-                        app:layout_constraintTop_toTopOf="parent"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="#1976D2"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <!-- Categoria do Animal -->
                     <com.google.android.material.textfield.TextInputLayout
@@ -76,18 +84,18 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="20dp"
                         android:hint="@string/label_categoria_animal"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:layout_constraintTop_toBottomOf="@id/tv_titulo_calcular"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="#2196F3"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="#78909C"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/tv_titulo_calcular">
 
                         <AutoCompleteTextView
                             android:id="@+id/actv_categoria_animal"
@@ -95,9 +103,8 @@
                             android:layout_height="wrap_content"
                             android:inputType="none"
                             android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F"
-                            android:importantForAccessibility="yes" />
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="#263238" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Preço da Arroba -->
@@ -106,22 +113,20 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="16dp"
                         android:hint="@string/label_preco_arroba"
-                        app:placeholderText="@string/placeholder_preco"
-                        app:placeholderTextColor="#C7C7CC"
-                        app:prefixText="@string/prefix_moeda"
-                        app:prefixTextColor="#C7C7CC"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/til_categoria_animal"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="#2196F3"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="#78909C"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/til_categoria_animal"
+                        app:placeholderText="0,00"
+                        app:placeholderTextColor="#B0BEC5">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_preco_arroba"
@@ -129,61 +134,30 @@
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
                             android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F" />
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="#263238" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Percentual de Ágio -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_percentual_agio"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:hint="@string/label_percentual_agio"
-                        app:placeholderText="@string/placeholder_percentual"
-                        app:placeholderTextColor="#C7C7CC"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/til_preco_arroba"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_percentual_agio"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Quantidade de Animais -->
+                    <!-- Quantidade -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_quantidade_animais"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="16dp"
                         android:hint="@string/label_quantidade_animais"
-                        app:placeholderText="@string/placeholder_quantidade"
-                        app:placeholderTextColor="#C7C7CC"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/til_percentual_agio"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="#2196F3"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="#78909C"
+                        app:placeholderText="0"
+                        app:placeholderTextColor="#B0BEC5"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/til_preco_arroba">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_quantidade_animais"
@@ -191,30 +165,30 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F" />
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="#263238" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Peso do Animal -->
+                    <!-- Peso -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_peso_animal"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginTop="16dp"
                         android:hint="@string/label_peso_animal"
-                        app:placeholderText="@string/placeholder_peso"
-                        app:placeholderTextColor="#C7C7CC"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/til_quantidade_animais"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="#2196F3"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="#78909C"
+                        app:placeholderText="150 kg"
+                        app:placeholderTextColor="#B0BEC5"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/til_quantidade_animais">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_peso_animal"
@@ -222,159 +196,240 @@
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
                             android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F" />
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="#263238" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Card Resultado Valor -->
+
+            <!-- Card Resultado -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_resultado"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:visibility="gone"
-                tools:visibility="visible"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp"
-                app:layout_constraintTop_toBottomOf="@id/card_container"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/card_container"
+                app:strokeColor="#E3F2FD"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="20dp">
 
-                    <!-- Container para Valor Cabeça e Valor KG lado a lado -->
                     <LinearLayout
                         android:id="@+id/container_valores"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:baselineAligned="false"
                         android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_marginBottom="4dp"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <!-- Card para Label e Valor Cabeça -->
+                        <!-- Resultado Cabeça -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_valor_cabeca"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="12dp"
                             android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
                             app:cardBackgroundColor="#E3F2FD"
-                            app:cardCornerRadius="12dp"
+                            app:cardCornerRadius="16dp"
                             app:cardElevation="0dp"
-                            app:strokeColor="#90CAF9"
-                            app:strokeWidth="1dp">
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:gravity="center">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:id="@+id/tv_label_valor_cabeca"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Valor Cabeça"
-                                    android:textSize="11sp"
-                                    android:textColor="#64B5F6"
-                                    android:textStyle="bold"
-                                    android:letterSpacing="0.05"/>
+                                    android:contentDescription="@string/valor_cabeca"
+                                    android:letterSpacing="0.02"
+                                    android:text="@string/valor_cabeca"
+                                    android:textAppearance="?attr/textAppearanceBodySmall"
+                                    android:textColor="#546E7A" />
 
                                 <TextView
                                     android:id="@+id/tv_valor_cabeca"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="R$ 2.500,00"
-                                    android:textSize="18sp"
+                                    android:layout_marginTop="6dp"
+                                    android:textAppearance="?attr/textAppearanceTitleLarge"
                                     android:textColor="#1976D2"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="6dp"/>
-
+                                    tools:text="R$ 2.500,00" />
                             </LinearLayout>
-
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Card para Valor por KG -->
+                        <!-- Resultado KG -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_valor_kg"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:layout_marginStart="6dp"
                             app:cardBackgroundColor="#E3F2FD"
-                            app:cardCornerRadius="12dp"
+                            app:cardCornerRadius="16dp"
                             app:cardElevation="0dp"
-                            app:strokeColor="#90CAF9"
-                            app:strokeWidth="1dp">
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:gravity="center">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:id="@+id/tv_label_valor_kg"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Valor por KG"
-                                    android:textSize="11sp"
-                                    android:textColor="#64B5F6"
-                                    android:textStyle="bold"
-                                    android:letterSpacing="0.05"/>
+                                    android:contentDescription="@string/valor_por_kg"
+                                    android:letterSpacing="0.02"
+                                    android:text="@string/valor_por_kg"
+                                    android:textAppearance="?attr/textAppearanceBodySmall"
+                                    android:textColor="#546E7A" />
 
                                 <TextView
                                     android:id="@+id/tv_valor_kg"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="R$ 15,50/kg"
-                                    android:textSize="18sp"
+                                    android:layout_marginTop="6dp"
+                                    android:textAppearance="?attr/textAppearanceTitleLarge"
                                     android:textColor="#1976D2"
                                     android:textStyle="bold"
-                                    android:layout_marginTop="6dp"/>
-
+                                    tools:text="R$ 15,50" />
                             </LinearLayout>
-
                         </com.google.android.material.card.MaterialCardView>
-
                     </LinearLayout>
 
-                    <!-- Divisor -->
-                    <View
-                        android:id="@+id/divider_resultado"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="20dp"
-                        app:layout_constraintTop_toBottomOf="@id/container_valores"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <!-- Card do Valor Total -->
+                    <!-- Resultado Total -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_valor_total"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:cardBackgroundColor="#E8F5E9"
-                        app:cardCornerRadius="12dp"
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="#2196F3"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
-                        app:strokeColor="#81C784"
-                        app:strokeWidth="1dp"
-                        app:layout_constraintTop_toBottomOf="@id/divider_resultado"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/container_valores"
+                        app:strokeWidth="0dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="20dp">
+
+                            <ImageView
+                                android:id="@+id/icon_valor_total"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@drawable/ic_attach_money"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:tint="#FFFFFF" />
+
+                            <TextView
+                                android:id="@+id/tv_label_valor_total"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="16dp"
+                                android:contentDescription="@string/valor_total_estimado"
+                                android:text="@string/valor_total_estimado"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="#FFFFFF"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/tv_valor_total"
+                                app:layout_constraintStart_toEndOf="@id/icon_valor_total"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_valor_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?attr/textAppearanceTitleLarge"
+                                android:textColor="#FFFFFF"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="R$ 2.657,14" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card Frete -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_frete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_resultado"
+                app:strokeColor="#E3F2FD"
+                app:strokeWidth="1dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tv_titulo_frete"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/title_calculo_frete"
+                        android:gravity="start"
+                        android:letterSpacing="0.005"
+                        android:text="@string/title_calculo_frete"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="#1976D2"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <!-- Card Recomendação -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_recomendacao_transporte"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="#E3F2FD"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_titulo_frete"
+                        app:strokeWidth="0dp"
+                        tools:visibility="visible">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -382,281 +437,58 @@
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/icon_valor_total"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_attach_money"
-                                android:tint="#4CAF50"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                            <TextView
-                                android:id="@+id/tv_label_valor_total"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="Valor Total"
-                                android:textSize="14sp"
-                                android:textColor="#66BB6A"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.03"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="16dp"
-                                app:layout_constraintStart_toEndOf="@id/icon_valor_total"
-                                app:layout_constraintEnd_toStartOf="@id/tv_valor_total"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent" />
-
-                            <TextView
-                                android:id="@+id/tv_valor_total"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="20sp"
-                                android:textColor="#2E7D32"
-                                android:textStyle="bold"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                tools:text="R$ 2.657,14" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-            //
-
-            <!-- Card Frete -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_frete"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:layout_constraintTop_toBottomOf="@id/card_resultado"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="24dp">
-
-                    <TextView
-                        android:id="@+id/tv_titulo_frete"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/title_calculo_frete"
-                        android:textSize="18sp"
-                        android:textColor="#1D1D1F"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <!-- card_recomendacao_transporte.xml -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_recomendacao_transporte"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:visibility="gone"
-                        tools:visibility="visible"
-                        app:cardBackgroundColor="#E9F3FE"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="#D0E2FF"
-                        app:layout_constraintTop_toBottomOf="@id/tv_titulo_frete"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp">
-
-                            <!-- Cabeçalho alinhado e suave -->
-                            <ImageView
                                 android:id="@+id/iv_icone_info"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:src="@drawable/ic_info"
-                                app:tint="#1976D2"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:tint="#2196F3" />
 
                             <TextView
                                 android:id="@+id/tv_cabecalho_recomendacao"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="6dp"
+                                android:layout_marginStart="10dp"
+                                android:contentDescription="@string/recomendacao_transporte"
                                 android:text="@string/recomendacao_transporte"
-                                android:textSize="13sp"
+                                android:textAppearance="?attr/textAppearanceTitleSmall"
                                 android:textColor="#1976D2"
                                 android:textStyle="bold"
-                                android:includeFontPadding="false"
-                                app:layout_constraintStart_toEndOf="@id/iv_icone_info"
-                                app:layout_constraintTop_toTopOf="@id/iv_icone_info"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_icone_info"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintBottom_toBottomOf="@id/iv_icone_info"/>
+                                app:layout_constraintStart_toEndOf="@id/iv_icone_info"
+                                app:layout_constraintTop_toTopOf="@id/iv_icone_info" />
 
-                            <!-- Lista minimalista -->
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/rv_recomendacoes_transporte"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="12dp"
                                 android:nestedScrollingEnabled="false"
                                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                                app:layout_constraintTop_toBottomOf="@id/tv_cabecalho_recomendacao"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                tools:itemCount="3"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/tv_cabecalho_recomendacao"
+                                tools:itemCount="1"
                                 tools:listitem="@layout/item_recomendacao" />
 
-                            <!-- Motivo opcional com estilo -->
                             <TextView
                                 android:id="@+id/tv_motivo_recomendacao"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
-                                android:textSize="13sp"
-                                android:textColor="#455A64"
-                                android:lineSpacingExtra="2dp"
+                                android:lineSpacingExtra="3dp"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="#546E7A"
                                 android:visibility="gone"
-                                android:includeFontPadding="false"
-                                app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                tools:visibility="visible"
-                                tools:text="Distribuição ideal para 92 bois com menor custo por quilômetro." />
-
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
+                                tools:text="Otimização para redução de custo por km."
+                                tools:visibility="visible" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
-
                     </com.google.android.material.card.MaterialCardView>
-
-
-                    <!-- Distância -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_distancia_km"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:hint="@string/label_distancia_km"
-                        app:placeholderText="@string/placeholder_distancia"
-                        app:placeholderTextColor="#C7C7CC"
-                        app:suffixText="@string/suffix_km"
-                        app:suffixTextColor="#C7C7CC"
-                        app:boxStrokeColor="#007AFF"
-                        app:boxStrokeWidth="1dp"
-                        app:hintTextColor="#007AFF"
-                        app:boxCornerRadiusBottomEnd="14dp"
-                        app:boxCornerRadiusBottomStart="14dp"
-                        app:boxCornerRadiusTopEnd="14dp"
-                        app:boxCornerRadiusTopStart="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/card_recomendacao_transporte"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_distancia_km"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:paddingVertical="14dp"
-                            android:textSize="14sp"
-                            android:textColor="#1D1D1F" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Card Resultado Frete -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_resultado_frete"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone" tools:visibility="visible"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:layout_constraintTop_toBottomOf="@id/card_frete"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/tv_label_distancia"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/resultado_distancia"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_distancia_frete"
-                        app:layout_constraintTop_toTopOf="@id/tv_distancia_frete"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_distancia_frete" />
-
-                    <TextView
-                        android:id="@+id/tv_distancia_frete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:textSize="14sp"
-                        android:textColor="#1D1D1F"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="150 km" />
-
-                    <View
-                        android:id="@+id/divider_frete_2"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="16dp"
-                        android:background="#E5E5EA"
-                        app:layout_constraintTop_toBottomOf="@id/tv_distancia_frete"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_label_valor_frete"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/resultado_valor_frete"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_valor_frete"
-                        app:layout_constraintTop_toTopOf="@id/tv_valor_frete"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_valor_frete" />
-
-                    <TextView
-                        android:id="@+id/tv_valor_frete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:textSize="18sp"
-                        android:textColor="#007AFF"
-                        app:layout_constraintTop_toBottomOf="@id/divider_frete_2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="R$ 1.980,00" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -664,21 +496,23 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_calcular"
                 android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="0dp"
+                android:contentDescription="@string/desc_botao_calcular"
+                android:letterSpacing="0.02"
+                android:minHeight="56dp"
                 android:text="@string/btn_calcular"
-                android:textAllCaps="false"
-                android:textSize="14sp"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textColor="#FFFFFF"
-                app:backgroundTint="#007AFF"
-                app:cornerRadius="14dp"
+                android:textStyle="bold"
+                app:backgroundTint="#2196F3"
+                app:cornerRadius="16dp"
                 app:elevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/card_resultado_frete"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:contentDescription="@string/desc_botao_calcular" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_frete" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

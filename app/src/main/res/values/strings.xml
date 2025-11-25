@@ -51,7 +51,7 @@
     <string name="btn_limpar">Limpar</string>
     <string name="btn_analisar">Analisar Proposta</string>
 
-    <string name="prefix_moeda">R$ </string>
+    <string name="prefix_moeda">R$  </string>
     <string name="suffix_km"> km</string>
     <string name="suffix_porcentagem">%</string>
 
@@ -73,4 +73,7 @@
     <string name="permission_denied_title">Permissão de localização</string>
     <string name="permission_denied">A permissão de localização é obrigatoria</string>
     <string name="cancel">cancelar</string>
+    <string name="valor_total_estimado">Valor Total</string>
+    <string name="valor_cabeca">Valor Cabeça</string>
+    <string name="valor_por_kg">Valor por KG</string>
 </resources>
