@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/container_campos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="?attr/colorPrimary"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="6dp">
+
+            <ImageView
+                android:id="@+id/iv_icone_origem_interno"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="14dp"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/ic_circle"
+                app:tint="?attr/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/et_origem"
+                app:layout_constraintBottom_toBottomOf="@id/et_origem" />
+
+            <EditText
+                android:id="@+id/et_origem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/label_endereco_partida"
+                android:autofillHints="postalAddress|streetAddress"
+                android:importantForAutofill="yes"
+                android:textSize="15sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="14dp"
+                android:paddingVertical="14dp"
+                android:inputType="textPostalAddress"
+                android:imeOptions="actionNext"
+                android:maxLines="1"
+                app:layout_constraintStart_toEndOf="@id/iv_icone_origem_interno"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/linha_separadora"
+                android:layout_width="0dp"
+                android:layout_height="1.5dp"
+                android:layout_marginStart="42dp"
+                android:background="?attr/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_origem" />
+
+            <View
+                android:id="@+id/linha_conectora_interna"
+                android:layout_width="1.5dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="23dp"
+                android:background="?attr/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_icone_origem_interno"
+                app:layout_constraintBottom_toTopOf="@id/iv_icone_destino_interno" />
+
+            <ImageView
+                android:id="@+id/iv_icone_destino_interno"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="14dp"
+                android:src="@drawable/ic_circle"
+                android:contentDescription="@string/todo"
+                app:tint="?attr/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/et_destino"
+                app:layout_constraintBottom_toBottomOf="@id/et_destino" />
+
+            <EditText
+                android:id="@+id/et_destino"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/para_onde"
+                android:autofillHints="postalAddress|streetAddress"
+                android:importantForAutofill="yes"
+                android:textSize="15sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="14dp"
+                android:paddingVertical="14dp"
+                android:inputType="textPostalAddress"
+                android:imeOptions="actionDone"
+                android:maxLines="1"
+                app:layout_constraintStart_toEndOf="@id/iv_icone_destino_interno"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linha_separadora"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

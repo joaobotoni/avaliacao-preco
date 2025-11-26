@@ -1,4 +1,4 @@
-<!-- layout/item_recomendacao_com_quantidade.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,12 +8,11 @@
     android:paddingVertical="8dp"
     android:paddingHorizontal="4dp">
 
-    <!-- Pill da quantidade (MENOR E MAIS CLEAN) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_quantidade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#D6E4FB"
+        app:cardBackgroundColor="?attr/colorPrimaryContainer"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp"
         app:strokeColor="@android:color/transparent"
@@ -25,9 +24,6 @@
             android:id="@+id/tv_quantidade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#1A73E8"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:includeFontPadding="false"
@@ -36,17 +32,12 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Nome do transporte (MENOR E MAIS ESTÉTICO) -->
     <TextView
         android:id="@+id/tv_transporte"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:textColor="#2C2C2E"
         android:includeFontPadding="false"
-        android:letterSpacing="0.01"
         app:layout_constraintStart_toEndOf="@id/card_quantidade"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/card_quantidade"

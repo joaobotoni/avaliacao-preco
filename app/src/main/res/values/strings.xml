@@ -47,7 +47,7 @@
     <string name="transporte_carreta_alta">CARRETA ALTA - 3 eixos</string>
     <string name="transporte_bitrem">BITREM - 9 eixos</string>
 
-    <string name="btn_calcular">Calcular</string>
+    <string name="btn_send">Enviar</string>
     <string name="btn_limpar">Limpar</string>
     <string name="btn_analisar">Analisar Proposta</string>
 
@@ -76,4 +76,34 @@
     <string name="valor_total_estimado">Valor Total</string>
     <string name="valor_cabeca">Valor Cabeça</string>
     <string name="valor_por_kg">Valor por KG</string>
+
+    <!-- Novas strings extraídas de pasted_content.txt -->
+    <string name="placeholder_peso_animal">150 kg</string>
+    <string name="placeholder_preco_arroba">0,00</string>
+    <string name="placeholder_quantidade_animais">0</string>
+    <string name="placeholder_distancia_km">0</string>
+    <string name="info_adicionar_localizacao">Adicione a Localização</string>
+    <string name="info_buscar_localizacao">Toque no botão abaixo para buscar ou selecionar sua localização atual</string>
+    <string name="label_endereco_partida">Digite sua localização</string>
+    <string name="label_endereco_destino">Endereço de Destino</string>
+    <string name="tools_text_endereco_partida">Avenida Modelo, 1234 – Zona Teste</string>
+    <string name="tools_text_endereco_partida_secundario">Praça da República</string>
+    <string name="tools_text_endereco_destino">Rua Alfa, 42 – Setor Beta</string>
+    <string name="tools_text_endereco_destino_secundario">Avenida Verde</string>
+    <string name="tools_text_valor_cabeca">R$ 2.500,00</string>
+    <string name="tools_text_valor_kg">R$ 15,50</string>
+    <string name="tools_text_valor_total">R$ 2.657,14</string>
+    <string name="tools_text_motivo_recomendacao">Otimização para redução de custo por km.</string>
+    <string name="contentDescription"></string>
+    <string name="hint_searchbar">Pesquisar...</string>
+    <string name="titulo_calculo_frete">Cálculo do Frete</string>
+    <string name="label_origem">Origem</string>
+    <string name="label_destino">Destino</string>
+    <string name="label_distancia">Distância</string>
+    <string name="valor_frete">Valor do Frete</string>
+    <string name="valor_final_total">Total</string>
+    <string name="helper_calculo_arroba">1 arroba = 15kg | Valores aproximados</string>
+    <string name="todo">TODO</string>
+    <string name="para_onde">Para onde?</string>
+
 </resources>

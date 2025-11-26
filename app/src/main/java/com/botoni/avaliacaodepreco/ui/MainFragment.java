@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco;
+package com.botoni.avaliacaodepreco.ui;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,12 +25,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.botoni.avaliacaodepreco.adapter.RecomendacaoAdapter;
+import com.botoni.avaliacaodepreco.R;
+import com.botoni.avaliacaodepreco.ui.adapter.RecomendacaoAdapter;
 import com.botoni.avaliacaodepreco.data.database.AppDatabase;
 import com.botoni.avaliacaodepreco.data.entities.CapacidadeFrete;
 import com.botoni.avaliacaodepreco.data.entities.CategoriaFrete;
 import com.botoni.avaliacaodepreco.data.entities.Recomendacao;
 import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -78,20 +82,17 @@ public class MainFragment extends Fragment {
 
     // ========== VIEWS - FRETE ==========
     private AutoCompleteTextView campoTipoTransporte;
-    TextInputEditText campoDistanciaKm;
-    private CardView cardInfoCapacidade;
-    private TextView textoCapacidadeBois;
-    private TextView textoCapacidadeVacas;
-    private TextView textoCapacidadeBezerros;
-    private CardView cardResultadoFrete;
-    TextView textoTipoTransporteFrete;
-    TextView textoDistanciaFrete;
-    TextView textoValorFrete;
+
+    private CardView cardFrete;
 
     // ========== VIEWS - RECOMENDAÇÃO ==========
     private CardView cardRecomendacaoTransporte;
     private RecyclerView listaRecomendacoes;
     private TextView textoMotivoRecomendacao;
+
+    // ========== VIEWS - LOCALIZAÇÃO ==========
+    private FrameLayout bottomSheet;
+    private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
 
     // ========== DEPENDÊNCIAS (Adicionais para Recomendação) ==========
     private List<TipoVeiculoFrete> tiposVeiculo;
@@ -135,28 +136,43 @@ public class MainFragment extends Fragment {
         carregarDados();
         configurarRecyclerView();
         dialogPermission();
+        vincularViewLocalizacao(view);
     }
 
     private void vincularViewsBezerro(@NonNull View raiz) {
         campoPrecoArroba = raiz.findViewById(R.id.et_preco_arroba);
         campoQuantidade = raiz.findViewById(R.id.et_quantidade_animais);
         camposPesoBezerro = raiz.findViewById(R.id.et_peso_animal);
-        botaoCalcular = raiz.findViewById(R.id.btn_calcular);
+        botaoCalcular = raiz.findViewById(R.id.btn_send);
 
         cardResultado = raiz.findViewById(R.id.card_resultado);
         textoValorBezerro = raiz.findViewById(R.id.tv_valor_cabeca);
         textoValorTotal = raiz.findViewById(R.id.tv_valor_total);
         textoValorPorKg = raiz.findViewById(R.id.tv_valor_kg);
+
+
     }
 
     private void vincularViewsFrete(@NonNull View raiz) {
         campoTipoTransporte = raiz.findViewById(R.id.actv_categoria_animal);
+        cardFrete = raiz.findViewById(R.id.card_frete);
+
     }
 
     private void vincularViewsRecomendacao(@NonNull View raiz) {
         cardRecomendacaoTransporte = raiz.findViewById(R.id.card_recomendacao_transporte);
         listaRecomendacoes = raiz.findViewById(R.id.rv_recomendacoes_transporte);
         textoMotivoRecomendacao = raiz.findViewById(R.id.tv_motivo_recomendacao);
+    }
+
+    private void vincularViewLocalizacao(@NonNull View raiz){
+        bottomSheet = raiz.findViewById(R.id.bottom_sheet_padrao);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setHideable(true);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        cardFrete.setOnClickListener(click ->{
+           bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+        });
     }
 
     // ========== SETUP - CÁLCULO DE BEZERRO ==========
@@ -550,22 +566,6 @@ public class MainFragment extends Fragment {
 
     private void ocultarResultadoBezerro() {
         cardResultado.setVisibility(View.GONE);
-    }
-
-    private void exibirResultadoFrete() {
-        cardResultadoFrete.setVisibility(View.VISIBLE);
-    }
-
-    private void ocultarResultadoFrete() {
-        cardResultadoFrete.setVisibility(View.GONE);
-    }
-
-    private void exibirInfoCapacidade() {
-        cardInfoCapacidade.setVisibility(View.VISIBLE);
-    }
-
-    private void ocultarInfoCapacidade() {
-        cardInfoCapacidade.setVisibility(View.GONE);
     }
 
     private void limparResultadoBezerro() {

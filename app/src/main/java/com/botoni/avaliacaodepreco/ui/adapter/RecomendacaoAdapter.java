@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco.adapter;
+package com.botoni.avaliacaodepreco.ui.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
