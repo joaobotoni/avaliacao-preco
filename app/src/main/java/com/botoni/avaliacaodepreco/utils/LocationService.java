@@ -8,17 +8,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-
 public class LocationService {
-
     private final Context context;
     private Geocoder geocoder;
-
     public LocationService(Context context) {
         this.context = context;
         this.geocoder = new Geocoder(context, new Locale("pt", "BR"));
     }
+
     public List<Address> getAddressWithQuery(String query) {
         if (query == null || query.isBlank()) {
             return Collections.emptyList();

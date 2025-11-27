@@ -105,5 +105,6 @@
     <string name="helper_calculo_arroba">1 arroba = 15kg | Valores aproximados</string>
     <string name="todo">TODO</string>
     <string name="para_onde">Para onde?</string>
+    <string name="info_search_location_is_null">Digite para buscar um endereço</string>
 
 </resources>

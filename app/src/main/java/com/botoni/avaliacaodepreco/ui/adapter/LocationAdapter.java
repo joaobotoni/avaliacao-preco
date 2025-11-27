@@ -39,26 +39,19 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvRua;
-        private TextView tvBairro;
         private TextView tvCidade;
         private TextView tvEstado;
-        private TextView tvCep;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRua = itemView.findViewById(R.id.tv_rua);
-            tvBairro = itemView.findViewById(R.id.tv_bairro);
+
             tvCidade = itemView.findViewById(R.id.tv_cidade);
             tvEstado = itemView.findViewById(R.id.tv_estado);
-            tvCep = itemView.findViewById(R.id.tv_cep);
         }
 
         public void bind(Address address){
-            tvRua.setText(address.getThoroughfare());
-            tvBairro.setText(address.getSubLocality());
             tvCidade.setText(address.getLocality());
             tvEstado.setText(address.getAdminArea());
-            tvCep.setText(address.getPostalCode());
         }
     }
 }

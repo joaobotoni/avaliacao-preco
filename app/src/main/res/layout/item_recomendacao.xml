@@ -12,10 +12,9 @@
         android:id="@+id/card_quantidade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorPrimaryContainer"
+        style="?attr/materialCardViewFilledStyle"
         app:cardCornerRadius="10dp"
-        app:cardElevation="0dp"
-        app:strokeColor="@android:color/transparent"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -26,9 +25,8 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
-            android:includeFontPadding="false"
             android:gravity="center"
-            tools:text="10" />
+            tools:text="10"/>
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -37,11 +35,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:includeFontPadding="false"
-        app:layout_constraintStart_toEndOf="@id/card_quantidade"
+        tools:text="Carreta Alta"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/card_quantidade"
         app:layout_constraintTop_toTopOf="@id/card_quantidade"
-        app:layout_constraintBottom_toBottomOf="@id/card_quantidade"
-        tools:text="Carreta Alta" />
+        app:layout_constraintBottom_toBottomOf="@id/card_quantidade" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

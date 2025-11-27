@@ -21,82 +21,32 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="ContentDescription" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tv_cidade"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="14dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="São Paulo"
         app:layout_constraintStart_toEndOf="@id/iv_icone_localizacao"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_rua"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="Rua das Flores"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_bairro"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text=", Jardins"
-            app:layout_constraintBaseline_toBaselineOf="@id/tv_rua"
-            app:layout_constraintStart_toEndOf="@id/tv_rua"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_complemento"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="Apt 45, Bloco B"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_rua"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/tv_cidade"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="São Paulo"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_complemento" />
-
-        <TextView
-            android:id="@+id/tv_estado"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text=" - SP"
-            app:layout_constraintBaseline_toBaselineOf="@id/tv_cidade"
-            app:layout_constraintStart_toEndOf="@id/tv_cidade" />
-
-        <TextView
-            android:id="@+id/tv_cep"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="01445-000"
-            app:layout_constraintBaseline_toBaselineOf="@id/tv_cidade"
-            app:layout_constraintStart_toEndOf="@id/tv_estado"
-            app:layout_constraintEnd_toEndOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_estado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="- SP"
+        app:layout_constraintStart_toEndOf="@id/tv_cidade"
+        app:layout_constraintTop_toTopOf="@id/tv_cidade"
+        app:layout_constraintBottom_toBottomOf="@id/tv_cidade" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
