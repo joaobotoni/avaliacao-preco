@@ -1,7 +1,6 @@
 package com.botoni.avaliacaodepreco.ui.adapter;
 
 import android.location.Address;
-import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     private List<Address> addresses;
-
     public LocationAdapter(List<Address> addresses) {
         this.addresses = addresses;
     }
@@ -41,17 +39,39 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvCidade;
         private TextView tvEstado;
+        private View vSeparador;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvCidade = itemView.findViewById(R.id.tv_cidade);
             tvEstado = itemView.findViewById(R.id.tv_estado);
+            vSeparador = itemView.findViewById(R.id.v_separador);
         }
 
         public void bind(Address address){
-            tvCidade.setText(address.getLocality());
-            tvEstado.setText(address.getAdminArea());
+            String cidade = address.getLocality();
+            String estado = address.getAdminArea();
+
+            if (cidade != null) {
+                cidade = cidade.trim();
+            }
+            if (estado != null) {
+                estado = estado.trim();
+            }
+
+            boolean hasCidade = cidade != null && !cidade.isEmpty();
+
+            if (hasCidade) {
+                tvCidade.setText(cidade);
+                tvCidade.setVisibility(View.VISIBLE);
+                vSeparador.setVisibility(View.VISIBLE);
+            } else {
+                tvCidade.setVisibility(View.GONE);
+                vSeparador.setVisibility(View.GONE);
+            }
+
+            tvEstado.setText(estado != null && !estado.isEmpty() ? estado : "");
         }
     }
 }

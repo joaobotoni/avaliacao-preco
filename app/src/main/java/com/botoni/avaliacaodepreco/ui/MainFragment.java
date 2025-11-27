@@ -1,11 +1,14 @@
 package com.botoni.avaliacaodepreco.ui;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,8 +40,10 @@ import com.botoni.avaliacaodepreco.data.entities.Recomendacao;
 import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
 import com.botoni.avaliacaodepreco.utils.LocationService;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -53,7 +58,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment {
-
+    private static final String TAG = "MainFragment";
+    private static final int SEARCH_DELAY_MS = 100;
     private static final BigDecimal PESO_ARROBA_KG = new BigDecimal("30.0");
     private static final BigDecimal ARROBAS_ABATE_ESPERADO = new BigDecimal("21.00");
     private static final BigDecimal PESO_BASE_KG = new BigDecimal("180.0");
@@ -64,36 +70,59 @@ public class MainFragment extends Fragment {
     private static final int ESCALA_CALCULO = 15;
     private static final int ESCALA_RESULTADO = 2;
     private static final RoundingMode MODO_ARREDONDAMENTO = RoundingMode.HALF_EVEN;
-    private static final DecimalFormatSymbols SIMBOLOS_BRASILEIROS = new DecimalFormatSymbols(new Locale("pt", "BR"));
-    private static final DecimalFormat FORMATADOR_MOEDA = new DecimalFormat("#,##0.00", SIMBOLOS_BRASILEIROS);
-    private EditText camposPesoBezerro, campoPrecoArroba, campoQuantidade;
+
+    private static final DecimalFormatSymbols SIMBOLOS_BRASILEIROS =
+            new DecimalFormatSymbols(new Locale("pt", "BR"));
+    private static final DecimalFormat FORMATADOR_MOEDA =
+            new DecimalFormat("#,##0.00", SIMBOLOS_BRASILEIROS);
+
+    private EditText camposPesoBezerro;
+    private EditText campoPrecoArroba;
+    private EditText campoQuantidade;
     private Button botaoCalcular;
-    private TextView textoValorBezerro, textoValorPorKg, textoValorTotal, textoMotivoRecomendacao;
-    private CardView cardResultado, cardFrete, cardRecomendacaoTransporte;
+    private CardView cardResultado;
+    private TextView textoValorBezerro;
+    private TextView textoValorPorKg;
+    private TextView textoValorTotal;
+
+    private CardView cardFrete;
     private AutoCompleteTextView campoTipoTransporte;
-    private RecyclerView listaRecomendacoes, listaLocalizacao;
-    private EditText origem, destino;
+    private CardView cardRecomendacaoTransporte;
+    private RecyclerView listaRecomendacoes;
+    private TextView textoMotivoRecomendacao;
+
+    private EditText origem;
+    private EditText destino;
     private FrameLayout bottomSheet;
     private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
+    private RecyclerView listaLocalizacao;
+    private LocationAdapter locationAdapter;
+
     private AppDatabase database;
     private LocationService locationService;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private LocationAdapter locationAdapter;
-    private final List<Address> listAddress = new ArrayList<>();
+    private Geocoder geocoder;
+    List<Address> listAddress = new ArrayList<>();
     private List<TipoVeiculoFrete> tiposVeiculo = new ArrayList<>();
     private List<CategoriaFrete> categorias = new ArrayList<>();
     private List<CapacidadeFrete> capacidadesFrete = new ArrayList<>();
     private CategoriaFrete categoriaAtual;
-    BigDecimal valorBezerroCalculado = BigDecimal.ZERO;
-    BigDecimal valorTotalCalculado = BigDecimal.ZERO;
+
+     BigDecimal valorBezerroCalculado = BigDecimal.ZERO;
+     BigDecimal valorTotalCalculado = BigDecimal.ZERO;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private Runnable searchRunnable;
+
     private final ActivityResultLauncher<String[]> locationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-                    result -> {
-                        if (Boolean.FALSE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION)) ||
-                                Boolean.FALSE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION))) {
-                            showPermissionDeniedDialog();
-                        }
-                    });
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineLocation = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
+                boolean coarseLocation = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
+
+                if (!fineLocation || !coarseLocation) {
+                    showPermissionDeniedDialog();
+                }
+            });
 
     public MainFragment() {
         super(R.layout.fragment_main);
@@ -111,11 +140,13 @@ public class MainFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         executor.shutdown();
+        mainHandler.removeCallbacksAndMessages(null);
     }
 
     private void inicializarComponentes(@NonNull View view) {
         database = AppDatabase.getDatabase(requireContext());
         locationService = new LocationService(requireContext());
+        geocoder = new Geocoder(requireContext(), Locale.getDefault());
 
         vincularViews(view);
         configurarRecyclerViews();
@@ -124,7 +155,6 @@ public class MainFragment extends Fragment {
     }
 
     private void vincularViews(@NonNull View view) {
-        // Bezerro
         camposPesoBezerro = view.findViewById(R.id.et_peso_animal);
         campoPrecoArroba = view.findViewById(R.id.et_preco_arroba);
         campoQuantidade = view.findViewById(R.id.et_quantidade_animais);
@@ -134,16 +164,13 @@ public class MainFragment extends Fragment {
         textoValorTotal = view.findViewById(R.id.tv_valor_total);
         textoValorPorKg = view.findViewById(R.id.tv_valor_kg);
 
-        // Frete
         campoTipoTransporte = view.findViewById(R.id.actv_categoria_animal);
         cardFrete = view.findViewById(R.id.card_frete);
 
-        // Recomendação
         cardRecomendacaoTransporte = view.findViewById(R.id.card_recomendacao_transporte);
         listaRecomendacoes = view.findViewById(R.id.rv_recomendacoes_transporte);
         textoMotivoRecomendacao = view.findViewById(R.id.tv_motivo_recomendacao);
 
-        // Localização
         origem = view.findViewById(R.id.et_origem);
         destino = view.findViewById(R.id.et_destino);
         bottomSheet = view.findViewById(R.id.bottom_sheet_padrao);
@@ -167,8 +194,7 @@ public class MainFragment extends Fragment {
 
     private void configurarListeners() {
         botaoCalcular.setOnClickListener(v -> executarCalculoBezerro());
-        cardFrete.setOnClickListener(v ->
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED));
+        cardFrete.setOnClickListener(v -> bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED));
 
         TextWatcher calculoAutoWatcher = criarTextWatcher(() -> {
             if (todosCamposPreenchidos()) {
@@ -177,7 +203,6 @@ public class MainFragment extends Fragment {
                 limparResultado();
             }
         });
-
         camposPesoBezerro.addTextChangedListener(calculoAutoWatcher);
         campoPrecoArroba.addTextChangedListener(calculoAutoWatcher);
         campoQuantidade.addTextChangedListener(calculoAutoWatcher);
@@ -186,11 +211,7 @@ public class MainFragment extends Fragment {
         campoQuantidade.addTextChangedListener(recomendacaoWatcher);
         campoTipoTransporte.addTextChangedListener(recomendacaoWatcher);
 
-        TextWatcher localizacaoWatcher = criarQueryWatcher(query -> {
-            List<Address> addresses = locationService.getAddressWithQuery(query);
-            atualizarLocalizacoes(addresses);
-        });
-
+        TextWatcher localizacaoWatcher = criarSearchWatcher(this::buscarLocalizacao);
         origem.addTextChangedListener(localizacaoWatcher);
         destino.addTextChangedListener(localizacaoWatcher);
 
@@ -200,13 +221,20 @@ public class MainFragment extends Fragment {
         });
     }
 
+    private void executarAsync(Runnable tarefa) {
+        executor.execute(tarefa);
+    }
+
+    private void executarNaUI(Runnable acao) {
+        mainHandler.post(acao);
+    }
+
     private void carregarDadosIniciais() {
-        executor.execute(() -> {
+        executarAsync(() -> {
             tiposVeiculo = database.tipoVeiculoFreteDao().getAll();
             capacidadesFrete = database.capacidadeFreteDao().getAll();
             categorias = database.categoriaFreteDao().getAll();
-
-            requireActivity().runOnUiThread(this::configurarAutoComplete);
+            executarNaUI(this::configurarAutoComplete);
         });
     }
 
@@ -214,7 +242,6 @@ public class MainFragment extends Fragment {
         String[] descricoes = categorias.stream()
                 .map(CategoriaFrete::getDescricao)
                 .toArray(String[]::new);
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, descricoes);
         campoTipoTransporte.setAdapter(adapter);
@@ -229,21 +256,25 @@ public class MainFragment extends Fragment {
             return;
         }
 
-        try {
-            BigDecimal pesoKg = new BigDecimal(peso);
-            BigDecimal precoPorArroba = new BigDecimal(precoArroba);
-            BigDecimal qtd = new BigDecimal(quantidade);
+        executarAsync(() -> {
+            try {
+                BigDecimal pesoKg = new BigDecimal(peso);
+                BigDecimal precoPorArroba = new BigDecimal(precoArroba);
+                BigDecimal qtd = new BigDecimal(quantidade);
 
-            BigDecimal valorBezerro = calcularValorBezerro(pesoKg, precoPorArroba);
-            BigDecimal valorPorKg = calcularValorPorKg(pesoKg, precoPorArroba);
-            BigDecimal valorTotal = valorBezerro.multiply(qtd)
-                    .setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
+                BigDecimal valorBezerro = calcularValorBezerro(pesoKg, precoPorArroba);
+                BigDecimal valorPorKg = calcularValorPorKg(pesoKg, precoPorArroba);
+                BigDecimal valorTotal = valorBezerro.multiply(qtd)
+                        .setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
 
-            exibirResultado(valorBezerro, valorTotal, valorPorKg);
-        } catch (NumberFormatException e) {
-            mostrarErro("Valores inválidos");
-            ocultarResultado();
-        }
+                executarNaUI(() -> exibirResultado(valorBezerro, valorTotal, valorPorKg));
+            } catch (NumberFormatException e) {
+                executarNaUI(() -> {
+                    mostrarErro("Valores inválidos");
+                    ocultarResultado();
+                });
+            }
+        });
     }
 
     private BigDecimal calcularValorBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba) {
@@ -280,7 +311,6 @@ public class MainFragment extends Fragment {
             BigDecimal valorRef = calcularValorReferenciaAgio(precoPorArroba);
             BigDecimal taxa = calcularTaxaPorArroba(pesoAtual, precoPorArroba);
             acumulado = acumulado.add(valorRef.subtract(taxa));
-
             BigDecimal arrobas = converterKgParaArrobas(pesoAtual);
             BigDecimal proximasArrobas = arrobas.setScale(0, RoundingMode.CEILING).add(BigDecimal.ONE);
             pesoAtual = proximasArrobas.multiply(PESO_ARROBA_KG).min(PESO_BASE_KG);
@@ -293,12 +323,12 @@ public class MainFragment extends Fragment {
         BigDecimal taxaPorArroba = calcularTaxaPorArroba(PESO_BASE_KG, precoPorArroba);
         BigDecimal fatorAgio = CEM.subtract(AGIO).divide(CEM, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
         BigDecimal arrobasBase = converterKgParaArrobas(PESO_BASE_KG);
-        BigDecimal valorComAgio = arrobasBase.multiply(precoPorArroba).divide(fatorAgio, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+        BigDecimal valorComAgio = arrobasBase.multiply(precoPorArroba)
+                .divide(fatorAgio, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
         BigDecimal valorSemAgio = arrobasBase.multiply(precoPorArroba);
         BigDecimal agioTotal = valorComAgio.subtract(valorSemAgio);
         BigDecimal arrobasRestantes = ARROBAS_ABATE_ESPERADO.subtract(arrobasBase);
         BigDecimal agioPorArroba = agioTotal.divide(arrobasRestantes, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
-
         return taxaPorArroba.add(agioPorArroba);
     }
 
@@ -323,16 +353,19 @@ public class MainFragment extends Fragment {
         Integer qtd = parseIntSafe(campoQuantidade);
         if (qtd == null || qtd <= 0) return;
 
-        List<Recomendacao> recomendacoes = calcularRecomendacoes(qtd, categoriaAtual.getId());
-
-        if (recomendacoes.isEmpty()) {
-            textoMotivoRecomendacao.setText(String.format(Locale.getDefault(),
-                    "Nenhuma recomendação encontrada para %d %s.", qtd,
-                    categoriaAtual.getDescricao().toLowerCase()));
-            return;
-        }
-
-        exibirRecomendacoes(recomendacoes, qtd);
+        final int quantidade = qtd;
+        executarAsync(() -> {
+            List<Recomendacao> recomendacoes = calcularRecomendacoes(quantidade, categoriaAtual.getId());
+            executarNaUI(() -> {
+                if (recomendacoes.isEmpty()) {
+                    textoMotivoRecomendacao.setText(String.format(Locale.getDefault(),
+                            "Nenhuma recomendação encontrada para %d %s.",
+                            quantidade, categoriaAtual.getDescricao().toLowerCase()));
+                } else {
+                    exibirRecomendacoes(recomendacoes, quantidade);
+                }
+            });
+        });
     }
 
     private List<Recomendacao> calcularRecomendacoes(int totalAnimais, Long idCategoria) {
@@ -344,7 +377,8 @@ public class MainFragment extends Fragment {
         if (capacidadesOrdenadas.isEmpty()) return new ArrayList<>();
 
         return encontrarVeiculoIdeal(totalAnimais, capacidadesOrdenadas)
-                .map(veiculo -> List.of(new Recomendacao(1, getNomeVeiculo(tiposVeiculo, veiculo.getIdTipoVeiculoFrete()))))
+                .map(veiculo -> List.of(new Recomendacao(1,
+                        getNomeVeiculo(tiposVeiculo, veiculo.getIdTipoVeiculoFrete()))))
                 .orElseGet(() -> calcularCombinacao(totalAnimais, capacidadesOrdenadas));
     }
 
@@ -357,14 +391,14 @@ public class MainFragment extends Fragment {
     private List<Recomendacao> calcularCombinacao(int total, List<CapacidadeFrete> capacidades) {
         List<Recomendacao> resultado = new ArrayList<>();
         int restantes = total;
-
         CapacidadeFrete maior = capacidades.get(0);
         int maxCap = maior.getQtdeFinal();
 
         if (maxCap > 0) {
             int veiculosCompletos = restantes / maxCap;
             if (veiculosCompletos > 0) {
-                resultado.add(new Recomendacao(veiculosCompletos, getNomeVeiculo(tiposVeiculo, maior.getIdTipoVeiculoFrete())));
+                resultado.add(new Recomendacao(veiculosCompletos,
+                        getNomeVeiculo(tiposVeiculo, maior.getIdTipoVeiculoFrete())));
                 restantes %= maxCap;
             }
         }
@@ -375,8 +409,8 @@ public class MainFragment extends Fragment {
                     .filter(c -> finalRestantes >= c.getQtdeInicial() && finalRestantes <= c.getQtdeFinal())
                     .findFirst()
                     .orElse(maior);
-
-            resultado.add(new Recomendacao(1, getNomeVeiculo(tiposVeiculo, veiculoRestante.getIdTipoVeiculoFrete())));
+            resultado.add(new Recomendacao(1,
+                    getNomeVeiculo(tiposVeiculo, veiculoRestante.getIdTipoVeiculoFrete())));
         }
 
         return agruparRecomendacoes(resultado);
@@ -393,17 +427,58 @@ public class MainFragment extends Fragment {
     }
 
     private static String getNomeVeiculo(List<TipoVeiculoFrete> tiposVeiculo, Long idTipo) {
-        return tiposVeiculo == null ? "Desconhecido" :
-                tiposVeiculo.stream()
-                        .filter(t -> t.getId().longValue() == idTipo)
-                        .map(TipoVeiculoFrete::getDescricao)
-                        .findFirst()
-                        .orElse("Desconhecido");
+        return tiposVeiculo == null ? "Desconhecido" : tiposVeiculo.stream()
+                .filter(t -> t.getId().longValue() == idTipo)
+                .map(TipoVeiculoFrete::getDescricao)
+                .findFirst()
+                .orElse("Desconhecido");
     }
 
+    private void buscarLocalizacao(String query) {
+        if (query.length() < 3) {
+            executarNaUI(() -> atualizarLocalizacoes(new ArrayList<>()));
+            return;
+        }
+
+        executarAsync(() -> {
+            List<Address> addresses = locationService.getAddressWithQuery(query);
+            filterLocation(addresses);
+        });
+    }
+
+    private void filterLocation(List<Address> addresses) {
+        if (hasLocationPermissions()) {
+            executarNaUI(this::showPermissionDeniedDialog);
+            return;
+        }
+
+        locationService.getLastLocation(location -> {
+            executarAsync(() -> {
+                try {
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+
+                    List<Address> result = geocoder.getFromLocation(latitude, longitude, 1);
+                    if (result != null && !result.isEmpty()) {
+                        String countryCode = result.get(0).getCountryCode();
+                        List<Address> filteredAddresses = addresses.stream()
+                                .filter(address -> countryCode.equals(address.getCountryCode()))
+                                .collect(Collectors.toList());
+                        executarNaUI(() -> atualizarLocalizacoes(filteredAddresses));
+                    }
+                } catch (IOException e) {
+                    executarNaUI(() -> mostrarErro(e.getMessage()));
+                } catch (NullPointerException e) {
+                    executarNaUI(() -> mostrarErro("Não foi possível obter a localização"));
+                }
+            });
+        }, this::showPermissionDeniedDialog);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private void atualizarLocalizacoes(List<Address> addresses) {
         if (addresses == null || addresses.isEmpty()) {
-            Log.d("Localizacao", "Nenhum endereço encontrado");
+            Log.d(TAG, "Nenhum endereço encontrado");
             return;
         }
         listAddress.clear();
@@ -412,7 +487,7 @@ public class MainFragment extends Fragment {
     }
 
     private void verificarPermissoes() {
-        if (!hasLocationPermissions()) {
+        if (hasLocationPermissions()) {
             locationPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
@@ -422,27 +497,26 @@ public class MainFragment extends Fragment {
 
     private boolean hasLocationPermissions() {
         return ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(requireContext(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
     }
 
     private void showPermissionDeniedDialog() {
-        new AlertDialog.Builder(requireActivity())
+        new MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(R.string.permission_denied_title)
                 .setMessage(R.string.permission_denied)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
     private TextWatcher criarTextWatcher(Runnable acao) {
         return new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -451,22 +525,25 @@ public class MainFragment extends Fragment {
         };
     }
 
-    private TextWatcher criarQueryWatcher(QueryCallback callback) {
+    private TextWatcher criarSearchWatcher(QueryCallback callback) {
         return new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() >= 1) {
-                    callback.onQuery(s.toString());
+                if (searchRunnable != null) {
+                    mainHandler.removeCallbacks(searchRunnable);
+                }
+
+                if (s.length() >= 3) {
+                    searchRunnable = () -> callback.onQuery(s.toString());
+                    mainHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         };
     }
 
@@ -520,11 +597,9 @@ public class MainFragment extends Fragment {
         int totalVeiculos = recomendacoes.stream()
                 .mapToInt(Recomendacao::getQtdeRecomendada)
                 .sum();
-
         String msg = String.format(Locale.getDefault(),
-                "Para %d %s(s), requer %d veículo(s).", qtd,
-                categoriaAtual.getDescricao().toLowerCase(), totalVeiculos);
-
+                "Para %d %s(s), requer %d veículo(s).",
+                qtd, categoriaAtual.getDescricao().toLowerCase(), totalVeiculos);
         textoMotivoRecomendacao.setText(msg);
         mostrarView(textoMotivoRecomendacao);
         mostrarView(cardRecomendacaoTransporte);
