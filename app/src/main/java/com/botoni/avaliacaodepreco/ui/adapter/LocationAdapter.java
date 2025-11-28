@@ -14,9 +14,15 @@ import com.botoni.avaliacaodepreco.R;
 import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
+    public interface OnClickListener {
+        void onItemClick(Address address);
+    }
     private List<Address> addresses;
-    public LocationAdapter(List<Address> addresses) {
+    private OnClickListener listener;
+
+    public LocationAdapter(List<Address> addresses, OnClickListener listener) {
         this.addresses = addresses;
+        this.listener = listener;
     }
 
     @NonNull
@@ -28,7 +34,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(addresses.get(position));
+        Address address = addresses.get(position);
+        holder.bind(address);
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(address));
     }
 
     @Override
@@ -49,7 +57,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             vSeparador = itemView.findViewById(R.id.v_separador);
         }
 
-        public void bind(Address address){
+        public void bind(Address address) {
             String cidade = address.getLocality();
             String estado = address.getAdminArea();
 

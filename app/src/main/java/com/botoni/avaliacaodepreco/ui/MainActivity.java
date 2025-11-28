@@ -9,6 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.botoni.avaliacaodepreco.R;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApi;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,5 +32,4 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
 }

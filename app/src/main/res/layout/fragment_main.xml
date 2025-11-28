@@ -429,43 +429,25 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
-                        android:id="@+id/tv_rotulo_partida"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="@string/label_endereco_partida"
-                        app:layout_constraintStart_toEndOf="@id/fundo_check_partida"
-                        app:layout_constraintEnd_toStartOf="@id/btn_remover_partida"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
                         android:id="@+id/tv_primario_partida"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/tools_text_endereco_partida"
-                        app:layout_constraintStart_toStartOf="@id/tv_rotulo_partida"
-                        app:layout_constraintEnd_toEndOf="@id/tv_rotulo_partida"
-                        app:layout_constraintTop_toBottomOf="@id/tv_rotulo_partida" />
-
-                    <TextView
-                        android:id="@+id/tv_secundario_partida"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/tools_text_endereco_partida_secundario"
-                        app:layout_constraintStart_toStartOf="@id/tv_primario_partida"
-                        app:layout_constraintEnd_toEndOf="@id/tv_primario_partida"
-                        app:layout_constraintTop_toBottomOf="@id/tv_primario_partida" />
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        tools:text="@string/tools_text_endereco_partida"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btn_remover_partida"
+                        app:layout_constraintStart_toEndOf="@id/fundo_check_partida"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageButton
                         android:id="@+id/btn_remover_partida"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/todo"
                         app:srcCompat="@drawable/ic_close"
                         app:tint="?attr/colorOnSecondaryContainer"
-                        android:contentDescription="@string/todo"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />
@@ -510,43 +492,25 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
-                        android:id="@+id/tv_rotulo_destino"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="@string/label_endereco_destino"
-                        app:layout_constraintStart_toEndOf="@id/fundo_check_destino"
-                        app:layout_constraintEnd_toStartOf="@id/btn_remover_destino"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
                         android:id="@+id/tv_primario_destino"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/tools_text_endereco_destino"
-                        app:layout_constraintStart_toStartOf="@id/tv_rotulo_destino"
-                        app:layout_constraintEnd_toEndOf="@id/tv_rotulo_destino"
-                        app:layout_constraintTop_toBottomOf="@id/tv_rotulo_destino" />
-
-                    <TextView
-                        android:id="@+id/tv_secundario_destino"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/tools_text_endereco_destino_secundario"
-                        app:layout_constraintStart_toStartOf="@id/tv_primario_destino"
-                        app:layout_constraintEnd_toEndOf="@id/tv_primario_destino"
-                        app:layout_constraintTop_toBottomOf="@id/tv_primario_destino" />
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        tools:text="@string/tools_text_endereco_destino"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btn_remover_destino"
+                        app:layout_constraintStart_toEndOf="@id/fundo_check_destino"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageButton
                         android:id="@+id/btn_remover_destino"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/todo"
                         app:srcCompat="@drawable/ic_close"
                         app:tint="?attr/colorOnSecondaryContainer"
-                        android:contentDescription="@string/todo"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />

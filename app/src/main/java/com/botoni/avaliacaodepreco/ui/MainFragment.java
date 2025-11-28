@@ -31,17 +31,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.botoni.avaliacaodepreco.R;
-import com.botoni.avaliacaodepreco.ui.adapter.LocationAdapter;
-import com.botoni.avaliacaodepreco.ui.adapter.RecomendacaoAdapter;
 import com.botoni.avaliacaodepreco.data.database.AppDatabase;
 import com.botoni.avaliacaodepreco.data.entities.CapacidadeFrete;
 import com.botoni.avaliacaodepreco.data.entities.CategoriaFrete;
 import com.botoni.avaliacaodepreco.data.entities.Recomendacao;
 import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
+import com.botoni.avaliacaodepreco.ui.adapter.LocationAdapter;
+import com.botoni.avaliacaodepreco.ui.adapter.RecomendacaoAdapter;
 import com.botoni.avaliacaodepreco.utils.LocationService;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -70,12 +72,10 @@ public class MainFragment extends Fragment {
     private static final int ESCALA_CALCULO = 15;
     private static final int ESCALA_RESULTADO = 2;
     private static final RoundingMode MODO_ARREDONDAMENTO = RoundingMode.HALF_EVEN;
-
     private static final DecimalFormatSymbols SIMBOLOS_BRASILEIROS =
             new DecimalFormatSymbols(new Locale("pt", "BR"));
     private static final DecimalFormat FORMATADOR_MOEDA =
             new DecimalFormat("#,##0.00", SIMBOLOS_BRASILEIROS);
-
     private EditText camposPesoBezerro;
     private EditText campoPrecoArroba;
     private EditText campoQuantidade;
@@ -84,20 +84,25 @@ public class MainFragment extends Fragment {
     private TextView textoValorBezerro;
     private TextView textoValorPorKg;
     private TextView textoValorTotal;
-
     private CardView cardFrete;
+    private CardView cardPartida;
+    private CardView cardDestino;
+
+    private TextView textoPartida;
+    private TextView textoDestino;
     private AutoCompleteTextView campoTipoTransporte;
     private CardView cardRecomendacaoTransporte;
     private RecyclerView listaRecomendacoes;
     private TextView textoMotivoRecomendacao;
-
-    private EditText origem;
-    private EditText destino;
+    private TextInputEditText origem;
+    private TextInputEditText destino;
+    private TextInputEditText editTextAtivo;
+    private TextInputLayout tilOrigem;
+    private TextInputLayout tilDestino;
     private FrameLayout bottomSheet;
     private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
     private RecyclerView listaLocalizacao;
     private LocationAdapter locationAdapter;
-
     private AppDatabase database;
     private LocationService locationService;
     private Geocoder geocoder;
@@ -106,9 +111,8 @@ public class MainFragment extends Fragment {
     private List<CategoriaFrete> categorias = new ArrayList<>();
     private List<CapacidadeFrete> capacidadesFrete = new ArrayList<>();
     private CategoriaFrete categoriaAtual;
-
-     BigDecimal valorBezerroCalculado = BigDecimal.ZERO;
-     BigDecimal valorTotalCalculado = BigDecimal.ZERO;
+    BigDecimal valorBezerroCalculado = BigDecimal.ZERO;
+    BigDecimal valorTotalCalculado = BigDecimal.ZERO;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService executor = Executors.newCachedThreadPool();
@@ -152,6 +156,7 @@ public class MainFragment extends Fragment {
         configurarRecyclerViews();
         configurarBottomSheet();
         verificarPermissoes();
+        configurarFocusEditTexts();
     }
 
     private void vincularViews(@NonNull View view) {
@@ -163,14 +168,20 @@ public class MainFragment extends Fragment {
         textoValorBezerro = view.findViewById(R.id.tv_valor_cabeca);
         textoValorTotal = view.findViewById(R.id.tv_valor_total);
         textoValorPorKg = view.findViewById(R.id.tv_valor_kg);
+        textoPartida = view.findViewById(R.id.tv_primario_partida);
+        textoDestino = view.findViewById(R.id.tv_primario_destino);
 
         campoTipoTransporte = view.findViewById(R.id.actv_categoria_animal);
         cardFrete = view.findViewById(R.id.card_frete);
+        cardPartida = view.findViewById(R.id.card_partida);
+        cardDestino = view.findViewById(R.id.card_destino);
 
         cardRecomendacaoTransporte = view.findViewById(R.id.card_recomendacao_transporte);
         listaRecomendacoes = view.findViewById(R.id.rv_recomendacoes_transporte);
         textoMotivoRecomendacao = view.findViewById(R.id.tv_motivo_recomendacao);
 
+        tilOrigem = view.findViewById(R.id.til_origem);
+        tilDestino = view.findViewById(R.id.til_destino);
         origem = view.findViewById(R.id.et_origem);
         destino = view.findViewById(R.id.et_destino);
         bottomSheet = view.findViewById(R.id.bottom_sheet_padrao);
@@ -181,9 +192,58 @@ public class MainFragment extends Fragment {
         listaRecomendacoes.setLayoutManager(new LinearLayoutManager(requireContext()));
         listaRecomendacoes.setHasFixedSize(true);
 
-        locationAdapter = new LocationAdapter(listAddress);
+        locationAdapter = new LocationAdapter(listAddress, this::selectedLocation);
         listaLocalizacao.setLayoutManager(new LinearLayoutManager(requireContext()));
         listaLocalizacao.setAdapter(locationAdapter);
+    }
+
+
+    private void configurarFocusEditTexts() {
+        origem.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) editTextAtivo = origem;
+        });
+
+        destino.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) editTextAtivo = destino;
+        });
+    }
+
+
+    public void selectedLocation(Address address) {
+        if (editTextAtivo == null) return;
+
+        String textoEndereco = String.format("%s - %s", address.getLocality(), address.getAdminArea());
+        editTextAtivo.setText(textoEndereco);
+        editTextAtivo.setEnabled(false);
+        editTextAtivo.setCursorVisible(false);
+
+        TextInputLayout tilAtivo = (editTextAtivo.getId() == R.id.et_origem) ? tilOrigem : tilDestino;
+        tilAtivo.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+        tilAtivo.setEndIconDrawable(getResources().getDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel, null));
+        tilAtivo.setEndIconVisible(true);
+        tilAtivo.setEndIconOnClickListener(v -> limparSelecao(editTextAtivo, tilAtivo));
+
+        String origemText = origem.getText() != null ? origem.getText().toString().trim() : "";
+        String destinoText = destino.getText() != null ? destino.getText().toString().trim() : "";
+
+        if (!origemText.isEmpty() && !destinoText.isEmpty()) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            textoPartida.setText(origemText);
+            textoDestino.setText(destinoText);
+
+            mostrarView(cardPartida);
+            mostrarView(cardDestino);
+        }
+    }
+
+
+    private void limparSelecao(TextInputEditText editText, TextInputLayout til) {
+        editText.setText("");
+        editText.setEnabled(true);
+        editText.setCursorVisible(true);
+        til.setEndIconMode(TextInputLayout.END_ICON_NONE);
+        editText.requestFocus();
     }
 
     private void configurarBottomSheet() {
@@ -211,7 +271,7 @@ public class MainFragment extends Fragment {
         campoQuantidade.addTextChangedListener(recomendacaoWatcher);
         campoTipoTransporte.addTextChangedListener(recomendacaoWatcher);
 
-        TextWatcher localizacaoWatcher = criarSearchWatcher(this::buscarLocalizacao);
+        TextWatcher localizacaoWatcher = SearchWatcher(this::buscarLocalizacao);
         origem.addTextChangedListener(localizacaoWatcher);
         destino.addTextChangedListener(localizacaoWatcher);
 
@@ -441,7 +501,7 @@ public class MainFragment extends Fragment {
         }
 
         executarAsync(() -> {
-            List<Address> addresses = locationService.getAddressWithQuery(query);
+            List<Address> addresses = locationService.getAddressesWithQuery(query);
             filterLocation(addresses);
         });
     }
@@ -513,10 +573,12 @@ public class MainFragment extends Fragment {
     private TextWatcher criarTextWatcher(Runnable acao) {
         return new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -525,17 +587,17 @@ public class MainFragment extends Fragment {
         };
     }
 
-    private TextWatcher criarSearchWatcher(QueryCallback callback) {
+    private TextWatcher SearchWatcher(QueryCallback callback) {
         return new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (searchRunnable != null) {
                     mainHandler.removeCallbacks(searchRunnable);
                 }
-
                 if (s.length() >= 3) {
                     searchRunnable = () -> callback.onQuery(s.toString());
                     mainHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
@@ -543,7 +605,9 @@ public class MainFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+
+            }
         };
     }
 

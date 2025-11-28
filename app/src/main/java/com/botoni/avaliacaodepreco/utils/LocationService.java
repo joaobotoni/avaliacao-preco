@@ -17,18 +17,20 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
 public class LocationService {
 
     private Geocoder geocoder;
     private final Context context;
     private final FusedLocationProviderClient fusedLocationClient;
+
     public LocationService(Context context) {
         this.context = context;
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         this.geocoder = new Geocoder(context, new Locale("pt", "BR"));
     }
 
-    public List<Address> getAddressWithQuery(String query) {
+    public List<Address> getAddressesWithQuery(String query) {
         if (query == null || query.isBlank()) {
             return Collections.emptyList();
         }
@@ -40,7 +42,24 @@ public class LocationService {
         }
     }
 
-    public void getLastLocation(OnSuccessListener<Location> listener, Runnable runnable){
+    public Address getAddressWithQuery(String query) {
+        if (query == null || query.isBlank()) {
+            return null;
+        }
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(query.trim(), 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                return addresses.get(0);
+            }
+
+            return null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public void getLastLocation(OnSuccessListener<Location> listener, Runnable runnable) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             runnable.run();
