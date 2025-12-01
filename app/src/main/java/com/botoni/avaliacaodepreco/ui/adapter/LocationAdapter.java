@@ -14,11 +14,13 @@ import com.botoni.avaliacaodepreco.R;
 import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
+
     public interface OnClickListener {
         void onItemClick(Address address);
     }
-    private List<Address> addresses;
-    private OnClickListener listener;
+
+    private final List<Address> addresses;
+    private final OnClickListener listener;
 
     public LocationAdapter(List<Address> addresses, OnClickListener listener) {
         this.addresses = addresses;
@@ -28,15 +30,14 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_localizacao, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_localizacao, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Address address = addresses.get(position);
-        holder.bind(address);
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(address));
+        holder.bind(addresses.get(position), listener);
     }
 
     @Override
@@ -45,41 +46,39 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvCidade;
-        private TextView tvEstado;
-        private View vSeparador;
+        private final TextView textViewCidade;
+        private final TextView textViewEstado;
+        private final View separador;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            tvCidade = itemView.findViewById(R.id.tv_cidade);
-            tvEstado = itemView.findViewById(R.id.tv_estado);
-            vSeparador = itemView.findViewById(R.id.v_separador);
+            textViewCidade = itemView.findViewById(R.id.cidade_text);
+            textViewEstado = itemView.findViewById(R.id.estado_text);
+            separador = itemView.findViewById(R.id.cidade_estado_separador);
         }
 
-        public void bind(Address address) {
-            String cidade = address.getLocality();
-            String estado = address.getAdminArea();
+        public void bind(Address address, OnClickListener listener) {
+            String cidade = sanitize(address.getLocality());
+            String estado = sanitize(address.getAdminArea());
 
-            if (cidade != null) {
-                cidade = cidade.trim();
-            }
-            if (estado != null) {
-                estado = estado.trim();
-            }
+            setTextAndVisibility(textViewCidade, cidade);
+            setTextAndVisibility(textViewEstado, estado);
+            separador.setVisibility(isValid(cidade) ? View.VISIBLE : View.GONE);
 
-            boolean hasCidade = cidade != null && !cidade.isEmpty();
+            itemView.setOnClickListener(v -> listener.onItemClick(address));
+        }
 
-            if (hasCidade) {
-                tvCidade.setText(cidade);
-                tvCidade.setVisibility(View.VISIBLE);
-                vSeparador.setVisibility(View.VISIBLE);
-            } else {
-                tvCidade.setVisibility(View.GONE);
-                vSeparador.setVisibility(View.GONE);
-            }
+        private String sanitize(String text) {
+            return text != null ? text.trim() : "";
+        }
 
-            tvEstado.setText(estado != null && !estado.isEmpty() ? estado : "");
+        private boolean isValid(String text) {
+            return text != null && !text.isEmpty();
+        }
+
+        private void setTextAndVisibility(TextView textView, String text) {
+            textView.setText(text);
+            textView.setVisibility(isValid(text) ? View.VISIBLE : View.GONE);
         }
     }
 }

@@ -37,6 +37,7 @@ plugins {
 dependencies {
     implementation(libs.room.runtime)
     implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
     annotationProcessor(libs.room.compiler)
     implementation(libs.appcompat)
     implementation(libs.material)

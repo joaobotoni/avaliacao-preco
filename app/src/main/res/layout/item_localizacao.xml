@@ -11,7 +11,7 @@
     android:paddingVertical="12dp">
 
     <ImageView
-        android:id="@+id/iv_icone_localizacao"
+        android:id="@+id/localizacao_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_location_on"
@@ -22,7 +22,7 @@
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/tv_cidade"
+        android:id="@+id/cidade_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -31,22 +31,22 @@
         android:textSize="16sp"
         android:textColor="?android:attr/textColorPrimary"
         tools:text="São Paulo"
-        app:layout_constraintStart_toEndOf="@id/iv_icone_localizacao"
+        app:layout_constraintStart_toEndOf="@id/localizacao_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <View
-        android:id="@+id/v_separador"
+        android:id="@+id/cidade_estado_separador"
         android:layout_width="4dp"
         android:layout_height="4dp"
         android:layout_marginStart="6dp"
         android:background="@drawable/circle_separator"
-        app:layout_constraintStart_toEndOf="@id/tv_cidade"
-        app:layout_constraintTop_toTopOf="@id/tv_cidade"
-        app:layout_constraintBottom_toBottomOf="@id/tv_cidade" />
+        app:layout_constraintStart_toEndOf="@id/cidade_text"
+        app:layout_constraintTop_toTopOf="@id/cidade_text"
+        app:layout_constraintBottom_toBottomOf="@id/cidade_text" />
 
     <TextView
-        android:id="@+id/tv_estado"
+        android:id="@+id/estado_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
@@ -55,9 +55,9 @@
         android:textSize="16sp"
         android:textColor="?android:attr/textColorPrimary"
         tools:text="SP"
-        app:layout_constraintStart_toEndOf="@id/v_separador"
+        app:layout_constraintStart_toEndOf="@id/cidade_estado_separador"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tv_cidade"
-        app:layout_constraintBottom_toBottomOf="@id/tv_cidade" />
+        app:layout_constraintTop_toTopOf="@id/cidade_text"
+        app:layout_constraintBottom_toBottomOf="@id/cidade_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

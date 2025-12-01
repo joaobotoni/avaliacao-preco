@@ -15,7 +15,6 @@ import java.util.List;
 
 public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapter.ViewHolder> {
     private final List<Recomendacao> recomendacoes;
-
     public RecomendacaoAdapter(List<Recomendacao> recomendacoes) {
         this.recomendacoes = recomendacoes;
     }
@@ -38,18 +37,18 @@ public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView quantidade;
-        private TextView tipoTransporte;
+        private TextView textViewQuantidade;
+        private TextView textViewTipoTransporte;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            quantidade = itemView.findViewById(R.id.tv_quantidade);
-            tipoTransporte = itemView.findViewById(R.id.tv_transporte);
+            textViewQuantidade = itemView.findViewById(R.id.quantidade_text);
+            textViewTipoTransporte = itemView.findViewById(R.id.tipo_transporte_text);
         }
 
         public void bind(Recomendacao recomendacao) {
-            quantidade.setText(String.valueOf(recomendacao.getQtdeRecomendada()));
-            tipoTransporte.setText(recomendacao.getTipoTransporte());
+            textViewQuantidade.setText(String.valueOf(recomendacao.getQtdeRecomendada()));
+            textViewTipoTransporte.setText(recomendacao.getTipoTransporte());
         }
     }
 }

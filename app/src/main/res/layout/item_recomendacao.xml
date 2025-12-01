@@ -9,7 +9,7 @@
     android:paddingHorizontal="4dp">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_quantidade"
+        android:id="@+id/quantidade_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="?attr/materialCardViewFilledStyle"
@@ -20,25 +20,29 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
-            android:id="@+id/tv_quantidade"
+            android:id="@+id/quantidade_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:gravity="center"
-            tools:text="10"/>
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="10" />
 
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
-        android:id="@+id/tv_transporte"
+        android:id="@+id/tipo_transporte_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:textSize="15sp"
+        android:textColor="?android:attr/textColorSecondary"
         tools:text="Carreta Alta"
+        app:layout_constraintStart_toEndOf="@id/quantidade_card"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_quantidade"
-        app:layout_constraintTop_toTopOf="@id/card_quantidade"
-        app:layout_constraintBottom_toBottomOf="@id/card_quantidade" />
+        app:layout_constraintTop_toTopOf="@id/quantidade_card"
+        app:layout_constraintBottom_toBottomOf="@id/quantidade_card" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

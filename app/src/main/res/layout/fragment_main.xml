@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <ScrollView
-        android:id="@+id/scroll_container"
+        android:id="@+id/conteudo_scroll_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -14,12 +14,12 @@
         android:overScrollMode="never"
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btn_send"
+        app:layout_constraintBottom_toTopOf="@+id/enviar_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container_principal"
+            android:id="@+id/conteudo_principal_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="20dp"
@@ -27,24 +27,24 @@
             android:paddingBottom="100dp">
 
             <TextView
-                android:id="@+id/tv_subtitulo"
+                android:id="@+id/instrucao_subtitulo_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/subtitle_preencha_campos"
-                android:contentDescription="@string/subtitle_preencha_campos"
+                android:text="@string/instrucao_preencher_campos"
+                android:contentDescription="@string/instrucao_preencher_campos"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_container"
+                android:id="@+id/dados_animal_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_subtitulo"
+                app:layout_constraintTop_toBottomOf="@id/instrucao_subtitulo_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -54,7 +54,7 @@
                     android:padding="20dp">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_categoria_animal"
+                        android:id="@+id/categoria_animal_input_layout"
                         style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         app:boxBackgroundColor="?attr/colorOnSurfaceInverse"
@@ -65,84 +65,84 @@
                         app:layout_constraintEnd_toEndOf="parent">
 
                         <AutoCompleteTextView
-                            android:id="@+id/actv_categoria_animal"
+                            android:id="@+id/categoria_animal_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/label_categoria_animal"
+                            android:hint="@string/rotulo_categoria_animal"
                             android:inputType="none"
                             tools:ignore="LabelFor" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_preco_arroba"
+                        android:id="@+id/preco_arroba_input_layout"
                         style="@style/Widget.Material3.TextInputLayout.FilledBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         app:boxBackgroundColor="?attr/colorOnSurfaceInverse"
                         app:boxStrokeErrorColor="?attr/colorError"
-                        app:layout_constraintTop_toBottomOf="@id/til_categoria_animal"
+                        app:layout_constraintTop_toBottomOf="@id/categoria_animal_input_layout"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_preco_arroba"
+                            android:id="@+id/preco_arroba_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/label_preco_arroba"
+                            android:hint="@string/rotulo_preco_arroba"
                             android:inputType="numberDecimal" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_peso_animal"
+                        android:id="@+id/peso_animal_input_layout"
                         style="@style/Widget.Material3.TextInputLayout.FilledBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         app:boxBackgroundColor="?attr/colorOnSurfaceInverse"
                         app:boxStrokeErrorColor="?attr/colorError"
-                        app:layout_constraintTop_toBottomOf="@id/til_preco_arroba"
+                        app:layout_constraintTop_toBottomOf="@id/preco_arroba_input_layout"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_peso_animal"
+                            android:id="@+id/peso_animal_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/label_peso_animal"
+                            android:hint="@string/rotulo_peso_animal"
                             android:inputType="numberDecimal" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/til_quantidade_animais"
+                        android:id="@+id/quantidade_animais_input_layout"
                         style="@style/Widget.Material3.TextInputLayout.FilledBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         app:boxBackgroundColor="?attr/colorOnSurfaceInverse"
                         app:boxStrokeErrorColor="?attr/colorError"
-                        app:layout_constraintTop_toBottomOf="@id/til_peso_animal"
+                        app:layout_constraintTop_toBottomOf="@id/peso_animal_input_layout"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_quantidade_animais"
+                            android:id="@+id/quantidade_animais_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/label_quantidade_animais"
+                            android:hint="@string/rotulo_quantidade_animais"
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_resultado"
+                android:id="@+id/resultado_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/card_container"
+                app:layout_constraintTop_toBottomOf="@id/dados_animal_card"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="gone"
@@ -154,16 +154,16 @@
                     android:padding="20dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_valor_cabeca"
+                        android:id="@+id/valor_por_cabeca_card"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="20dp"
                         app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/card_valor_kg"
+                        app:layout_constraintEnd_toStartOf="@id/valor_por_kg_card"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/card_valor_total">
+                        app:layout_constraintBottom_toTopOf="@id/valor_total_card">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -171,38 +171,38 @@
                             android:padding="16dp">
 
                             <TextView
-                                android:id="@+id/tv_label_valor_cabeca"
+                                android:id="@+id/valor_por_cabeca_label_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/valor_cabeca"
+                                android:text="@string/rotulo_valor_por_cabeca"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent" />
 
                             <TextView
-                                android:id="@+id/tv_valor_cabeca"
+                                android:id="@+id/valor_por_cabeca_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                app:layout_constraintTop_toBottomOf="@id/tv_label_valor_cabeca"
+                                app:layout_constraintTop_toBottomOf="@id/valor_por_cabeca_label_text"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                tools:text="@string/tools_text_valor_cabeca" />
+                                tools:text="@string/preview_valor_por_cabeca" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_valor_kg"
+                        android:id="@+id/valor_por_kg_card"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         app:cardCornerRadius="20dp"
                         app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                        app:layout_constraintStart_toEndOf="@id/card_valor_cabeca"
+                        app:layout_constraintStart_toEndOf="@id/valor_por_cabeca_card"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/card_valor_cabeca"
-                        app:layout_constraintBottom_toBottomOf="@id/card_valor_cabeca">
+                        app:layout_constraintTop_toTopOf="@id/valor_por_cabeca_card"
+                        app:layout_constraintBottom_toBottomOf="@id/valor_por_cabeca_card">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -210,35 +210,35 @@
                             android:padding="16dp">
 
                             <TextView
-                                android:id="@+id/tv_label_valor_kg"
+                                android:id="@+id/valor_por_kg_label_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/valor_por_kg"
+                                android:text="@string/rotulo_valor_por_kg"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent" />
 
                             <TextView
-                                android:id="@+id/tv_valor_kg"
+                                android:id="@+id/valor_por_kg_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                app:layout_constraintTop_toBottomOf="@id/tv_label_valor_kg"
+                                app:layout_constraintTop_toBottomOf="@id/valor_por_kg_label_text"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                tools:text="@string/tools_text_valor_kg" />
+                                tools:text="@string/preview_valor_por_kg" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_valor_total"
+                        android:id="@+id/valor_total_card"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         app:cardCornerRadius="20dp"
                         app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                        app:layout_constraintTop_toBottomOf="@id/card_valor_cabeca"
+                        app:layout_constraintTop_toBottomOf="@id/valor_por_cabeca_card"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
@@ -248,36 +248,36 @@
                             android:padding="20dp">
 
                             <TextView
-                                android:id="@+id/tv_label_valor_total"
+                                android:id="@+id/valor_total_label_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/valor_total_estimado"
+                                android:text="@string/rotulo_valor_total_estimado"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/tv_valor_total"
+                                app:layout_constraintEnd_toStartOf="@id/valor_total_text"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent" />
 
                             <TextView
-                                android:id="@+id/tv_valor_total"
+                                android:id="@+id/valor_total_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                tools:text="@string/tools_text_valor_total" />
+                                tools:text="@string/preview_valor_total" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_recomendacao_transporte"
+                android:id="@+id/recomendacao_transporte_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/card_resultado"
+                app:layout_constraintTop_toBottomOf="@id/resultado_card"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="gone"
@@ -289,55 +289,55 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/iv_icone_info"
+                        android:id="@+id/info_recomendacao_icon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:contentDescription="@string/todo"
+                        android:contentDescription="@string/descricao_generica_todo"
                         android:src="@drawable/ic_info"
                         app:tint="?attr/colorSecondary"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/tv_cabecalho_recomendacao"
+                        android:id="@+id/recomendacao_titulo_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="@string/recomendacao_transporte"
-                        app:layout_constraintStart_toEndOf="@id/iv_icone_info"
+                        android:text="@string/rotulo_recomendacao_transporte"
+                        app:layout_constraintStart_toEndOf="@id/info_recomendacao_icon"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/iv_icone_info"
-                        app:layout_constraintBottom_toBottomOf="@id/iv_icone_info" />
+                        app:layout_constraintTop_toTopOf="@id/info_recomendacao_icon"
+                        app:layout_constraintBottom_toBottomOf="@id/info_recomendacao_icon" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_recomendacoes_transporte"
+                        android:id="@+id/recomendacoes_transporte_recycler_view"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:nestedScrollingEnabled="false"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintTop_toBottomOf="@id/tv_cabecalho_recomendacao"
+                        app:layout_constraintTop_toBottomOf="@id/recomendacao_titulo_text"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:itemCount="1"
                         tools:listitem="@layout/item_recomendacao" />
 
                     <TextView
-                        android:id="@+id/tv_motivo_recomendacao"
+                        android:id="@+id/motivo_recomendacao_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:visibility="gone"
-                        app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
+                        app:layout_constraintTop_toBottomOf="@id/recomendacoes_transporte_recycler_view"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        tools:text="@string/tools_text_motivo_recomendacao"
+                        tools:text="@string/preview_motivo_recomendacao"
                         tools:visibility="visible" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_frete"
+                android:id="@+id/adicionar_localizacao_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
                 android:layout_width="0dp"
@@ -346,11 +346,9 @@
                 android:alpha="0.6"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/card_recomendacao_transporte"
+                app:layout_constraintTop_toBottomOf="@id/recomendacao_transporte_card"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="visible"
-                tools:visibility="visible">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -358,24 +356,24 @@
                     android:padding="32dp">
 
                     <ImageView
-                        android:id="@+id/location_icon"
+                        android:id="@+id/localizacao_icon"
                         android:layout_width="64dp"
                         android:layout_height="64dp"
                         android:src="@drawable/ic_location_on"
                         app:tint="?attr/colorOnSurfaceVariant"
-                        android:contentDescription="@string/todo"
+                        android:contentDescription="@string/descricao_generica_todo"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
                     <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/tv_info_adicionar_localizacao"
+                        android:id="@+id/adicionar_localizacao_texto_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="@string/info_adicionar_localizacao"
+                        android:text="@string/botao_adicionar_localizacao"
                         android:textAlignment="center"
-                        app:layout_constraintTop_toBottomOf="@id/location_icon"
+                        app:layout_constraintTop_toBottomOf="@id/localizacao_icon"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -383,26 +381,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/info_buscar_localizacao"
+                        android:text="@string/botao_buscar_localizacao"
                         android:textAlignment="center"
-                        app:layout_constraintTop_toBottomOf="@id/tv_info_adicionar_localizacao"
+                        app:layout_constraintTop_toBottomOf="@id/adicionar_localizacao_texto_text"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_partida"
+                android:id="@+id/local_partida_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/card_frete"
+                app:layout_constraintTop_toBottomOf="@id/adicionar_localizacao_card"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="gone"
-                tools:visibility="visible">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -410,62 +406,220 @@
                     android:padding="20dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/fundo_check_partida"
+                        android:id="@+id/partida_check_fundo_card"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         app:cardBackgroundColor="?attr/colorPrimary"
                         app:cardCornerRadius="16dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center"
-                            android:contentDescription="@string/todo"
+                            android:contentDescription="@string/descricao_generica_todo"
                             android:src="@drawable/ic_check_circle"
                             app:tint="?attr/colorOnPrimary" />
                     </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tv_primario_partida"
+                    <LinearLayout
+                        android:id="@+id/partida_info_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        tools:text="@string/tools_text_endereco_partida"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/btn_remover_partida"
-                        app:layout_constraintStart_toEndOf="@id/fundo_check_partida"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="@id/partida_check_fundo_card"
+                        app:layout_constraintEnd_toStartOf="@id/remover_partida_button"
+                        app:layout_constraintStart_toEndOf="@id/partida_check_fundo_card"
+                        app:layout_constraintTop_toTopOf="@id/partida_check_fundo_card">
+
+                        <TextView
+                            android:id="@+id/partida_label_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/titulo_rotulo_origem"
+                            android:textSize="12sp"
+                            android:alpha="0.7" />
+
+                        <TextView
+                            android:id="@+id/partida_endereco_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="Cuiabá, MT" />
+                    </LinearLayout>
 
                     <ImageButton
-                        android:id="@+id/btn_remover_partida"
+                        android:id="@+id/remover_partida_button"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/todo"
+                        android:contentDescription="@string/descricao_generica_todo"
                         app:srcCompat="@drawable/ic_close"
                         app:tint="?attr/colorOnSecondaryContainer"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/partida_divider_ajuste"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="20dp"
+                        android:alpha="0.12"
+                        android:background="?attr/colorOutline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/partida_check_fundo_card" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/partida_ajuste_km_card"
+                        style="?attr/materialCardViewFilledStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/partida_divider_ajuste">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/partida_ajuste_icon"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/informacao_ajuste"
+                                android:src="@drawable/ic_info"
+                                app:tint="?attr/colorSecondary"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/partida_ajuste_titulo_text"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/informacao_ajuste_distancia"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/partida_ajuste_icon"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/partida_ajuste_icon"
+                                app:layout_constraintTop_toTopOf="@id/partida_ajuste_icon" />
+
+                            <TextView
+                                android:id="@+id/partida_ajuste_descricao_text"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="@string/informacao_rota_card"
+                                android:textSize="13sp"
+                                android:alpha="0.75"
+                                android:lineSpacingExtra="2dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/partida_ajuste_titulo_text" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/partida_km_adicional_input_layout"
+                                style="?attr/textInputFilledStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:hint="@string/rotulo_km_adicionais"
+                                app:boxStrokeColor="?attr/colorPrimary"
+                                app:boxStrokeErrorColor="?attr/colorError"
+                                app:endIconMode="clear_text"
+                                app:helperText="Valor será somado à distância calculada"
+                                app:helperTextEnabled="true"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/partida_ajuste_descricao_text">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/partida_km_adicional_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="numberDecimal"
+                                    android:maxLines="1"
+                                    android:textSize="16sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <LinearLayout
+                                android:id="@+id/partida_botoes_rapidos_container"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/partida_km_adicional_input_layout">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/rotulo_atalhos"
+                                    android:textSize="12sp"
+                                    android:alpha="0.7"
+                                    android:layout_marginEnd="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/partida_adicionar_5km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_5"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/partida_adicionar_10km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_10"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/partida_adicionar_20km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_20"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_destino"
+                android:id="@+id/local_destino_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/card_partida"
+                app:layout_constraintTop_toBottomOf="@id/local_partida_card"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="gone"
-                tools:visibility="visible">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -473,58 +627,218 @@
                     android:padding="20dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/fundo_check_destino"
+                        android:id="@+id/destino_check_fundo_card"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         app:cardBackgroundColor="?attr/colorPrimary"
                         app:cardCornerRadius="16dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_gravity="center"
-                            android:contentDescription="@string/todo"
+                            android:contentDescription="@string/descricao_generica_todo"
                             android:src="@drawable/ic_check_circle"
                             app:tint="?attr/colorOnPrimary" />
                     </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tv_primario_destino"
+                    <LinearLayout
+                        android:id="@+id/destino_info_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        tools:text="@string/tools_text_endereco_destino"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/btn_remover_destino"
-                        app:layout_constraintStart_toEndOf="@id/fundo_check_destino"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="@id/destino_check_fundo_card"
+                        app:layout_constraintEnd_toStartOf="@id/remover_destino_button"
+                        app:layout_constraintStart_toEndOf="@id/destino_check_fundo_card"
+                        app:layout_constraintTop_toTopOf="@id/destino_check_fundo_card">
+
+                        <TextView
+                            android:id="@+id/destino_label_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/titulo_rotulo_destino"
+                            android:textSize="12sp"
+                            android:alpha="0.7" />
+
+                        <TextView
+                            android:id="@+id/destino_endereco_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="São Paulo, SP" />
+                    </LinearLayout>
 
                     <ImageButton
-                        android:id="@+id/btn_remover_destino"
+                        android:id="@+id/remover_destino_button"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/todo"
+                        android:contentDescription="@string/descricao_generica_todo"
                         app:srcCompat="@drawable/ic_close"
                         app:tint="?attr/colorOnSecondaryContainer"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/destino_divider_ajuste"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="20dp"
+                        android:alpha="0.12"
+                        android:background="?attr/colorOutline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/destino_check_fundo_card" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/destino_ajuste_km_card"
+                        style="?attr/materialCardViewFilledStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/destino_divider_ajuste">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/destino_ajuste_icon"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/informacao_ajuste"
+                                android:src="@drawable/ic_info"
+                                app:tint="?attr/colorSecondary"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/destino_ajuste_titulo_text"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/informacao_ajuste_distancia"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/destino_ajuste_icon"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/destino_ajuste_icon"
+                                app:layout_constraintTop_toTopOf="@id/destino_ajuste_icon" />
+
+                            <TextView
+                                android:id="@+id/destino_ajuste_descricao_text"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="@string/informacao_rota_card"
+                                android:textSize="13sp"
+                                android:alpha="0.75"
+                                android:lineSpacingExtra="2dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/destino_ajuste_titulo_text" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/destino_km_adicional_input_layout"
+                                style="?attr/textInputFilledStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:hint="@string/rotulo_km_adicionais"
+                                app:boxStrokeColor="?attr/colorPrimary"
+                                app:boxStrokeErrorColor="?attr/colorError"
+                                app:endIconMode="clear_text"
+                                app:helperText="Valor será somado à distância calculada"
+                                app:helperTextEnabled="true"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/destino_ajuste_descricao_text">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/destino_km_adicional_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="numberDecimal"
+                                    android:maxLines="1"
+                                    android:textSize="16sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <LinearLayout
+                                android:id="@+id/destino_botoes_rapidos_container"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/destino_km_adicional_input_layout">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/rotulo_atalhos"
+                                    android:textSize="12sp"
+                                    android:alpha="0.7"
+                                    android:layout_marginEnd="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/destino_adicionar_5km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_5"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/destino_adicionar_10km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_10"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/destino_adicionar_20km_button"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:minWidth="60dp"
+                                    android:text="@string/atalho_mais_20"
+                                    android:textSize="12sp"
+                                    app:cornerRadius="8dp" />
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_valor_frete_final"
+                android:id="@+id/valor_frete_final_card"
                 style="?attr/materialCardViewFilledStyle"
                 app:cardCornerRadius="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:layout_constraintTop_toBottomOf="@id/card_destino"
+                app:layout_constraintTop_toBottomOf="@id/local_destino_card"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="gone"
@@ -536,7 +850,7 @@
                     android:padding="28dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_rota_container"
+                        android:id="@+id/rota_resumo_card"
                         style="?attr/materialCardViewFilledStyle"
                         app:cardCornerRadius="20dp"
                         android:layout_width="0dp"
@@ -552,22 +866,22 @@
                             android:padding="20dp">
 
                             <TextView
-                                android:id="@+id/tv_label_origem"
+                                android:id="@+id/origem_label_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/label_origem"
+                                android:text="@string/rotulo_origem"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/divider_vertical"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/tv_origem_frete"
+                                android:id="@+id/origem_valor_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/divider_vertical"
-                                app:layout_constraintTop_toBottomOf="@id/tv_label_origem"
+                                app:layout_constraintTop_toBottomOf="@id/origem_label_text"
                                 tools:text="São Paulo, SP" />
 
                             <View
@@ -579,52 +893,52 @@
                                 android:background="?attr/colorOutline"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/tv_origem_frete"
-                                app:layout_constraintEnd_toStartOf="@id/tv_destino_frete" />
+                                app:layout_constraintStart_toEndOf="@id/origem_valor_text"
+                                app:layout_constraintEnd_toStartOf="@id/destino_valor_text" />
 
                             <TextView
-                                android:id="@+id/tv_label_destino"
+                                android:id="@+id/destino_label_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="end"
-                                android:text="@string/label_destino"
+                                android:text="@string/rotulo_destino"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/divider_vertical"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/tv_destino_frete"
+                                android:id="@+id/destino_valor_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:gravity="end"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/divider_vertical"
-                                app:layout_constraintTop_toBottomOf="@id/tv_label_destino"
+                                app:layout_constraintTop_toBottomOf="@id/destino_label_text"
                                 tools:text="Cuiabá, MT" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
-                        android:id="@+id/tv_label_distancia"
+                        android:id="@+id/distancia_label_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:text="@string/label_distancia_km"
+                        android:text="@string/rotulo_distancia_km"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/card_rota_container" />
+                        app:layout_constraintTop_toBottomOf="@id/rota_resumo_card" />
 
                     <TextView
-                        android:id="@+id/tv_distancia_frete"
+                        android:id="@+id/distancia_valor_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        app:layout_constraintBaseline_toBaselineOf="@id/tv_label_distancia"
+                        app:layout_constraintBaseline_toBaselineOf="@id/distancia_label_text"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:text="1.234 km" />
 
                     <View
-                        android:id="@+id/divider"
+                        android:id="@+id/separador_distancia"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginTop="28dp"
@@ -632,28 +946,28 @@
                         android:background="?attr/colorOutline"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_label_distancia" />
+                        app:layout_constraintTop_toBottomOf="@id/distancia_label_text" />
 
                     <TextView
-                        android:id="@+id/tv_label_valor_frete"
+                        android:id="@+id/valor_frete_label_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="28dp"
-                        android:text="@string/valor_frete"
+                        android:text="@string/rotulo_valor_frete"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_valor_frete"
-                        app:layout_constraintTop_toBottomOf="@id/divider" />
+                        app:layout_constraintEnd_toStartOf="@id/valor_frete_text"
+                        app:layout_constraintTop_toBottomOf="@id/separador_distancia" />
 
                     <TextView
-                        android:id="@+id/tv_valor_frete"
+                        android:id="@+id/valor_frete_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBaseline_toBaselineOf="@id/tv_label_valor_frete"
+                        app:layout_constraintBaseline_toBaselineOf="@id/valor_frete_label_text"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:text="R$ 2.450,00" />
 
                     <View
-                        android:id="@+id/divider_fino"
+                        android:id="@+id/separador_fino"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginVertical="20dp"
@@ -661,23 +975,23 @@
                         android:background="?attr/colorOutline"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_label_valor_frete" />
+                        app:layout_constraintTop_toBottomOf="@id/valor_frete_label_text" />
 
                     <TextView
-                        android:id="@+id/tv_label_valor_final_total"
+                        android:id="@+id/valor_total_final_label_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="28dp"
-                        android:text="@string/valor_final_total"
+                        android:text="@string/rotulo_valor_total_final"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/tv_valor_final_total"
-                        app:layout_constraintTop_toBottomOf="@id/divider_fino" />
+                        app:layout_constraintEnd_toStartOf="@id/valor_total_final_text"
+                        app:layout_constraintTop_toBottomOf="@id/separador_fino" />
 
                     <TextView
-                        android:id="@+id/tv_valor_final_total"
+                        android:id="@+id/valor_total_final_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBaseline_toBaselineOf="@id/tv_label_valor_final_total"
+                        app:layout_constraintBaseline_toBaselineOf="@id/valor_total_final_label_text"
                         app:layout_constraintEnd_toEndOf="parent"
                         tools:text="R$ 45.850,00" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -687,16 +1001,16 @@
     </ScrollView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_send"
+        android:id="@+id/enviar_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="@string/btn_send"
-        android:contentDescription="@string/desc_botao_calcular"
+        android:text="@string/botao_enviar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"
         tools:visibility="visible" />
+
     <include layout="@layout/bottom_sheet_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -72,12 +72,11 @@
     <string name="desc_botao_calcular">Botão para calcular valor e frete</string>
     <string name="permission_denied_title">Permissão de localização</string>
     <string name="permission_denied">A permissão de localização é obrigatoria</string>
-    <string name="cancel">cancelar</string>
+    <string name="cancel">Cancelar</string>
     <string name="valor_total_estimado">Valor Total</string>
     <string name="valor_cabeca">Valor Cabeça</string>
     <string name="valor_por_kg">Valor por KG</string>
 
-    <!-- Novas strings extraídas de pasted_content.txt -->
     <string name="placeholder_peso_animal">150 kg</string>
     <string name="placeholder_preco_arroba">0,00</string>
     <string name="placeholder_quantidade_animais">0</string>
@@ -94,7 +93,6 @@
     <string name="tools_text_valor_kg">R$ 15,50</string>
     <string name="tools_text_valor_total">R$ 2.657,14</string>
     <string name="tools_text_motivo_recomendacao">Otimização para redução de custo por km.</string>
-    <string name="contentDescription"></string>
     <string name="hint_searchbar">Pesquisar...</string>
     <string name="titulo_calculo_frete">Cálculo do Frete</string>
     <string name="label_origem">Origem</string>
@@ -106,5 +104,43 @@
     <string name="todo">TODO</string>
     <string name="para_onde">Para onde?</string>
     <string name="info_search_location_is_null">Digite para buscar um endereço</string>
+    <string name="text_info_rota_card">A rota calculada é aproximada. Adicione quilômetros extras se necessário para compensar desvios ou acessos internos.</string>
+    <string name="info_ajuste">Informação sobre ajuste</string>
+    <string name="info_ajuste_distancia">Ajuste de Distância</string>
+    <string name="km_adicionais">Quilômetros adicionais</string>
 
+    <string name="instrucao_preencher_campos">Preencha os campos abaixo para calcular.</string>
+    <string name="rotulo_recomendacao_transporte">Recomendação de Transporte</string>
+    <string name="rotulo_valor_frete">Valor do Frete</string>
+    <string name="rotulo_valor_total_final">Valor Final Total</string>
+    <string name="rotulo_categoria_animal">Categoria do Animal</string>
+    <string name="rotulo_preco_arroba">Preço da Arroba</string>
+    <string name="rotulo_peso_animal">Peso do Animal</string>
+    <string name="rotulo_quantidade_animais">Quantidade de Animais</string>
+    <string name="rotulo_origem">Origem</string>
+    <string name="rotulo_destino">Destino</string>
+    <string name="rotulo_distancia_km">Distância (Km)</string>
+    <string name="rotulo_km_adicionais">Km Adicionais</string>
+    <string name="botao_enviar">Enviar</string>
+    <string name="botao_adicionar_localizacao">Adicionar Localização</string>
+    <string name="botao_buscar_localizacao">Buscar Localização</string>
+    <string name="rotulo_valor_por_cabeca">Valor por Cabeça</string>
+    <string name="rotulo_valor_por_kg">Valor por Kg</string>
+    <string name="rotulo_valor_total_estimado">Valor Total Estimado</string>
+    <string name="informacao_ajuste_distancia">Ajuste a distância para o cálculo do frete.</string>
+    <string name="informacao_rota_card">Informação da Rota</string>
+    <string name="informacao_ajuste">Informação de ajuste</string>
+    <string name="preview_valor_por_cabeca">R$ 0,00</string>
+    <string name="preview_valor_por_kg">R$ 0,00</string>
+    <string name="preview_valor_total">R$ 0,00</string>
+    <string name="preview_motivo_recomendacao">O peso total dos animais excede o limite de transporte.</string>
+    <string name="descricao_generica_todo">Descrição de conteúdo pendente (TODO)</string>
+    <string name="titulo_rotulo_origem">Origem</string>
+    <string name="titulo_rotulo_destino">Destino</string>
+    <string name="rotulo_atalhos">Atalhos:</string>
+    <string name="atalho_mais_5">+5</string>
+    <string name="atalho_mais_10">+10</string>
+    <string name="atalho_mais_20">+20</string>
+    <string name="submit">OK</string>
+    <string name="error_locations">Erro inesperado</string>
 </resources>

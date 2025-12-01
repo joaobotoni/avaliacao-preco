@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
@@ -9,7 +10,7 @@
     android:paddingBottom="8dp">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/container_campos"
+        android:id="@+id/origem_destino_card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:cardCornerRadius="12dp"
@@ -27,30 +28,29 @@
             android:paddingVertical="6dp">
 
             <ImageView
-                android:id="@+id/iv_icone_origem_interno"
+                android:id="@+id/partida_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="14dp"
-                android:contentDescription="@string/todo"
                 android:src="@drawable/ic_circle"
                 app:tint="?attr/colorPrimary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/til_origem"
-                app:layout_constraintBottom_toBottomOf="@id/til_origem" />
+                app:layout_constraintTop_toTopOf="@id/partida_input_layout"
+                app:layout_constraintBottom_toBottomOf="@id/partida_input_layout" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_origem"
+                android:id="@+id/partida_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/label_endereco_partida"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:layout_constraintStart_toEndOf="@id/iv_icone_origem_interno"
+                app:layout_constraintStart_toEndOf="@id/partida_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_origem"
+                    android:id="@+id/partida_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -65,55 +65,53 @@
                     android:inputType="textPostalAddress"
                     android:imeOptions="actionNext"
                     android:maxLines="1" />
-
             </com.google.android.material.textfield.TextInputLayout>
 
             <View
-                android:id="@+id/linha_separadora"
+                android:id="@+id/partida_destino_separador"
                 android:layout_width="0dp"
                 android:layout_height="1.5dp"
                 android:layout_marginStart="42dp"
                 android:background="?attr/colorPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/til_origem" />
+                app:layout_constraintTop_toBottomOf="@id/partida_input_layout" />
 
             <View
-                android:id="@+id/linha_conectora_interna"
+                android:id="@+id/linha_conectora"
                 android:layout_width="1.5dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="23dp"
                 android:background="?attr/colorPrimary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_icone_origem_interno"
-                app:layout_constraintBottom_toTopOf="@id/iv_icone_destino_interno" />
+                app:layout_constraintTop_toBottomOf="@id/partida_icon"
+                app:layout_constraintBottom_toTopOf="@id/destino_icon" />
 
             <ImageView
-                android:id="@+id/iv_icone_destino_interno"
+                android:id="@+id/destino_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="14dp"
                 android:src="@drawable/ic_circle"
-                android:contentDescription="@string/todo"
                 app:tint="?attr/colorPrimary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/til_destino"
-                app:layout_constraintBottom_toBottomOf="@id/til_destino" />
+                app:layout_constraintTop_toTopOf="@id/destino_input_layout"
+                app:layout_constraintBottom_toBottomOf="@id/destino_input_layout" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_destino"
+                android:id="@+id/destino_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/para_onde"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:layout_constraintStart_toEndOf="@id/iv_icone_destino_interno"
+                app:layout_constraintStart_toEndOf="@id/destino_icon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linha_separadora"
+                app:layout_constraintTop_toBottomOf="@id/partida_destino_separador"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_destino"
+                    android:id="@+id/destino_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -128,9 +126,7 @@
                     android:inputType="textPostalAddress"
                     android:imeOptions="actionDone"
                     android:maxLines="1" />
-
             </com.google.android.material.textfield.TextInputLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

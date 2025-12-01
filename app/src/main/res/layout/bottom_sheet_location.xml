@@ -6,25 +6,25 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-        android:id="@+id/bottom_sheet_padrao"
+        android:id="@+id/localizacao_bottom_sheet_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="@style/Widget.Material3.BottomSheet"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/bottom_sheet_content_container"
+            android:id="@+id/bottom_sheet_conteudo_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-                android:id="@+id/alca_arraste"
+                android:id="@+id/bottom_sheet_drag_handle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/layout_origem_destino"
+                android:id="@+id/origem_destino_container"
                 layout="@layout/layout_origem_destino"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -32,15 +32,15 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/alca_arraste" />
+                app:layout_constraintTop_toBottomOf="@id/bottom_sheet_drag_handle" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_localizacoes"
+                android:id="@+id/localizacoes_recycler_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="16dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/layout_origem_destino"
+                app:layout_constraintTop_toBottomOf="@id/origem_destino_container"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
