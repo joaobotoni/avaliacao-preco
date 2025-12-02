@@ -350,43 +350,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/location_container_view"
+                    android:name="com.botoni.avaliacaodepreco.ui.LocationCardFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="32dp">
+                    android:layout_height="wrap_content" />
 
-                    <ImageView
-                        android:id="@+id/localizacao_icon"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:src="@drawable/ic_location_on"
-                        app:tint="?attr/colorOnSurfaceVariant"
-                        android:contentDescription="@string/descricao_generica_todo"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/adicionar_localizacao_texto_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/botao_adicionar_localizacao"
-                        android:textAlignment="center"
-                        app:layout_constraintTop_toBottomOf="@id/localizacao_icon"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/botao_buscar_localizacao"
-                        android:textAlignment="center"
-                        app:layout_constraintTop_toBottomOf="@id/adicionar_localizacao_texto_text"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -406,7 +375,7 @@
                     android:padding="20dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/partida_check_fundo_card"
+                        android:id="@+id/local_partida_check_fundo_card"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         app:cardBackgroundColor="?attr/colorPrimary"
@@ -424,19 +393,19 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout
-                        android:id="@+id/partida_info_container"
+                        android:id="@+id/local_partida_info_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:orientation="vertical"
-                        app:layout_constraintBottom_toBottomOf="@id/partida_check_fundo_card"
-                        app:layout_constraintEnd_toStartOf="@id/remover_partida_button"
-                        app:layout_constraintStart_toEndOf="@id/partida_check_fundo_card"
-                        app:layout_constraintTop_toTopOf="@id/partida_check_fundo_card">
+                        app:layout_constraintBottom_toBottomOf="@id/local_partida_check_fundo_card"
+                        app:layout_constraintEnd_toStartOf="@id/local_remover_partida_button"
+                        app:layout_constraintStart_toEndOf="@id/local_partida_check_fundo_card"
+                        app:layout_constraintTop_toTopOf="@id/local_partida_check_fundo_card">
 
                         <TextView
-                            android:id="@+id/partida_label_text"
+                            android:id="@+id/local_partida_label_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/titulo_rotulo_origem"
@@ -444,7 +413,7 @@
                             android:alpha="0.7" />
 
                         <TextView
-                            android:id="@+id/partida_endereco_text"
+                            android:id="@+id/local_partida_endereco_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -454,7 +423,7 @@
                     </LinearLayout>
 
                     <ImageButton
-                        android:id="@+id/remover_partida_button"
+                        android:id="@+id/local_remover_partida_button"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -465,7 +434,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:id="@+id/partida_divider_ajuste"
+                        android:id="@+id/local_partida_divider_ajuste"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginTop="20dp"
@@ -473,10 +442,10 @@
                         android:background="?attr/colorOutline"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/partida_check_fundo_card" />
+                        app:layout_constraintTop_toBottomOf="@id/local_partida_check_fundo_card" />
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/partida_ajuste_km_card"
+                        android:id="@+id/local_partida_ajuste_km_card"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -486,7 +455,7 @@
                         app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/partida_divider_ajuste">
+                        app:layout_constraintTop_toBottomOf="@id/local_partida_divider_ajuste">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -494,7 +463,7 @@
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/partida_ajuste_icon"
+                                android:id="@+id/local_partida_ajuste_icon"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:contentDescription="@string/informacao_ajuste"
@@ -504,20 +473,20 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/partida_ajuste_titulo_text"
+                                android:id="@+id/local_partida_ajuste_titulo_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
                                 android:text="@string/informacao_ajuste_distancia"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
-                                app:layout_constraintBottom_toBottomOf="@id/partida_ajuste_icon"
+                                app:layout_constraintBottom_toBottomOf="@id/local_partida_ajuste_icon"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/partida_ajuste_icon"
-                                app:layout_constraintTop_toTopOf="@id/partida_ajuste_icon" />
+                                app:layout_constraintStart_toEndOf="@id/local_partida_ajuste_icon"
+                                app:layout_constraintTop_toTopOf="@id/local_partida_ajuste_icon" />
 
                             <TextView
-                                android:id="@+id/partida_ajuste_descricao_text"
+                                android:id="@+id/local_partida_ajuste_descricao_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -527,10 +496,10 @@
                                 android:lineSpacingExtra="2dp"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/partida_ajuste_titulo_text" />
+                                app:layout_constraintTop_toBottomOf="@id/local_partida_ajuste_titulo_text" />
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/partida_km_adicional_input_layout"
+                                android:id="@+id/local_partida_km_adicional_input_layout"
                                 style="?attr/textInputFilledStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -543,10 +512,10 @@
                                 app:helperTextEnabled="true"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/partida_ajuste_descricao_text">
+                                app:layout_constraintTop_toBottomOf="@id/local_partida_ajuste_descricao_text">
 
                                 <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/partida_km_adicional_input"
+                                    android:id="@+id/local_partida_km_adicional_input"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:inputType="numberDecimal"
@@ -555,7 +524,7 @@
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <LinearLayout
-                                android:id="@+id/partida_botoes_rapidos_container"
+                                android:id="@+id/local_partida_botoes_rapidos_container"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
@@ -563,7 +532,7 @@
                                 android:gravity="center"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/partida_km_adicional_input_layout">
+                                app:layout_constraintTop_toBottomOf="@id/local_partida_km_adicional_input_layout">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -574,7 +543,7 @@
                                     android:layout_marginEnd="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/partida_adicionar_5km_button"
+                                    android:id="@+id/local_partida_adicionar_5km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -585,7 +554,7 @@
                                     app:cornerRadius="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/partida_adicionar_10km_button"
+                                    android:id="@+id/local_partida_adicionar_10km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -596,7 +565,7 @@
                                     app:cornerRadius="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/partida_adicionar_20km_button"
+                                    android:id="@+id/local_partida_adicionar_20km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -627,7 +596,7 @@
                     android:padding="20dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/destino_check_fundo_card"
+                        android:id="@+id/local_destino_check_fundo_card"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         app:cardBackgroundColor="?attr/colorPrimary"
@@ -645,19 +614,19 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout
-                        android:id="@+id/destino_info_container"
+                        android:id="@+id/local_destino_info_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:orientation="vertical"
-                        app:layout_constraintBottom_toBottomOf="@id/destino_check_fundo_card"
-                        app:layout_constraintEnd_toStartOf="@id/remover_destino_button"
-                        app:layout_constraintStart_toEndOf="@id/destino_check_fundo_card"
-                        app:layout_constraintTop_toTopOf="@id/destino_check_fundo_card">
+                        app:layout_constraintBottom_toBottomOf="@id/local_destino_check_fundo_card"
+                        app:layout_constraintEnd_toStartOf="@id/local_remover_destino_button"
+                        app:layout_constraintStart_toEndOf="@id/local_destino_check_fundo_card"
+                        app:layout_constraintTop_toTopOf="@id/local_destino_check_fundo_card">
 
                         <TextView
-                            android:id="@+id/destino_label_text"
+                            android:id="@+id/local_destino_label_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/titulo_rotulo_destino"
@@ -665,7 +634,7 @@
                             android:alpha="0.7" />
 
                         <TextView
-                            android:id="@+id/destino_endereco_text"
+                            android:id="@+id/local_destino_endereco_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -675,7 +644,7 @@
                     </LinearLayout>
 
                     <ImageButton
-                        android:id="@+id/remover_destino_button"
+                        android:id="@+id/local_remover_destino_button"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -686,7 +655,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:id="@+id/destino_divider_ajuste"
+                        android:id="@+id/local_destino_divider_ajuste"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginTop="20dp"
@@ -694,10 +663,10 @@
                         android:background="?attr/colorOutline"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/destino_check_fundo_card" />
+                        app:layout_constraintTop_toBottomOf="@id/local_destino_check_fundo_card" />
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/destino_ajuste_km_card"
+                        android:id="@+id/local_destino_ajuste_km_card"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -707,7 +676,7 @@
                         app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/destino_divider_ajuste">
+                        app:layout_constraintTop_toBottomOf="@id/local_destino_divider_ajuste">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
@@ -715,7 +684,7 @@
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/destino_ajuste_icon"
+                                android:id="@+id/local_destino_ajuste_icon"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:contentDescription="@string/informacao_ajuste"
@@ -725,20 +694,20 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/destino_ajuste_titulo_text"
+                                android:id="@+id/local_destino_ajuste_titulo_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
                                 android:text="@string/informacao_ajuste_distancia"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
-                                app:layout_constraintBottom_toBottomOf="@id/destino_ajuste_icon"
+                                app:layout_constraintBottom_toBottomOf="@id/local_destino_ajuste_icon"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/destino_ajuste_icon"
-                                app:layout_constraintTop_toTopOf="@id/destino_ajuste_icon" />
+                                app:layout_constraintStart_toEndOf="@id/local_destino_ajuste_icon"
+                                app:layout_constraintTop_toTopOf="@id/local_destino_ajuste_icon" />
 
                             <TextView
-                                android:id="@+id/destino_ajuste_descricao_text"
+                                android:id="@+id/local_destino_ajuste_descricao_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -748,10 +717,10 @@
                                 android:lineSpacingExtra="2dp"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/destino_ajuste_titulo_text" />
+                                app:layout_constraintTop_toBottomOf="@id/local_destino_ajuste_titulo_text" />
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/destino_km_adicional_input_layout"
+                                android:id="@+id/local_destino_km_adicional_input_layout"
                                 style="?attr/textInputFilledStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -764,10 +733,10 @@
                                 app:helperTextEnabled="true"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/destino_ajuste_descricao_text">
+                                app:layout_constraintTop_toBottomOf="@id/local_destino_ajuste_descricao_text">
 
                                 <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/destino_km_adicional_input"
+                                    android:id="@+id/local_destino_km_adicional_input"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:inputType="numberDecimal"
@@ -776,7 +745,7 @@
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <LinearLayout
-                                android:id="@+id/destino_botoes_rapidos_container"
+                                android:id="@+id/local_destino_botoes_rapidos_container"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
@@ -784,7 +753,7 @@
                                 android:gravity="center"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/destino_km_adicional_input_layout">
+                                app:layout_constraintTop_toBottomOf="@id/local_destino_km_adicional_input_layout">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -795,7 +764,7 @@
                                     android:layout_marginEnd="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/destino_adicionar_5km_button"
+                                    android:id="@+id/local_destino_adicionar_5km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -806,7 +775,7 @@
                                     app:cornerRadius="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/destino_adicionar_10km_button"
+                                    android:id="@+id/local_destino_adicionar_10km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -817,7 +786,7 @@
                                     app:cornerRadius="8dp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/destino_adicionar_20km_button"
+                                    android:id="@+id/local_destino_adicionar_20km_button"
                                     style="@style/Widget.Material3.Button.TonalButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="36dp"
@@ -897,7 +866,7 @@
                                 app:layout_constraintEnd_toStartOf="@id/destino_valor_text" />
 
                             <TextView
-                                android:id="@+id/destino_label_text"
+                                android:id="@+id/_label_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="end"
@@ -914,7 +883,7 @@
                                 android:gravity="end"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/divider_vertical"
-                                app:layout_constraintTop_toBottomOf="@id/destino_label_text"
+                                app:layout_constraintTop_toBottomOf="@id/origem_label_text"
                                 tools:text="Cuiabá, MT" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -1011,6 +980,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"
         tools:visibility="visible" />
-
-    <include layout="@layout/bottom_sheet_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

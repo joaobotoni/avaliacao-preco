@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
- android {
+android {
     namespace = "com.botoni.avaliacaodepreco"
 
     compileSdk {
@@ -32,6 +33,11 @@ plugins {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 dependencies {

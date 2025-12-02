@@ -83,8 +83,8 @@
     <string name="placeholder_distancia_km">0</string>
     <string name="info_adicionar_localizacao">Adicione a Localização</string>
     <string name="info_buscar_localizacao">Toque no botão abaixo para buscar ou selecionar sua localização atual</string>
-    <string name="label_endereco_partida">Digite sua localização</string>
-    <string name="label_endereco_destino">Endereço de Destino</string>
+    <string name="label_endereco_origem">Digite o Endereço de Destino</string>
+    <string name="label_endereco_destino">Cuiabá - Mato Grosso</string>
     <string name="tools_text_endereco_partida">Avenida Modelo, 1234 – Zona Teste</string>
     <string name="tools_text_endereco_partida_secundario">Praça da República</string>
     <string name="tools_text_endereco_destino">Rua Alfa, 42 – Setor Beta</string>
@@ -102,7 +102,6 @@
     <string name="valor_final_total">Total</string>
     <string name="helper_calculo_arroba">1 arroba = 15kg | Valores aproximados</string>
     <string name="todo">TODO</string>
-    <string name="para_onde">Para onde?</string>
     <string name="info_search_location_is_null">Digite para buscar um endereço</string>
     <string name="text_info_rota_card">A rota calculada é aproximada. Adicione quilômetros extras se necessário para compensar desvios ou acessos internos.</string>
     <string name="info_ajuste">Informação sobre ajuste</string>
@@ -142,5 +141,8 @@
     <string name="atalho_mais_10">+10</string>
     <string name="atalho_mais_20">+20</string>
     <string name="submit">OK</string>
-    <string name="error_locations">Erro inesperado</string>
+    <string name="error_locations">Erro ao processar os locais</string>
+    <string name="error_maps">Erro ao carregar o mapa</string>
+    <string name="error_route">Erro ao calcular rota</string>
+    <string name="error_api_key">Erro ao carregar a API</string>
 </resources>
