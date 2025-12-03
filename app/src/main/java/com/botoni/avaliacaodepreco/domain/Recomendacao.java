@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco.data.entities;
+package com.botoni.avaliacaodepreco.domain;
 
 public class Recomendacao {
     private final int qtdeRecomendada;
@@ -8,7 +8,6 @@ public class Recomendacao {
         this.qtdeRecomendada = qtdeRecomendada;
         this.tipoTransporte = tipoTransporte;
     }
-
     public int getQtdeRecomendada() {
         return qtdeRecomendada;
     }

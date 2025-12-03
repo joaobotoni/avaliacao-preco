@@ -14,7 +14,6 @@ import com.botoni.avaliacaodepreco.R;
 import java.util.List;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
-
     public interface OnClickListener {
         void onItemClick(Address address);
     }

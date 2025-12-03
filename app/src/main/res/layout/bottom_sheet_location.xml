@@ -13,9 +13,132 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/bottom_sheet_conteudo_container"
+            android:id="@+id/layout_half_expanded"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/layout_distance_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="24dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text_distance_summary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.02"
+                            android:textAppearance="?attr/textAppearanceTitleLarge"
+                            android:textColor="?attr/colorPrimary"
+                            tools:text="2,4 km" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Distância"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:alpha="0.5"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text_duration_summary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:textAppearance="?attr/textAppearanceTitleLarge"
+                            android:textColor="?attr/colorPrimary"
+                            tools:text="8 min" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Tempo"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_edit"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="12dp"
+                android:text="Editar"
+                android:textAllCaps="false"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                app:cornerRadius="16dp"
+                app:layout_constraintEnd_toStartOf="@id/button_finalizar"
+                app:layout_constraintHorizontal_weight="0.35"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_info" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_finalizar"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:text="Finalizar rota"
+                android:textAllCaps="false"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                app:cornerRadius="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.65"
+                app:layout_constraintStart_toEndOf="@id/button_edit"
+                app:layout_constraintTop_toBottomOf="@id/card_info" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
 
             <com.google.android.material.bottomsheet.BottomSheetDragHandleView
                 android:id="@+id/bottom_sheet_drag_handle"
@@ -28,24 +151,25 @@
                 layout="@layout/layout_origem_destino"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bottom_sheet_drag_handle" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/localizacoes_recycler_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/origem_destino_container"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/origem_destino_container"
                 tools:listitem="@layout/item_localizacao" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -352,7 +352,7 @@
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/location_container_view"
-                    android:name="com.botoni.avaliacaodepreco.ui.LocationCardFragment"
+                    android:name="com.botoni.avaliacaodepreco.ui.fragments.LocationCardFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

@@ -16,18 +16,5 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".MapsActivity" />
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:visibility="visible"
-        app:backgroundTint="?attr/colorSecondaryContainer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_location_on"
-        app:tint="@android:color/white" />
-    <include layout="@layout/bottom_sheet_location" android:elevation="10dp"/>
-
+    <include layout="@layout/bottom_sheet_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

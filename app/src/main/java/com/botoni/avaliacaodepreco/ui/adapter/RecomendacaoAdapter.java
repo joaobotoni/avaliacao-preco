@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.botoni.avaliacaodepreco.R;
-import com.botoni.avaliacaodepreco.data.entities.Recomendacao;
+import com.botoni.avaliacaodepreco.domain.Recomendacao;
 
 import java.util.List;
 
@@ -37,8 +37,8 @@ public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView textViewQuantidade;
-        private TextView textViewTipoTransporte;
+        private final TextView textViewQuantidade;
+        private final TextView textViewTipoTransporte;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

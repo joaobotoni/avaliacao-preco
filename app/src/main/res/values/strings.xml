@@ -140,9 +140,20 @@
     <string name="atalho_mais_5">+5</string>
     <string name="atalho_mais_10">+10</string>
     <string name="atalho_mais_20">+20</string>
+    <string name="error_api_key">Erro ao carregar a chave da API do Google Maps. Verifique o AndroidManifest.xml.</string>
+    <string name="error_maps">Erro ao aplicar o estilo do mapa. O mapa pode não ser exibido corretamente.</string>
+    <string name="error_locations">Erro de comunicação com o serviço de localização (Geocoder). Verifique sua conexão.</string>
+    <string name="error_network_directions">Erro de rede ao buscar rotas. Verifique sua conexão com a internet.</string>
+    <string name="error_json_directions">Erro ao processar a resposta da API de rotas. O formato dos dados está incorreto.</string>
+    <string name="error_no_route">Não foi possível encontrar uma rota entre a origem e o destino selecionados.</string>
+    <string name="error_unknown_directions">Ocorreu um erro desconhecido ao buscar as rotas.</string>
+    <string name="error_permission_denied_title">Permissão Negada</string>
+    <string name="error_permission_denied">É necessário conceder as permissões de localização para usar este recurso.</string>
+    <string name="error_no_location_data">Não foi possível obter os dados de localização atual.</string>
+    <string name="error_invalid_input">A origem deve ter pelo menos %d caracteres para iniciar a busca.</string>
     <string name="submit">OK</string>
-    <string name="error_locations">Erro ao processar os locais</string>
-    <string name="error_maps">Erro ao carregar o mapa</string>
-    <string name="error_route">Erro ao calcular rota</string>
-    <string name="error_api_key">Erro ao carregar a API</string>
+    <string name="origin_title">Origem</string>
+    <string name="destination_title">Destino</string>
+    <string name="route_info_format">Distância: %1$s, Duração: %2$s</string>
+    <string name="error">Erro Inesperado</string>
 </resources>

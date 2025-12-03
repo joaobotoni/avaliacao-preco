@@ -1,6 +1,5 @@
-package com.botoni.avaliacaodepreco.ui;
+package com.botoni.avaliacaodepreco.ui.fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -10,11 +9,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.botoni.avaliacaodepreco.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApi;
-
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
