@@ -1,6 +1,6 @@
 package com.botoni.avaliacaodepreco.di;
 
-public interface Callback<T> {
+public interface ResultListener<T> {
     void onSuccess(T result);
     void onError(int error);
 }

@@ -1,6 +1,6 @@
 package com.botoni.avaliacaodepreco.di;
 
 @FunctionalInterface
-public interface SearchCallback {
+public interface SearchListener {
     void onSearch(String query);
 }

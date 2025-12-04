@@ -4,13 +4,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 
-import com.botoni.avaliacaodepreco.di.SearchCallback;
+import com.botoni.avaliacaodepreco.di.SearchListener;
 
 public class SearchWatcher implements TextWatcher {
     private static final int MIN_SEARCH_LENGTH = 2;
-    private final SearchCallback callback;
+    private final SearchListener callback;
 
-    public SearchWatcher(SearchCallback callback) {
+    public SearchWatcher(SearchListener callback) {
         this.callback = callback;
     }
 

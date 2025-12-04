@@ -126,7 +126,7 @@
     <string name="rotulo_valor_por_cabeca">Valor por Cabeça</string>
     <string name="rotulo_valor_por_kg">Valor por Kg</string>
     <string name="rotulo_valor_total_estimado">Valor Total Estimado</string>
-    <string name="informacao_ajuste_distancia">Ajuste a distância para o cálculo do frete.</string>
+    <string name="informacao_ajuste_distancia">Ajuste a distância do frete</string>
     <string name="informacao_rota_card">Informação da Rota</string>
     <string name="informacao_ajuste">Informação de ajuste</string>
     <string name="preview_valor_por_cabeca">R$ 0,00</string>
@@ -156,4 +156,13 @@
     <string name="destination_title">Destino</string>
     <string name="route_info_format">Distância: %1$s, Duração: %2$s</string>
     <string name="error">Erro Inesperado</string>
+    <string name="helper_km_adicionais">Valor será somado à distância</string>
+    <string name="preview_origem_sp">São Paulo, SP</string>
+    <string name="preview_destino_mt">Cuiabá, MT</string>
+    <string name="preview_distancia_zero">0 km</string>
+    <string name="preview_valor_zero">R$ 0,00</string>
+    <string name="preview_rota_card">Visualizar percurso</string>
+    <string name="route_info_message">Sei la</string>
+
+
 </resources>

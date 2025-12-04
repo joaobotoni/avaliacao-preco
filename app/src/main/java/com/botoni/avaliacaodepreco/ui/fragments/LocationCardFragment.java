@@ -39,7 +39,7 @@ public class LocationCardFragment extends Fragment {
         Fragment parentFragment = getParentFragment();
         if (parentFragment != null)
             manager = parentFragment.getParentFragmentManager();
-        MaterialCardView cardView = view.findViewById(R.id.adicionar_localizacao_card);
+        MaterialCardView cardView = view.findViewById(R.id.card_ver_rota);
         cardView.setOnClickListener(v -> manager.beginTransaction()
                 .replace(R.id.fragment_container_view, LocationFragment.class, null)
                 .addToBackStack(null)
