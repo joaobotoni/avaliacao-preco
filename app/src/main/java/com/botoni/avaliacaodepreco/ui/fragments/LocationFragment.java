@@ -109,7 +109,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
         registerOriginListener();
         registerDestinationListener();
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private void registerOriginListener() {
         getParentFragmentManager().setFragmentResultListener(
                 RESULT_KEY_ORIGIN,
@@ -120,7 +120,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
                 }
         );
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private void registerDestinationListener() {
         getParentFragmentManager().setFragmentResultListener(
                 RESULT_KEY_DESTINATION,
@@ -160,9 +160,9 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
 
     private void configureBottomSheetBehavior(BottomSheetBehavior<FrameLayout> behavior) {
         behavior.setPeekHeight(BOTTOM_SHEET_PEEK_HEIGHT);
-        behavior.setHideable(false);
+        behavior.setHideable(true);
         behavior.setDraggable(false);
-        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void configureBottomSheetLayouts() {
@@ -275,6 +275,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
             drawRoute(directions.getRoutePoints());
             adjustCameraToRoute(extractCoordinates(originAddress), extractCoordinates(destinationAddress));
             displayRouteInfo(directions);
+            showBottomSheet(); // Mostrar o BottomSheet após calcular a rota
         });
     }
 
@@ -388,6 +389,12 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
 
     private void setViewVisibility(View view, int visibility) {
         view.setVisibility(visibility);
+    }
+
+    private void showBottomSheet() {
+        FrameLayout container = requireView().findViewById(R.id.localizacao_bottom_sheet_container);
+        BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(container);
+        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void handleEditAction() {
