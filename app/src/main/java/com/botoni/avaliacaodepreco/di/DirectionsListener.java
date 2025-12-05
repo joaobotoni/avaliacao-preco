@@ -3,8 +3,10 @@ package com.botoni.avaliacaodepreco.di;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.botoni.avaliacaodepreco.R;
 import com.botoni.avaliacaodepreco.domain.Directions;
@@ -23,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public interface DirectionsListener {
     default String load(@NonNull Context context) {
@@ -30,24 +34,24 @@ public interface DirectionsListener {
             ApplicationInfo info = context.getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             return Optional.ofNullable(info.metaData)
-                    .map(bundle -> bundle.getString("com.google.android.geo.API_KEY"))
+                    .map(bundle -> bundle.getString(context.getString(R.string.META_KEY_GOOGLE_MAPS_API)))
                     .filter(apiKey -> !apiKey.isEmpty())
-                    .orElseThrow(() -> new IllegalStateException(
-                            "API key not found or is empty in AndroidManifest.xml meta-data."));
+                    .orElseThrow(() -> new IllegalStateException(context.getString(R.string.ERROR_API_KEY_MISSING)));
 
         } catch (PackageManager.NameNotFoundException e) {
-            throw new IllegalStateException("Could not find the application package.", e);
+            throw new IllegalStateException(context.getString(R.string.ERROR_APP_PACKAGE_NOT_FOUND), e);
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     default String build(LatLng origin, LatLng destination, Context context) {
         String originStr = origin.latitude + "," + origin.longitude;
         String destStr = destination.latitude + "," + destination.longitude;
-        String params = String.format(Locale.US, "origin=%s&destination=%s&key=%s",
+        String params = String.format(Locale.US, context.getString(R.string.DIRECTIONS_API_QUERY_FORMAT),
                 URLEncoder.encode(originStr, StandardCharsets.UTF_8),
                 URLEncoder.encode(destStr, StandardCharsets.UTF_8),
                 load(context));
-        return "https://maps.googleapis.com/maps/api/directions/json" + "?" + params;
+        return context.getString(R.string.DIRECTIONS_API_BASE_URL) + "?" + params;
     }
 
     default String fetch(String curl) throws IOException {
@@ -106,7 +110,7 @@ public interface DirectionsListener {
         return points;
     }
 
-    default void parse(@NonNull String json, @NonNull ResultListener<Directions> resultListener) {
+    default void parse(@NonNull String json, @NonNull Consumer<Directions> success, @NonNull Consumer<Integer> failure) {
         try {
             JSONObject root = new JSONObject(json);
             String status = root.optString("status");
@@ -115,7 +119,7 @@ public interface DirectionsListener {
                 int errorRes = "ZERO_RESULTS".equals(status)
                         ? R.string.error_no_route
                         : R.string.error_unknown_directions;
-                resultListener.onError(errorRes);
+                failure.accept(errorRes);
                 return;
             }
 
@@ -130,10 +134,10 @@ public interface DirectionsListener {
             List<LatLng> points = decode(encoded);
             Directions directions = new Directions(points, distance, duration);
 
-            resultListener.onSuccess(directions);
+            success.accept(directions);
 
         } catch (Exception e) {
-            resultListener.onError(R.string.error_json_directions);
+            failure.accept(R.string.error_json_directions);
         }
     }
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,13 +22,13 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.botoni.avaliacaodepreco.R;
 import com.botoni.avaliacaodepreco.di.DirectionsListener;
 import com.botoni.avaliacaodepreco.di.PermissionsListener;
-import com.botoni.avaliacaodepreco.di.ResultListener;
 import com.botoni.avaliacaodepreco.domain.Directions;
 import com.botoni.avaliacaodepreco.ui.adapter.LocationAdapter;
 import com.botoni.avaliacaodepreco.ui.views.SearchWatcher;
@@ -49,56 +50,412 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment implements DirectionsListener, PermissionsListener {
-    private final String DEFAULT_LOCATION = "Cuiabá";
-    private static final int BACKGROUND_THREAD_POOL_SIZE = 4;
-    private static final int MAXIMUM_SEARCH_RESULTS = 10;
+    private static final String DEFAULT_LOCATION = "Cuiabá";
+    private static final int THREAD_POOL_SIZE = 4;
+    private static final int MAX_SEARCH_RESULTS = 10;
+    private static final String KEY_ORIGIN = "origin";
+    private static final String KEY_DESTINATION = "destination";
+    private static final String RESULT_KEY_ORIGIN = "originKey";
+    private static final String RESULT_KEY_DESTINATION = "destinationKey";
     private FragmentManager manager;
-    private ExecutorService executor;
+    private Address originAddress;
+    private Address destinationAddress;
+    private String userCountryCode;
+    private final List<Address> searchResults = new ArrayList<>();
+    private ExecutorService executorService;
     private Geocoder geocoder;
     private FusedLocationProviderClient locationClient;
-    private TextInputEditText inputOrigin;
-    private TextInputEditText inputDestination;
-    private TextInputLayout layoutInputOrigin;
-    private MaterialCardView locationCard;
+    private TextInputEditText originInput;
+    private TextInputEditText destinationInput;
+    private TextInputLayout originInputLayout;
+    private MaterialCardView addLocationCard;
+    private Button location;
     private RecyclerView recyclerView;
     private LocationAdapter adapter;
     private BottomSheetBehavior<FrameLayout> bottomSheet;
-    private final List<Address> addresses = new ArrayList<>();
-    private Address originAddress;
-    private Address destinationAddress;
-    private String countryCode;
 
     private final ActivityResultLauncher<String[]> permissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-                    this::handlePermissionResult);
+            registerForActivityResult(
+                    new ActivityResultContracts.RequestMultiplePermissions(),
+                    this::onPermissionsResult
+            );
+
+    private void onPermissionsResult(Map<String, Boolean> results) {
+        onResult(results, this::fetchUserLocation, this::showPermissionDeniedDialog);
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeServices();
+        initializeDependencies();
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_main, container, false); // This inflates the XML you provided
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindViews(view);
-        setupComponents();
+        initializeViews(view);
+        setupUI();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        shutdown();
+    }
+
+    @RequiresPermission(allOf = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    })
+    private void fetchUserLocation() {
+        if (isGranted(requireContext())) return;
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(requireActivity(), location -> {
+                    if (location != null) {
+                        processUserLocation(location);
+                    }
+                });
+    }
+
+    private void processUserLocation(Location location) {
+        reverseGeocode(location.getLatitude(), location.getLongitude(),
+                addresses -> {
+                    if (!addresses.isEmpty()) {
+                        updateUserCountryCode(addresses.get(0).getCountryCode());
+                    }
+                }, this::showError);
+    }
+
+    private void showPermissionDeniedDialog() {
+        showDialog(
+                R.string.error_permission_denied_title,
+                R.string.error_permission_denied
+        );
+    }
+
+
+    private void initializeDependencies() {
+        executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        geocoder = new Geocoder(requireContext(), new Locale("pt", "BR"));
+        load(requireContext());
+    }
+
+    private void initializeViews(View root) {
+        location = root.findViewById(R.id.button_fragment_location);
+        addLocationCard = root.findViewById(R.id.adicionar_localizacao_card);
+        originInput = root.findViewById(R.id.origem_input);
+        destinationInput = root.findViewById(R.id.destino_input);
+        originInputLayout = root.findViewById(R.id.origem_input_layout);
+        recyclerView = root.findViewById(R.id.localizacoes_recycler_view);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void setupUI() {
+        requestPermissions();
+        setupBottomSheet();
+        setupRecyclerView();
+        setupCard();
+        setupOriginInput();
+        setupDestinationInput();
+        transition();
+    }
+
+    private void setupBottomSheet() {
+        FrameLayout container = requireView().findViewById(R.id.localizacao_bottom_sheet_container);
+        bottomSheet = BottomSheetBehavior.from(container);
+        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void setupRecyclerView() {
+        adapter = new LocationAdapter(searchResults, this::onAddressSelected);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void setupCard() {
+        addLocationCard.setOnClickListener(v ->
+                setBottomSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED)
+        );
+    }
+
+    private void transition() {
+        manager = getParentFragmentManager();
+        location.setOnClickListener(v -> manager.beginTransaction()
+                .replace(R.id.fragment_container_view, LocationFragment.class, null)
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit());
+    }
+
+    private void setupOriginInput() {
+        configureOriginFocusListener();
+        configureOriginTextWatcher();
+        configureOriginClearButton();
+    }
+
+    private void setupDestinationInput() {
+        setDestinationHint(DEFAULT_LOCATION);
+        setDestinationEnabled(false);
+        setDestinationCursorVisible(false);
+        loadDefaultDestination();
+    }
+
+    private void configureOriginFocusListener() {
+        originInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                setBottomSheetState(BottomSheetBehavior.STATE_EXPANDED);
+                setOriginCursorVisible(true);
+            } else {
+                setOriginCursorVisible(false);
+            }
+        });
+    }
+
+    @SuppressLint("PrivateResource")
+    private void configureOriginClearButton() {
+        originInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+        originInputLayout.setEndIconDrawable(
+                com.google.android.material.R.drawable.mtrl_ic_cancel
+        );
+        setOriginClearButtonVisible(false);
+        originInputLayout.setEndIconOnClickListener(v -> clearOrigin());
+    }
+
+    private void configureOriginTextWatcher() {
+        originInput.addTextChangedListener(new SearchWatcher(this::searchAddress));
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void requestPermissions() {
+        ask(permissionLauncher, requireContext());
+    }
+
+    private void searchAddress(String query) {
+        clearError();
+        geocodeByName(query, userCountryCode, this::updateSearchResults,
+                error -> {
+                    updateSearchResults(Collections.emptyList());
+                    runOnMainThread(() -> showError(error));
+                }
+        );
+    }
+
+    private void geocodeByName(String query, String countryCode, Consumer<List<Address>> onSuccess, Consumer<Integer> onError) {
+        executeAsync(() -> {
+            try {
+                List<Address> results = geocoder.getFromLocationName(query, MAX_SEARCH_RESULTS);
+                List<Address> filtered = filterByCountry(
+                        results != null ? results : Collections.emptyList(),
+                        countryCode
+                );
+                runOnMainThread(() -> onSuccess.accept(filtered));
+            } catch (IOException e) {
+                onError.accept(R.string.error_locations);
+            }
+        });
+    }
+
+    private void reverseGeocode(double lat, double lng, Consumer<List<Address>> onSuccess, Consumer<Integer> onError) {
+        executeAsync(() -> {
+            try {
+                List<Address> results = geocoder.getFromLocation(lat, lng, 1);
+                List<Address> finalResults = results != null ? results : Collections.emptyList();
+                runOnMainThread(() -> onSuccess.accept(finalResults));
+            } catch (IOException e) {
+                onError.accept(R.string.error_locations);
+            }
+        });
+    }
+
+    private List<Address> filterByCountry(List<Address> addresses, String countryCode) {
+        if (countryCode == null || addresses.isEmpty()) {
+            return addresses;
+        }
+        return addresses.stream()
+                .filter(address -> countryCode.equals(address.getCountryCode()))
+                .collect(Collectors.toList());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void onAddressSelected(Address address) {
+        updateOriginAddress(address);
+        notifyOriginSelected(address);
+        updateOriginUI(address);
+        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    private void loadDefaultDestination() {
+        geocodeByName(
+                DEFAULT_LOCATION,
+                null,
+                addresses -> {
+                    if (!addresses.isEmpty() && isAdded()) {
+                        updateDestinationAddress(addresses.get(0));
+                        notifyDestinationSelected(addresses.get(0));
+                    }
+                },
+                error -> runOnMainThread(() -> showError(error))
+        );
+    }
+
+
+    private void updateOriginAddress(Address address) {
+        this.originAddress = address;
+    }
+
+    private void updateDestinationAddress(Address address) {
+        this.destinationAddress = address;
+    }
+
+    private void updateUserCountryCode(String countryCode) {
+        this.userCountryCode = countryCode;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void updateSearchResults(List<Address> results) {
+        searchResults.clear();
+        searchResults.addAll(results);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void clearOrigin() {
+        updateOriginAddress(null);
+        resetOriginUI();
+    }
+
+    private void notifyOriginSelected(Address address) {
+        sendFragmentResult(RESULT_KEY_ORIGIN, KEY_ORIGIN, address);
+    }
+
+    private void notifyDestinationSelected(Address address) {
+        sendFragmentResult(RESULT_KEY_DESTINATION, KEY_DESTINATION, address);
+    }
+
+    private void sendFragmentResult(String resultKey, String bundleKey, Address address) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(bundleKey, address);
+        getParentFragmentManager().setFragmentResult(resultKey, bundle);
+    }
+
+    private void updateOriginUI(Address address) {
+        setOriginText("");
+        setOriginHint(address.getAddressLine(0));
+        setOriginEnabled(false);
+        setOriginFocusable(false);
+        setOriginCursorVisible(false);
+        setOriginClearButtonVisible(true);
+        clearOriginFocus();
+    }
+
+    private void resetOriginUI() {
+        setOriginText("");
+        setOriginHint(getString(R.string.label_endereco_origem));
+        setOriginEnabled(true);
+        setOriginFocusable(true);
+        setOriginClearButtonVisible(false);
+    }
+
+    private void setBottomSheetState(int state) {
+        bottomSheet.setState(state);
+    }
+
+    private void setOriginText(String text) {
+        originInput.setText(text);
+    }
+
+    private void setOriginHint(String hint) {
+        originInput.setHint(hint);
+    }
+
+    private void setOriginEnabled(boolean enabled) {
+        originInput.setEnabled(enabled);
+    }
+
+    private void setOriginFocusable(boolean focusable) {
+        originInput.setFocusable(focusable);
+        originInput.setFocusableInTouchMode(focusable);
+    }
+
+    private void setOriginCursorVisible(boolean visible) {
+        originInput.setCursorVisible(visible);
+    }
+
+    private void setOriginClearButtonVisible(boolean visible) {
+        originInputLayout.setEndIconVisible(visible);
+    }
+
+    private void clearOriginFocus() {
+        originInput.clearFocus();
+    }
+
+    private void clearError() {
+        originInputLayout.setError(null);
+    }
+
+    private void setDestinationHint(String hint) {
+        destinationInput.setHint(hint);
+    }
+
+    private void setDestinationEnabled(boolean enabled) {
+        destinationInput.setEnabled(enabled);
+    }
+
+    private void setDestinationCursorVisible(boolean visible) {
+        destinationInput.setCursorVisible(visible);
+    }
+
+    private void showError(int messageResId) {
+        showSnackbar(messageResId);
+    }
+
+    private void showSnackbar(int messageResId) {
+        Snackbar.make(requireView(), messageResId, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showDialog(int titleResId, int messageResId) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(titleResId)
+                .setMessage(messageResId)
+                .setPositiveButton(R.string.submit, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void executeAsync(Runnable task) {
+        executorService.execute(task);
+    }
+
+    private void runOnMainThread(Runnable action) {
+        requireActivity().runOnUiThread(action);
+    }
+
+
+    private void shutdown() {
         shutdownExecutor();
+    }
+
+    private void shutdownExecutor() {
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
+        }
     }
 
     @Override
@@ -122,249 +479,8 @@ public class MainFragment extends Fragment implements DirectionsListener, Permis
     }
 
     @Override
-    public void parse(@NonNull String json, @NonNull ResultListener<Directions> resultListener) {
-        DirectionsListener.super.parse(json, resultListener);
+    public void parse(@NonNull String json, @NonNull Consumer<Directions> success, @NonNull Consumer<Integer> failure) {
+        DirectionsListener.super.parse(json, success, failure);
     }
 
-    private void initializeServices() {
-        executor = Executors.newFixedThreadPool(BACKGROUND_THREAD_POOL_SIZE);
-        locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-        geocoder = new Geocoder(requireContext(), new Locale("pt", "BR"));
-        load(requireContext());
-    }
-
-    private void bindViews(View view) {
-        locationCard = view.findViewById(R.id.adicionar_localizacao_card);
-        inputOrigin = view.findViewById(R.id.origem_input);
-        inputDestination = view.findViewById(R.id.destino_input);
-        layoutInputOrigin = view.findViewById(R.id.origem_input_layout);
-        recyclerView = view.findViewById(R.id.localizacoes_recycler_view);
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private void setupComponents() {
-        ask(permissionLauncher, requireContext());
-        setupBottomSheet();
-        setupRecyclerView();
-        setUpCard();
-        setupOriginInput();
-        loadDefaultDestination();
-    }
-
-    private void setupBottomSheet() {
-        FrameLayout container = requireView().findViewById(R.id.localizacao_bottom_sheet_container);
-        bottomSheet = BottomSheetBehavior.from(container);
-        bottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private void setupRecyclerView() {
-        adapter = new LocationAdapter(addresses, this::onAddressSelected);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void setUpCard() {
-        locationCard.setOnClickListener(v ->
-                bottomSheet.setState(BottomSheetBehavior.STATE_HALF_EXPANDED));
-    }
-
-    private void setupOriginInput() {
-        setupOriginFocus();
-        setupOriginWatcher();
-        setupOriginClearIcon();
-    }
-
-    private void setupOriginFocus() {
-        inputOrigin.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                bottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
-                inputOrigin.setCursorVisible(true);
-            } else {
-                inputOrigin.setCursorVisible(false);
-            }
-        });
-    }
-
-    @SuppressLint("PrivateResource")
-    private void setupOriginClearIcon() {
-        layoutInputOrigin.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-        layoutInputOrigin.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
-        layoutInputOrigin.setEndIconVisible(false);
-        layoutInputOrigin.setEndIconOnClickListener(v -> clearOrigin());
-    }
-
-    private void setupOriginWatcher() {
-        inputOrigin.addTextChangedListener(new SearchWatcher(this::searchAddress));
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private void onAddressSelected(Address address) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("origin", address);
-        getParentFragmentManager().setFragmentResult("originKey", bundle);
-        originAddress = address;
-        updateOriginUI(address);
-        bottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    private void updateOriginUI(Address address) {
-        inputOrigin.setText("");
-        inputOrigin.setHint(address.getAddressLine(0));
-        inputOrigin.setEnabled(false);
-        inputOrigin.setFocusable(false);
-        inputOrigin.setFocusableInTouchMode(false);
-        inputOrigin.setCursorVisible(false);
-        layoutInputOrigin.setEndIconVisible(true);
-        inputOrigin.clearFocus();
-    }
-
-    private void loadDefaultDestination() {
-        inputDestination.setHint(DEFAULT_LOCATION);
-        inputDestination.setEnabled(false);
-        inputDestination.setCursorVisible(false);
-
-        searchAddresses(DEFAULT_LOCATION, null, new ResultListener<>() {
-            @Override
-            public void onSuccess(List<Address> results) {
-                if (!results.isEmpty() && isAdded()) {
-                    destinationAddress = results.get(0);
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("destination", destinationAddress);
-                    getParentFragmentManager().setFragmentResult("destinationKey", bundle);
-                }
-            }
-
-            @Override
-            public void onError(int errorResId) {
-                showSnackBar(errorResId);
-            }
-        });
-    }
-
-    private void searchAddress(String query) {
-        layoutInputOrigin.setError(null);
-        searchAddresses(query, countryCode, new ResultListener<>() {
-            @Override
-            public void onSuccess(List<Address> results) {
-                updateSearchResults(results);
-            }
-
-            @Override
-            public void onError(int errorResId) {
-                updateSearchResults(Collections.emptyList());
-                showSnackBar(errorResId);
-            }
-        });
-    }
-
-    private void searchAddresses(String query, String country, ResultListener<List<Address>> resultListener) {
-        executor.execute(() -> {
-            try {
-                List<Address> results = geocoder.getFromLocationName(query, MAXIMUM_SEARCH_RESULTS);
-                if (results == null) results = Collections.emptyList();
-                List<Address> filtered = filterByCountry(results, country);
-                runOnUiThread(() -> resultListener.onSuccess(filtered));
-            } catch (IOException e) {
-                runOnUiThread(() -> resultListener.onError(R.string.error_locations));
-            }
-        });
-    }
-
-    private void getAddressFromCoordinates(double lat, double lng, ResultListener<List<Address>> resultListener) {
-        executor.execute(() -> {
-            try {
-                List<Address> results = geocoder.getFromLocation(lat, lng, 1);
-                if (results == null) results = Collections.emptyList();
-                List<Address> finalResults = results;
-                runOnUiThread(() -> resultListener.onSuccess(finalResults));
-            } catch (IOException e) {
-                runOnUiThread(() -> resultListener.onError(R.string.error_locations));
-            }
-        });
-    }
-
-    private List<Address> filterByCountry(List<Address> list, String country) {
-        if (country == null || list.isEmpty()) return list;
-        return list.stream()
-                .filter(a -> country.equals(a.getCountryCode()))
-                .collect(Collectors.toList());
-    }
-
-    private void handlePermissionResult(Map<String, Boolean> results) {
-        onResult(results, this::requestUserLocation,
-                () -> showDialog(R.string.error_permission_denied_title, R.string.error_permission_denied)
-        );
-    }
-
-    @RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    private void requestUserLocation() {
-        if (isGranted(requireContext())) return;
-        locationClient.getLastLocation()
-                .addOnSuccessListener(requireActivity(), location -> {
-                    if (location != null) {
-                        extractCountryCode(location);
-                    }
-                });
-    }
-
-    private void extractCountryCode(Location location) {
-        getAddressFromCoordinates(location.getLatitude(), location.getLongitude(), new ResultListener<>() {
-            @Override
-            public void onSuccess(List<Address> results) {
-                if (!results.isEmpty()) {
-                    countryCode = results.get(0).getCountryCode();
-                }
-            }
-
-            @Override
-            public void onError(int errorResId) {
-                showSnackBar(errorResId);
-            }
-        });
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void updateSearchResults(List<Address> results) {
-        addresses.clear();
-        addresses.addAll(results);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void clearOrigin() {
-        originAddress = null;
-        resetOriginUI();
-    }
-
-    private void resetOriginUI() {
-        inputOrigin.setText("");
-        inputOrigin.setHint(R.string.label_endereco_origem);
-        inputOrigin.setEnabled(true);
-        inputOrigin.setFocusable(true);
-        inputOrigin.setFocusableInTouchMode(true);
-        layoutInputOrigin.setEndIconVisible(false);
-    }
-
-    private void runOnUiThread(Runnable action) {
-        requireActivity().runOnUiThread(action);
-    }
-
-    private void showDialog(int titleResId, int messageResId) {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(titleResId)
-                .setMessage(messageResId)
-                .setPositiveButton(R.string.submit, (dialog, which) -> dialog.dismiss())
-                .show();
-    }
-
-    private void showSnackBar(int messageResId) {
-        Snackbar.make(requireView(), messageResId, Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void shutdownExecutor() {
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
-        }
-    }
 }

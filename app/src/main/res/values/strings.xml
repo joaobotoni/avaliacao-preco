@@ -162,7 +162,9 @@
     <string name="preview_distancia_zero">0 km</string>
     <string name="preview_valor_zero">R$ 0,00</string>
     <string name="preview_rota_card">Visualizar percurso</string>
-    <string name="route_info_message">Sei la</string>
-
-
+    <string name="ERROR_API_KEY_MISSING">A chave da API não foi encontrada ou está vazia nos metadados do AndroidManifest.xml.</string>
+    <string name="META_KEY_GOOGLE_MAPS_API">com.google.android.geo.API_KEY</string>
+    <string name="ERROR_APP_PACKAGE_NOT_FOUND">Não foi possível encontrar o pacote de aplicativos.</string>
+    <string name="DIRECTIONS_API_QUERY_FORMAT">origin=%s&amp;destination=%s&amp;key=%s</string>
+    <string name="DIRECTIONS_API_BASE_URL">https://maps.googleapis.com/maps/api/directions/json</string>
 </resources>
