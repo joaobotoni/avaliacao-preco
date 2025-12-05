@@ -16,5 +16,16 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".MapsActivity" />
 
+    <include
+        android:id="@+id/origem_destino_layout"
+        layout="@layout/unit_origem_destino_location"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <include layout="@layout/bottom_sheet_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

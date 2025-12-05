@@ -1,6 +1,6 @@
 package com.botoni.avaliacaodepreco.di;
 
 @FunctionalInterface
-public interface SearchListener {
+public interface SearchProvider {
     void onSearch(String query);
 }

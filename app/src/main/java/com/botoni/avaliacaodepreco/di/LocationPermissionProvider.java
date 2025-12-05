@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Map;
 
-public interface PermissionsListener {
+public interface LocationPermissionProvider {
     String[] LOCATION_PERMISSIONS = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -19,8 +19,7 @@ public interface PermissionsListener {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
     }
-
-    default void ask(ActivityResultLauncher<String[]> launcher, Context context) {
+    default void request(ActivityResultLauncher<String[]> launcher, Context context) {
         if (isGranted(context)) {
             launcher.launch(LOCATION_PERMISSIONS);
         }

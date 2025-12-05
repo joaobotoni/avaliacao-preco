@@ -148,7 +148,7 @@
 
             <include
                 android:id="@+id/origem_destino_container"
-                layout="@layout/layout_origem_destino"
+                layout="@layout/unit_origem_destino"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="12dp"

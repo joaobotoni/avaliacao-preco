@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="16dp"
+    style="@style/Widget.Material3.CardView.Elevated">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/icon_origin"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_location_on"
+            app:tint="?attr/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_origin"
+            app:layout_constraintBottom_toBottomOf="@id/text_origin" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_origin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Parque das Águas Júlio Domin..."
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/icon_origin"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/dots_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintStart_toStartOf="@id/icon_origin"
+            app:layout_constraintEnd_toEndOf="@id/icon_origin"
+            app:layout_constraintTop_toBottomOf="@id/icon_origin"
+            app:layout_constraintBottom_toTopOf="@id/icon_destination">
+
+            <View
+                android:id="@+id/dot_separator_1"
+                android:layout_width="3dp"
+                android:layout_height="3dp"
+                android:layout_marginVertical="2dp"
+                android:background="@android:color/darker_gray" />
+
+            <View
+                android:id="@+id/dot_separator_2"
+                android:layout_width="3dp"
+                android:layout_height="3dp"
+                android:layout_marginVertical="2dp"
+                android:background="@android:color/darker_gray" />
+
+            <View
+                android:id="@+id/dot_separator_3"
+                android:layout_width="3dp"
+                android:layout_height="3dp"
+                android:layout_marginVertical="2dp"
+                android:background="@android:color/darker_gray" />
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/text_origin"
+            app:layout_constraintTop_toBottomOf="@id/text_origin" />
+
+        <ImageView
+            android:id="@+id/icon_destination"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_location_on"
+            app:tint="?attr/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_destination"
+            app:layout_constraintBottom_toBottomOf="@id/text_destination" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_destination"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="12dp"
+            android:text="Rua Abc, 1679"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/icon_destination"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

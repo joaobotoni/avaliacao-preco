@@ -25,10 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public interface DirectionsListener {
+public interface DirectionsProvider {
     default String load(@NonNull Context context) {
         try {
             ApplicationInfo info = context.getPackageManager()

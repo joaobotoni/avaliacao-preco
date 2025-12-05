@@ -272,7 +272,7 @@
 
             <include
                 android:id="@+id/container_recomendation"
-                layout="@layout/recomendation_card"
+                layout="@layout/unit_recomendation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -343,414 +343,119 @@
                 android:layout_marginTop="20dp"
                 app:layout_constraintTop_toBottomOf="@id/adicionar_localizacao_card"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/local_partida_card"
+                android:id="@+id/ajuste_km_card"
                 style="?attr/materialCardViewFilledStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/button_fragment_location">
+                app:layout_constraintTop_toBottomOf="@id/button_fragment_location"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/local_partida_check_fundo_card"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        app:cardBackgroundColor="?attr/colorPrimary"
-                        app:cardCornerRadius="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/todo"
-                            android:src="@drawable/ic_check_circle"
-                            app:tint="?attr/colorOnPrimary" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/local_partida_label_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="56dp"
-                        android:alpha="0.7"
-                        android:text="@string/titulo_rotulo_origem"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toStartOf="@id/local_remover_partida_button"
-                        app:layout_constraintStart_toEndOf="@id/local_partida_check_fundo_card"
-                        app:layout_constraintTop_toTopOf="@id/local_partida_check_fundo_card" />
-
-                    <TextView
-                        android:id="@+id/local_partida_endereco_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="8dp"
-                        android:ellipsize="marquee"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:scrollHorizontally="true"
-                        android:singleLine="true"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/local_partida_check_fundo_card"
-                        app:layout_constraintEnd_toStartOf="@id/local_remover_partida_button"
-                        app:layout_constraintStart_toEndOf="@id/local_partida_check_fundo_card"
-                        app:layout_constraintTop_toBottomOf="@id/local_partida_label_text"
-                        tools:text="@string/preview_origem_sp" />
-
-
-                    <ImageButton
-                        android:id="@+id/local_remover_partida_button"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                    <ImageView
+                        android:id="@+id/ajuste_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:contentDescription="@string/todo"
-                        app:layout_constraintBottom_toBottomOf="@id/local_partida_check_fundo_card"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/local_partida_check_fundo_card"
-                        app:srcCompat="@drawable/ic_close"
-                        app:tint="?attr/colorOnSecondaryContainer" />
-
-                    <View
-                        android:id="@+id/local_partida_divider_ajuste"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="20dp"
-                        android:alpha="0.12"
-                        android:background="?attr/colorOutline"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:src="@drawable/ic_info"
+                        app:layout_constraintBottom_toBottomOf="@id/ajuste_titulo_text"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/local_partida_check_fundo_card" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="?attr/colorSecondary" />
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/local_partida_ajuste_km_card"
-                        style="?attr/materialCardViewFilledStyle"
+                    <TextView
+                        android:id="@+id/ajuste_titulo_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/informacao_ajuste_distancia"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ajuste_icon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/km_adicional_input_layout"
+                        style="?attr/textInputFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        android:hint="@string/rotulo_km_adicionais"
+                        app:boxBackgroundColor="?attr/colorOnSurfaceInverse"
+                        app:endIconMode="clear_text"
+                        app:helperText="@string/helper_km_adicionais"
+                        app:helperTextEnabled="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/local_partida_divider_ajuste">
+                        app:layout_constraintTop_toBottomOf="@id/ajuste_titulo_text">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/km_adicional_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp">
+                            android:inputType="numberDecimal"
+                            android:maxLines="1"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <ImageView
-                                android:id="@+id/local_partida_ajuste_icon"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:contentDescription="@string/todo"
-                                android:src="@drawable/ic_info"
-                                app:layout_constraintBottom_toBottomOf="@id/local_partida_ajuste_titulo_text"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:tint="?attr/colorSecondary" />
-
-                            <TextView
-                                android:id="@+id/local_partida_ajuste_titulo_text"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:text="@string/informacao_ajuste_distancia"
-                                android:textSize="14sp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/local_partida_ajuste_icon"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/local_partida_km_adicional_input_layout"
-                                style="?attr/textInputFilledStyle"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                android:hint="@string/rotulo_km_adicionais"
-                                app:boxStrokeColor="?attr/colorPrimary"
-                                app:endIconMode="clear_text"
-                                app:helperText="@string/helper_km_adicionais"
-                                app:helperTextEnabled="true"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/local_partida_ajuste_titulo_text">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/local_partida_km_adicional_input"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="numberDecimal"
-                                    android:maxLines="1"
-                                    android:textSize="16sp" />
-                            </com.google.android.material.textfield.TextInputLayout>
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_partida_adicionar_5km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginEnd="8dp"
-                                android:text="@string/atalho_mais_5"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toStartOf="@id/local_partida_adicionar_10km_button"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/local_partida_km_adicional_input_layout"
-                                app:layout_constraintWidth_percent="0.3" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_partida_adicionar_10km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginEnd="8dp"
-                                android:text="@string/atalho_mais_10"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toStartOf="@id/local_partida_adicionar_20km_button"
-                                app:layout_constraintStart_toEndOf="@id/local_partida_adicionar_5km_button"
-                                app:layout_constraintTop_toTopOf="@id/local_partida_adicionar_5km_button"
-                                app:layout_constraintWidth_percent="0.3" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_partida_adicionar_20km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:text="@string/atalho_mais_20"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/local_partida_adicionar_10km_button"
-                                app:layout_constraintTop_toTopOf="@id/local_partida_adicionar_5km_button"
-                                app:layout_constraintWidth_percent="0.3" />
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/local_destino_card"
-                style="?attr/materialCardViewFilledStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/local_partida_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp">
-
-                    <!-- Ícone check -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/local_destino_check_fundo_card"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        app:cardBackgroundColor="?attr/colorPrimary"
-                        app:cardCornerRadius="16dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/todo"
-                            android:src="@drawable/ic_check_circle"
-                            app:tint="?attr/colorOnPrimary" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Texto rotulo -->
-                    <TextView
-                        android:id="@+id/local_destino_label_text"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/adicionar_5km_button"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="56dp"
-                        android:alpha="0.7"
-                        android:text="@string/titulo_rotulo_destino"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toStartOf="@id/local_remover_destino_button"
-                        app:layout_constraintStart_toEndOf="@id/local_destino_check_fundo_card"
-                        app:layout_constraintTop_toTopOf="@id/local_destino_check_fundo_card" />
-
-                    <TextView
-                        android:id="@+id/local_destino_endereco_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="12dp"
                         android:layout_marginEnd="8dp"
-                        android:ellipsize="marquee"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:scrollHorizontally="true"
-                        android:singleLine="true"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/local_destino_check_fundo_card"
-                        app:layout_constraintEnd_toStartOf="@id/local_remover_destino_button"
-                        app:layout_constraintStart_toEndOf="@id/local_destino_check_fundo_card"
-                        app:layout_constraintTop_toBottomOf="@id/local_destino_label_text"
-                        tools:text="@string/preview_origem_sp" />
-
-
-                    <ImageButton
-                        android:id="@+id/local_remover_destino_button"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/todo"
-                        app:layout_constraintBottom_toBottomOf="@id/local_destino_check_fundo_card"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/local_destino_check_fundo_card"
-                        app:srcCompat="@drawable/ic_close"
-                        app:tint="?attr/colorOnSecondaryContainer" />
-
-                    <View
-                        android:id="@+id/local_destino_divider_ajuste"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="20dp"
-                        android:alpha="0.12"
-                        android:background="?attr/colorOutline"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:text="@string/atalho_mais_5"
+                        android:textSize="13sp"
+                        app:cornerRadius="12dp"
+                        app:layout_constraintEnd_toStartOf="@id/adicionar_10km_button"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/local_destino_check_fundo_card" />
+                        app:layout_constraintTop_toBottomOf="@id/km_adicional_input_layout"
+                        app:layout_constraintWidth_percent="0.3" />
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/local_destino_ajuste_km_card"
-                        style="?attr/materialCardViewFilledStyle"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/adicionar_10km_button"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/atalho_mais_10"
+                        android:textSize="13sp"
+                        app:cornerRadius="12dp"
+                        app:layout_constraintEnd_toStartOf="@id/local_partida_adicionar_20km_button"
+                        app:layout_constraintStart_toEndOf="@id/adicionar_5km_button"
+                        app:layout_constraintTop_toTopOf="@id/adicionar_5km_button"
+                        app:layout_constraintWidth_percent="0.3" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/local_partida_adicionar_20km_button"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:text="@string/atalho_mais_20"
+                        android:textSize="13sp"
+                        app:cornerRadius="12dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/local_destino_divider_ajuste">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:id="@+id/local_destino_ajuste_icon"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:contentDescription="@string/todo"
-                                android:src="@drawable/ic_info"
-                                app:layout_constraintBottom_toBottomOf="@id/local_destino_ajuste_titulo_text"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:tint="?attr/colorSecondary" />
-
-                            <TextView
-                                android:id="@+id/local_destino_ajuste_titulo_text"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:text="@string/informacao_ajuste_distancia"
-                                android:textSize="14sp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/local_destino_ajuste_icon"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/local_destino_km_adicional_input_layout"
-                                style="?attr/textInputFilledStyle"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                android:hint="@string/rotulo_km_adicionais"
-                                app:boxStrokeColor="?attr/colorPrimary"
-                                app:endIconMode="clear_text"
-                                app:helperText="@string/helper_km_adicionais"
-                                app:helperTextEnabled="true"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/local_destino_ajuste_titulo_text">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/local_destino_km_adicional_input"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="numberDecimal"
-                                    android:maxLines="1"
-                                    android:textSize="16sp" />
-                            </com.google.android.material.textfield.TextInputLayout>
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_destino_adicionar_5km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginEnd="8dp"
-                                android:text="@string/atalho_mais_5"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toStartOf="@id/local_destino_adicionar_10km_button"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/local_destino_km_adicional_input_layout"
-                                app:layout_constraintWidth_percent="0.3" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_destino_adicionar_10km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginEnd="8dp"
-                                android:text="@string/atalho_mais_10"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toStartOf="@id/local_destino_adicionar_20km_button"
-                                app:layout_constraintStart_toEndOf="@id/local_destino_adicionar_5km_button"
-                                app:layout_constraintTop_toTopOf="@id/local_destino_adicionar_5km_button"
-                                app:layout_constraintWidth_percent="0.3" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/local_destino_adicionar_20km_button"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:text="@string/atalho_mais_20"
-                                android:textSize="13sp"
-                                app:cornerRadius="12dp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@id/local_destino_adicionar_10km_button"
-                                app:layout_constraintTop_toTopOf="@id/local_destino_adicionar_5km_button"
-                                app:layout_constraintWidth_percent="0.3" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                        app:layout_constraintStart_toEndOf="@id/adicionar_10km_button"
+                        app:layout_constraintTop_toTopOf="@id/adicionar_5km_button"
+                        app:layout_constraintWidth_percent="0.3" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/valor_frete_final_card"
@@ -758,11 +463,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:visibility="visible"
                 app:cardCornerRadius="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/local_destino_card"
+                app:layout_constraintTop_toBottomOf="@id/ajuste_km_card"
+                android:visibility="gone"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -917,7 +622,6 @@
                         app:layout_constraintEnd_toEndOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
@@ -933,5 +637,5 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TooManyViews"
         tools:visibility="visible" />
-<!--    <include layout="@layout/bottom_sheet_location"/>-->
+<include layout="@layout/bottom_sheet_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
