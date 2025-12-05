@@ -933,5 +933,5 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TooManyViews"
         tools:visibility="visible" />
-    <include layout="@layout/bottom_sheet_location"/>
+<!--    <include layout="@layout/bottom_sheet_location"/>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

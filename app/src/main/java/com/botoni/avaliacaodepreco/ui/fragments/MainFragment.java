@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -20,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -73,6 +76,18 @@ public class MainFragment extends Fragment implements DirectionsListener, Permis
     private TextInputEditText destinationInput;
     private TextInputLayout originInputLayout;
     private MaterialCardView addLocationCard;
+    private CardView partidaCardView;
+    private TextView partidaEnderecoTextView;
+    private EditText partidaKmAdicionalInput;
+    private Button partidaAdicionar5KmButton;
+    private Button partidaAdicionar10KmButton;
+    private Button partidaAdicionar20KmButton;
+    private CardView destinoCardView;
+    private TextView destinoEnderecoTextView;
+    private EditText destinoKmAdicionalInput;
+    private Button destinoAdicionar5KmButton;
+    private Button destinoAdicionar10KmButton;
+    private Button destinoAdicionar20KmButton;
     private Button location;
     private RecyclerView recyclerView;
     private LocationAdapter adapter;
@@ -157,13 +172,27 @@ public class MainFragment extends Fragment implements DirectionsListener, Permis
     }
 
     private void initializeViews(View root) {
+
+        partidaCardView = root.findViewById(R.id.local_partida_card);
+        partidaEnderecoTextView = root.findViewById(R.id.local_partida_endereco_text);
+        partidaKmAdicionalInput = root.findViewById(R.id.local_partida_km_adicional_input);
+        partidaAdicionar5KmButton = root.findViewById(R.id.local_partida_adicionar_5km_button);
+        partidaAdicionar10KmButton = root.findViewById(R.id.local_partida_adicionar_10km_button);
+        partidaAdicionar20KmButton = root.findViewById(R.id.local_partida_adicionar_20km_button);
+
+        destinoCardView = root.findViewById(R.id.local_destino_card);
+        destinoEnderecoTextView = root.findViewById(R.id.local_destino_endereco_text);
+        destinoKmAdicionalInput = root.findViewById(R.id.local_destino_km_adicional_input);
+        destinoAdicionar5KmButton = root.findViewById(R.id.local_destino_adicionar_5km_button);
+        destinoAdicionar10KmButton = root.findViewById(R.id.local_destino_adicionar_10km_button);
+        destinoAdicionar20KmButton = root.findViewById(R.id.local_destino_adicionar_20km_button);
+
         location = root.findViewById(R.id.button_fragment_location);
         addLocationCard = root.findViewById(R.id.adicionar_localizacao_card);
         originInput = root.findViewById(R.id.origem_input);
         destinationInput = root.findViewById(R.id.destino_input);
         originInputLayout = root.findViewById(R.id.origem_input_layout);
         recyclerView = root.findViewById(R.id.localizacoes_recycler_view);
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -447,7 +476,6 @@ public class MainFragment extends Fragment implements DirectionsListener, Permis
         requireActivity().runOnUiThread(action);
     }
 
-
     private void shutdown() {
         shutdownExecutor();
     }
@@ -482,5 +510,4 @@ public class MainFragment extends Fragment implements DirectionsListener, Permis
     public void parse(@NonNull String json, @NonNull Consumer<Directions> success, @NonNull Consumer<Integer> failure) {
         DirectionsListener.super.parse(json, success, failure);
     }
-
 }
