@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="16dp"
-    style="@style/Widget.Material3.CardView.Elevated">
+    android:layout_margin="@dimen/margin_medium"
+    app:cardCornerRadius="@dimen/corner_radius_medium"
+    app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/margin_medium">
 
         <ImageView
             android:id="@+id/icon_origin"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:contentDescription="@string/todo"
             android:src="@drawable/ic_location_on"
-            app:tint="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/text_origin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/text_origin"
-            app:layout_constraintBottom_toBottomOf="@id/text_origin" />
+            app:tint="?attr/colorPrimary" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_origin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="Parque das Águas Júlio Domin..."
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            android:maxLines="1"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/margin_small"
             android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="Parque das Águas Júlio Domin..."
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_size_normal"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/icon_origin"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,14 +45,14 @@
             android:id="@+id/dots_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            app:layout_constraintStart_toStartOf="@id/icon_origin"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/icon_destination"
             app:layout_constraintEnd_toEndOf="@id/icon_origin"
-            app:layout_constraintTop_toBottomOf="@id/icon_origin"
-            app:layout_constraintBottom_toTopOf="@id/icon_destination">
+            app:layout_constraintStart_toStartOf="@id/icon_origin"
+            app:layout_constraintTop_toBottomOf="@id/icon_origin">
 
             <View
                 android:id="@+id/dot_separator_1"
@@ -79,35 +80,36 @@
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginTop="@dimen/padding_card"
+            android:layout_marginBottom="@dimen/padding_card"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/text_origin"
             app:layout_constraintTop_toBottomOf="@id/text_origin" />
 
         <ImageView
             android:id="@+id/icon_destination"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:contentDescription="@string/todo"
             android:src="@drawable/ic_location_on"
-            app:tint="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/text_destination"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/text_destination"
-            app:layout_constraintBottom_toBottomOf="@id/text_destination" />
+            app:tint="?attr/colorPrimary" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_destination"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="12dp"
-            android:text="Rua Abc, 1679"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            android:maxLines="1"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/padding_card"
+            android:layout_marginEnd="@dimen/margin_small"
             android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="Rua Abc, 1679"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_size_normal"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/icon_destination"
             app:layout_constraintTop_toBottomOf="@id/divider" />

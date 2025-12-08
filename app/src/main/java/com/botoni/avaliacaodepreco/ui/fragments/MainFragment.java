@@ -69,7 +69,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
     private Address originAddress;
     private Address destinationAddress;
     private String userCountryCode;
-    private final List<Address> searchResults = new ArrayList<>();
+    private final List<Address> addresses = new ArrayList<>();
     private ExecutorService executorService;
     private Geocoder geocoder;
     private FusedLocationProviderClient locationClient;
@@ -82,6 +82,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
     private Button adicionar5KmButton;
     private Button adicionar10KmButton;
     private Button adicionar20KmButton;
+    private Button confirmAjuste;
     private Button location;
     private RecyclerView recyclerView;
     private LocationAdapter adapter;
@@ -231,7 +232,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         adicionar5KmButton = root.findViewById(R.id.adicionar_5km_button);
         adicionar10KmButton = root.findViewById(R.id.adicionar_10km_button);
         adicionar20KmButton = root.findViewById(R.id.local_partida_adicionar_20km_button);
-
+        confirmAjuste = root.findViewById(R.id.confirmar_ajuste_button);
 
         location = root.findViewById(R.id.button_fragment_location);
         addLocationCard = root.findViewById(R.id.adicionar_localizacao_card);
@@ -318,7 +319,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
 
     private void setupRecyclerView() {
         if (recyclerView == null) return;
-        adapter = new LocationAdapter(searchResults, this::onAddressSelected);
+        adapter = new LocationAdapter(addresses, this::onAddressSelected);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
     }
@@ -353,24 +354,39 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void setupAdditionalButtons() {
-        if (adicionar5KmButton != null) {
-            adicionar5KmButton.setOnClickListener(v -> {
-                distance += 5;
-                runOnMainThread(() -> showSnackbar(String.format("Distância atualizada! Agora: %.2f km", distance)));
-            });
+        setupDistanceButton(adicionar5KmButton, 5);
+        setupDistanceButton(adicionar10KmButton, 10);
+        setupDistanceButton(adicionar20KmButton, 20);
+        confirmAjuste.setOnClickListener(v -> handleCustomDistance());
+    }
+
+    private void setupDistanceButton(Button button, double kmToAdd) {
+        if (button != null) {
+            button.setOnClickListener(v -> updateDistance(kmToAdd));
         }
-        if (adicionar10KmButton != null) {
-            adicionar10KmButton.setOnClickListener(v -> {
-                distance += 10;
-                runOnMainThread(() -> showSnackbar(String.format("Distância atualizada! Agora: %.2f km", distance)));
-            });
+    }
+
+    private void updateDistance(double kmToAdd) {
+        distance += kmToAdd;
+        runOnMainThread(() -> showSnackbar(String.format("Distância atualizada! Agora: %.2f km", distance))
+        );
+    }
+
+    private void handleCustomDistance() {
+        String value = kmAdicionalInput.getText().toString().trim();
+
+        if (value.isEmpty()) {
+            runOnMainThread(() -> showSnackbar("Digite um valor primeiro"));
+            return;
         }
-        if (adicionar20KmButton != null) {
-            adicionar20KmButton.setOnClickListener(v -> {
-                distance += 20;
-                runOnMainThread(() -> showSnackbar(String.format("Distância atualizada! Agora: %.2f km", distance)));
-            });
+
+        try {
+            double newValue = Double.parseDouble(value);
+            updateDistance(newValue);
+        } catch (NumberFormatException e) {
+            runOnMainThread(() -> showSnackbar("Erro: valor inválido"));
         }
     }
 
@@ -569,8 +585,8 @@ public class MainFragment extends Fragment implements DirectionsProvider,
 
     @SuppressLint("NotifyDataSetChanged")
     private void updateSearchResults(List<Address> results) {
-        searchResults.clear();
-        searchResults.addAll(results);
+        addresses.clear();
+        addresses.addAll(results);
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -619,7 +635,6 @@ public class MainFragment extends Fragment implements DirectionsProvider,
     }
 
     private volatile boolean isNavigating = false;
-
     private void navigateToLocationFragment() {
         if (!isAdded() || originAddress == null || destinationAddress == null || isNavigating)
             return;
@@ -732,12 +747,20 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         return address.getFeatureName() != null ? address.getFeatureName() : "";
     }
 
+    private void showPermissionDeniedDialog() {
+        if (!isAdded()) return;
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.error_permission_denied_title)
+                .setMessage(R.string.error_permission_denied)
+                .setPositiveButton(R.string.submit, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     private void showError(int messageResId) {
         if (isAdded()) {
             showSnackbar(messageResId);
         }
     }
-
 
     private void showSnackbar(String message) {
         View view = getView();
@@ -751,15 +774,6 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         if (view != null && isAdded()) {
             Snackbar.make(view, messageResId, Snackbar.LENGTH_SHORT).show();
         }
-    }
-
-    private void showPermissionDeniedDialog() {
-        if (!isAdded()) return;
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.error_permission_denied_title)
-                .setMessage(R.string.error_permission_denied)
-                .setPositiveButton(R.string.submit, (dialog, which) -> dialog.dismiss())
-                .show();
     }
 
     private void executeAsync(Runnable task) {
@@ -782,6 +796,8 @@ public class MainFragment extends Fragment implements DirectionsProvider,
                     executorService.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                showError(R.string.error);
+            } finally {
                 executorService.shutdownNow();
             }
         }

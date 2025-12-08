@@ -1,37 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Espaçamentos -->
-    <dimen name="spacing_xs">4dp</dimen>
-    <dimen name="spacing_small">8dp</dimen>
-    <dimen name="spacing_medium">16dp</dimen>
-    <dimen name="spacing_large">24dp</dimen>
-    <dimen name="screen_padding">24dp</dimen>
+    <dimen name="padding_padrao">20dp</dimen>
+    <dimen name="padding_card">12dp</dimen>
 
-    <!-- Cards -->
-    <dimen name="card_corner_radius">20dp</dimen>
-    <dimen name="card_elevation">0dp</dimen>
-    <dimen name="card_padding">24dp</dimen>
-    <dimen name="info_card_corner_radius">12dp</dimen>
-    <dimen name="info_card_padding">16dp</dimen>
-    <dimen name="result_card_padding">32dp</dimen>
+    <dimen name="margin_section">20dp</dimen>
+    <dimen name="margin_input">20dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
 
-    <!-- Inputs e Botões -->
-    <dimen name="input_corner_radius">12dp</dimen>
-    <dimen name="button_corner_radius">12dp</dimen>
-    <dimen name="button_height">60dp</dimen>
-
-    <!-- Textos -->
-    <dimen name="text_size_title">22sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_normal">16sp</dimen>
     <dimen name="text_size_large">18sp</dimen>
-    <dimen name="text_size_button">16sp</dimen>
-    <dimen name="text_size_input">16sp</dimen>
-    <dimen name="text_size_body">14sp</dimen>
-    <dimen name="text_size_caption">12sp</dimen>
-    <dimen name="text_size_result">36sp</dimen>
 
-    <!-- Outros -->
-    <dimen name="divider_width">60dp</dimen>
-    <dimen name="divider_height">4dp</dimen>
+    <dimen name="corner_radius_small">12dp</dimen>
+    <dimen name="corner_radius_medium">16dp</dimen>
+    <dimen name="corner_radius_large">20dp</dimen>
 
-
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">64dp</dimen>
 </resources>

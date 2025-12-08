@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingHorizontal="@dimen/margin_medium"
+    android:paddingVertical="@dimen/margin_small">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/origem_destino_card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="@dimen/corner_radius_small"
         app:cardElevation="0dp"
         app:strokeWidth="2dp"
         app:strokeColor="?attr/colorPrimary"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -29,43 +28,43 @@
 
             <ImageView
                 android:id="@+id/destino_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
                 android:layout_marginStart="14dp"
                 android:contentDescription="@string/todo"
                 android:src="@drawable/ic_circle"
-                app:tint="?attr/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/destino_input_layout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/destino_input_layout"
-                app:layout_constraintBottom_toBottomOf="@id/destino_input_layout" />
+                app:tint="?attr/colorPrimary" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/destino_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:hint="@string/label_endereco_destino"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:layout_constraintStart_toEndOf="@id/destino_icon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintStart_toEndOf="@id/destino_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:hint="@string/label_endereco_destino">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/destino_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@null"
-                    tools:hint="@string/label_endereco_destino"
                     android:autofillHints="postalAddress|streetAddress"
-                    android:importantForAutofill="yes"
-                    android:textSize="15sp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp"
-                    android:inputType="textPostalAddress"
+                    android:background="@null"
                     android:imeOptions="actionNext"
-                    android:maxLines="1" />
+                    android:importantForAutofill="yes"
+                    android:inputType="textPostalAddress"
+                    android:maxLines="1"
+                    android:paddingStart="@dimen/margin_small"
+                    android:paddingTop="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="14dp"
+                    android:textSize="15sp"
+                    tools:hint="@string/label_endereco_destino" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <View
@@ -74,8 +73,8 @@
                 android:layout_height="1.5dp"
                 android:layout_marginStart="42dp"
                 android:background="?attr/colorPrimary"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/destino_input_layout" />
 
             <View
@@ -84,21 +83,21 @@
                 android:layout_height="25dp"
                 android:layout_marginStart="23dp"
                 android:background="?attr/colorPrimary"
+                app:layout_constraintBottom_toTopOf="@id/origem_icon"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/destino_icon"
-                app:layout_constraintBottom_toTopOf="@id/origem_icon" />
+                app:layout_constraintTop_toBottomOf="@id/destino_icon" />
 
             <ImageView
                 android:id="@+id/origem_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
                 android:layout_marginStart="14dp"
-                android:src="@drawable/ic_circle"
-                app:tint="?attr/colorPrimary"
                 android:contentDescription="@string/todo"
+                android:src="@drawable/ic_circle"
+                app:layout_constraintBottom_toBottomOf="@id/origem_input_layout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/origem_input_layout"
-                app:layout_constraintBottom_toBottomOf="@id/origem_input_layout" />
+                app:tint="?attr/colorPrimary" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/origem_input_layout"
@@ -107,29 +106,28 @@
                 android:hint="@string/label_endereco_origem"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:layout_constraintStart_toEndOf="@id/origem_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/destino_origem_separador"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintStart_toEndOf="@id/origem_icon"
+                app:layout_constraintTop_toBottomOf="@id/destino_origem_separador">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/origem_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="postalAddress|streetAddress"
                     android:background="@null"
                     android:hint="@string/label_endereco_origem"
-                    android:autofillHints="postalAddress|streetAddress"
-                    android:importantForAutofill="yes"
-                    android:textSize="15sp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp"
-                    android:inputType="textPostalAddress"
                     android:imeOptions="actionDone"
-                    android:maxLines="1" />
+                    android:importantForAutofill="yes"
+                    android:inputType="textPostalAddress"
+                    android:maxLines="1"
+                    android:paddingStart="@dimen/margin_small"
+                    android:paddingTop="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="14dp"
+                    android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-

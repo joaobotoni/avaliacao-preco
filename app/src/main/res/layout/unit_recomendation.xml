@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_recomendacao_transporte"
         style="?attr/materialCardViewFilledStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="@dimen/corner_radius_large"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="@dimen/margin_medium">
 
             <ImageView
                 android:id="@+id/iv_icone_info"
@@ -26,9 +27,9 @@
                 android:layout_height="22dp"
                 android:contentDescription="@string/todo"
                 android:src="@drawable/ic_info"
-                app:tint="?attr/colorSecondary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/colorSecondary" />
 
             <TextView
                 android:id="@+id/tv_cabecalho_recomendacao"
@@ -36,33 +37,33 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:text="@string/recomendacao_transporte"
-                app:layout_constraintStart_toEndOf="@id/iv_icone_info"
+                app:layout_constraintBottom_toBottomOf="@id/iv_icone_info"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iv_icone_info"
-                app:layout_constraintBottom_toBottomOf="@id/iv_icone_info" />
+                app:layout_constraintStart_toEndOf="@id/iv_icone_info"
+                app:layout_constraintTop_toTopOf="@id/iv_icone_info" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_recomendacoes_transporte"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/padding_card"
                 android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/tv_cabecalho_recomendacao"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 tools:itemCount="1"
-                tools:listitem="@layout/item_recomendacao" />
+                tools:listitem="@layout/item_recomendacao"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/tv_cabecalho_recomendacao" />
 
             <TextView
                 android:id="@+id/tv_motivo_recomendacao"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/padding_card"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
                 tools:text="@string/tools_text_motivo_recomendacao"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
