@@ -33,12 +33,12 @@ public interface DirectionsProvider {
             ApplicationInfo info = context.getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             return Optional.ofNullable(info.metaData)
-                    .map(bundle -> bundle.getString(context.getString(R.string.META_KEY_GOOGLE_MAPS_API)))
+                    .map(bundle -> bundle.getString(context.getString(R.string.api_key_google_maps)))
                     .filter(apiKey -> !apiKey.isEmpty())
-                    .orElseThrow(() -> new IllegalStateException(context.getString(R.string.ERROR_API_KEY_MISSING)));
+                    .orElseThrow(() -> new IllegalStateException(context.getString(R.string.erro_chave_api_ausente)));
 
         } catch (PackageManager.NameNotFoundException e) {
-            throw new IllegalStateException(context.getString(R.string.ERROR_APP_PACKAGE_NOT_FOUND), e);
+            throw new IllegalStateException(context.getString(R.string.erro_pacote_app_nao_encontrado), e);
         }
     }
 
@@ -46,11 +46,11 @@ public interface DirectionsProvider {
     default String build(LatLng origin, LatLng destination, Context context) {
         String originStr = origin.latitude + "," + origin.longitude;
         String destStr = destination.latitude + "," + destination.longitude;
-        String params = String.format(Locale.US, context.getString(R.string.DIRECTIONS_API_QUERY_FORMAT),
+        String params = String.format(Locale.US, context.getString(R.string.api_formato_query_rotas),
                 URLEncoder.encode(originStr, StandardCharsets.UTF_8),
                 URLEncoder.encode(destStr, StandardCharsets.UTF_8),
                 load(context));
-        return context.getString(R.string.DIRECTIONS_API_BASE_URL) + "?" + params;
+        return context.getString(R.string.api_url_base_rotas) + "?" + params;
     }
 
     default String fetch(String curl) throws IOException {
@@ -116,8 +116,8 @@ public interface DirectionsProvider {
 
             if (!"OK".equals(status)) {
                 int errorRes = "ZERO_RESULTS".equals(status)
-                        ? R.string.error_no_route
-                        : R.string.error_unknown_directions;
+                        ? R.string.erro_sem_rota
+                        : R.string.erro_rotas_desconhecido;
                 failure.accept(errorRes);
                 return;
             }
@@ -136,7 +136,7 @@ public interface DirectionsProvider {
             success.accept(directions);
 
         } catch (Exception e) {
-            failure.accept(R.string.error_json_directions);
+            failure.accept(R.string.erro_json_rotas);
         }
     }
 }

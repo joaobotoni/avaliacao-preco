@@ -36,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@string/recomendacao_transporte"
+                android:text="@string/titulo_recomendacao_transporte"
                 app:layout_constraintBottom_toBottomOf="@id/iv_icone_info"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_icone_info"
@@ -46,7 +46,7 @@
                 android:id="@+id/rv_recomendacoes_transporte"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_card"
+                android:layout_marginTop="@dimen/padding_medium"
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="1"
                 tools:listitem="@layout/item_recomendacao"
@@ -59,12 +59,12 @@
                 android:id="@+id/tv_motivo_recomendacao"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_card"
+                android:layout_marginTop="@dimen/padding_medium"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
-                tools:text="@string/tools_text_motivo_recomendacao"
+                tools:text="@string/preview_motivo_recomendacao"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

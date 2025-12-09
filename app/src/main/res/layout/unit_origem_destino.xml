@@ -28,8 +28,8 @@
 
             <ImageView
                 android:id="@+id/destino_icon"
-                android:layout_width="@dimen/icon_size_small"
-                android:layout_height="@dimen/icon_size_small"
+                android:layout_width="@dimen/size_small"
+                android:layout_height="@dimen/size_small"
                 android:layout_marginStart="14dp"
                 android:contentDescription="@string/todo"
                 android:src="@drawable/ic_circle"
@@ -46,8 +46,7 @@
                 app:hintEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/destino_icon"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:hint="@string/label_endereco_destino">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/destino_input"
@@ -64,7 +63,7 @@
                     android:paddingEnd="14dp"
                     android:paddingBottom="14dp"
                     android:textSize="15sp"
-                    tools:hint="@string/label_endereco_destino" />
+                    tools:hint="@string/rotulo_endereco_destino" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <View
@@ -89,8 +88,8 @@
 
             <ImageView
                 android:id="@+id/origem_icon"
-                android:layout_width="@dimen/icon_size_small"
-                android:layout_height="@dimen/icon_size_small"
+                android:layout_width="@dimen/size_small"
+                android:layout_height="@dimen/size_small"
                 android:layout_marginStart="14dp"
                 android:contentDescription="@string/todo"
                 android:src="@drawable/ic_circle"
@@ -103,7 +102,6 @@
                 android:id="@+id/origem_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/label_endereco_origem"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -117,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:autofillHints="postalAddress|streetAddress"
                     android:background="@null"
-                    android:hint="@string/label_endereco_origem"
+                    android:hint="@string/rotulo_endereco_origem"
                     android:imeOptions="actionDone"
                     android:importantForAutofill="yes"
                     android:inputType="textPostalAddress"

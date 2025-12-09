@@ -54,8 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class MainFragment extends Fragment implements DirectionsProvider,
-        LocationPermissionProvider, AddressProvider {
+public class MainFragment extends Fragment implements DirectionsProvider, LocationPermissionProvider, AddressProvider {
     private static final String DEFAULT_LOCATION = "Cuiabá";
     private static final int THREAD_POOL_SIZE = 4;
     private static final int MAX_SEARCH_RESULTS = 10;
@@ -368,17 +367,18 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         }
     }
 
+    @SuppressLint("StringFormatMatches")
     private void updateDistance(double kmToAdd) {
         distance += kmToAdd;
-        runOnMainThread(() -> showSnackbar(String.format("Distância atualizada! Agora: %.2f km", distance))
-        );
+        String message = getString(R.string.sucesso_distancia_atualizada, distance);
+        runOnMainThread(() -> showSnackbar(message));
     }
 
     private void handleCustomDistance() {
         String value = kmAdicionalInput.getText().toString().trim();
 
         if (value.isEmpty()) {
-            runOnMainThread(() -> showSnackbar("Digite um valor primeiro"));
+            runOnMainThread(() -> showError(R.string.erro_campo_vazio));
             return;
         }
 
@@ -386,7 +386,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
             double newValue = Double.parseDouble(value);
             updateDistance(newValue);
         } catch (NumberFormatException e) {
-            runOnMainThread(() -> showSnackbar("Erro: valor inválido"));
+            runOnMainThread(() -> showError(R.string.erro_valor_invalido));
         }
     }
 
@@ -468,7 +468,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
             } catch (IOException e) {
                 runOnMainThread(() -> {
                     if (isAdded()) {
-                        onError.accept(R.string.error_locations);
+                        onError.accept(R.string.erro_servico_localizacao);
                     }
                 });
             }
@@ -487,7 +487,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
             } catch (IOException e) {
                 runOnMainThread(() -> {
                     if (isAdded()) {
-                        onError.accept(R.string.error_locations);
+                        onError.accept(R.string.erro_servico_localizacao);
                     }
                 });
             }
@@ -540,7 +540,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
             } catch (Exception e) {
                 runOnMainThread(() -> {
                     if (isAdded()) {
-                        onError.accept(R.string.error_network_directions);
+                        onError.accept(R.string.erro_rede_rotas);
                     }
                 });
             }
@@ -628,13 +628,14 @@ public class MainFragment extends Fragment implements DirectionsProvider,
     private void resetOriginUI() {
         if (!isAdded()) return;
         setOriginText("");
-        setOriginHint(getString(R.string.label_endereco_origem));
+        setOriginHint(getString(R.string.rotulo_endereco_origem));
         setOriginEnabled(true);
         setOriginFocusable(true);
         setOriginClearButtonVisible(false);
     }
 
     private volatile boolean isNavigating = false;
+
     private void navigateToLocationFragment() {
         if (!isAdded() || originAddress == null || destinationAddress == null || isNavigating)
             return;
@@ -733,26 +734,12 @@ public class MainFragment extends Fragment implements DirectionsProvider,
         }
     }
 
-    private String formatAddressText(Address address) {
-        if (address == null) return "";
-        String locality = address.getLocality();
-        String adminArea = address.getAdminArea();
-        if (locality != null && adminArea != null) {
-            return String.format("%s, %s", locality, adminArea);
-        } else if (locality != null) {
-            return locality;
-        } else if (adminArea != null) {
-            return adminArea;
-        }
-        return address.getFeatureName() != null ? address.getFeatureName() : "";
-    }
-
     private void showPermissionDeniedDialog() {
         if (!isAdded()) return;
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.error_permission_denied_title)
-                .setMessage(R.string.error_permission_denied)
-                .setPositiveButton(R.string.submit, (dialog, which) -> dialog.dismiss())
+                .setTitle(R.string.erro_titulo_permissao_negada)
+                .setMessage(R.string.erro_permissao_negada)
+                .setPositiveButton(R.string.btn_ok, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
@@ -796,7 +783,7 @@ public class MainFragment extends Fragment implements DirectionsProvider,
                     executorService.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                showError(R.string.error);
+                showError(R.string.erro_generico);
             } finally {
                 executorService.shutdownNow();
             }

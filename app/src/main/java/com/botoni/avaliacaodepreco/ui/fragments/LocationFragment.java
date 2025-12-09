@@ -407,7 +407,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
             } catch (Exception e) {
                 runOnMainThread(() -> {
                     if (isAdded()) {
-                        onError.accept(R.string.error_network_directions);
+                        onError.accept(R.string.erro_rede_rotas);
                     }
                 });
             }

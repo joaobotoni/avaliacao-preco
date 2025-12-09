@@ -22,15 +22,15 @@
             android:id="@+id/conteudo_principal_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_padrao">
+            android:padding="@dimen/padding_large">
 
             <TextView
                 android:id="@+id/instrucao_subtitulo_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/instrucao_preencher_campos"
+                android:contentDescription="@string/info_preencher_campos_para_calcular"
                 android:gravity="center"
-                android:text="@string/instrucao_preencher_campos"
+                android:text="@string/info_preencher_campos_para_calcular"
                 android:textSize="@dimen/text_size_normal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
                 android:id="@+id/dados_animal_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
@@ -52,7 +52,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_large">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/categoria_animal_input_layout"
@@ -78,7 +78,7 @@
                         style="?attr/textInputFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_input"
+                        android:layout_marginTop="@dimen/margin_large"
                         app:boxStrokeErrorColor="?attr/colorError"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +97,7 @@
                         style="?attr/textInputFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_input"
+                        android:layout_marginTop="@dimen/margin_large"
                         app:boxStrokeErrorColor="?attr/colorError"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +116,7 @@
                         style="?attr/textInputFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_input"
+                        android:layout_marginTop="@dimen/margin_large"
                         app:boxStrokeErrorColor="?attr/colorError"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -137,7 +137,7 @@
                 style="?attr/materialCardViewFilledStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 android:visibility="gone"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -148,7 +148,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_medium">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/valor_por_cabeca_card"
@@ -165,7 +165,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_card">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/valor_por_cabeca_label_text"
@@ -181,7 +181,7 @@
                                 android:id="@+id/valor_por_cabeca_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_section"
+                                android:layout_marginTop="@dimen/margin_large"
                                 android:textSize="@dimen/text_size_normal"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -194,7 +194,7 @@
                         android:id="@+id/valor_por_kg_card"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_section"
+                        android:layout_marginStart="@dimen/margin_large"
                         app:cardBackgroundColor="?attr/colorSurfaceContainer"
                         app:cardCornerRadius="@dimen/corner_radius_large"
                         app:cardElevation="0dp"
@@ -207,7 +207,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_card">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/valor_por_kg_label_text"
@@ -223,7 +223,7 @@
                                 android:id="@+id/valor_por_kg_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_section"
+                                android:layout_marginTop="@dimen/margin_large"
                                 android:textSize="@dimen/text_size_normal"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -236,7 +236,7 @@
                         android:id="@+id/valor_total_card"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         app:cardBackgroundColor="?attr/colorSurfaceContainer"
                         app:cardCornerRadius="@dimen/corner_radius_large"
                         app:cardElevation="0dp"
@@ -248,7 +248,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_card">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/valor_total_label_text"
@@ -264,7 +264,7 @@
                                 android:id="@+id/valor_total_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_section"
+                                android:layout_marginTop="@dimen/margin_large"
                                 android:textSize="@dimen/text_size_normal"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -280,7 +280,7 @@
                 layout="@layout/unit_recomendation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/resultado_card" />
@@ -290,7 +290,7 @@
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 android:alpha="0.6"
                 android:clickable="true"
                 android:focusable="true"
@@ -302,13 +302,13 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@+id/localizacao_icon"
-                        android:layout_width="@dimen/icon_size_large"
-                        android:layout_height="@dimen/icon_size_large"
-                        android:contentDescription="@string/descricao_generica_todo"
+                        android:layout_width="@dimen/size_large"
+                        android:layout_height="@dimen/size_large"
+                        android:contentDescription="@string/todo"
                         android:src="@drawable/ic_location_on"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -321,8 +321,8 @@
                 android:id="@+id/button_fragment_location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
-                android:text="@string/preview_rota_card"
+                android:layout_marginTop="@dimen/margin_large"
+                android:text="@string/btn_preview_card_rota"
                 android:visibility="gone"
                 app:cornerRadius="@dimen/corner_radius_small"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -334,7 +334,7 @@
                 android:id="@+id/ajuste_km_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/corner_radius_medium"
@@ -348,12 +348,12 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@+id/ajuste_icon"
-                        android:layout_width="@dimen/icon_size_small"
-                        android:layout_height="@dimen/icon_size_small"
+                        android:layout_width="@dimen/size_small"
+                        android:layout_height="@dimen/size_small"
                         android:contentDescription="@string/todo"
                         android:src="@drawable/ic_info"
                         app:layout_constraintBottom_toBottomOf="@id/ajuste_titulo_text"
@@ -365,8 +365,8 @@
                         android:id="@+id/ajuste_titulo_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_section"
-                        android:text="@string/informacao_ajuste_distancia"
+                        android:layout_marginStart="@dimen/margin_large"
+                        android:text="@string/info_ajuste_distancia_frete"
                         android:textSize="@dimen/text_size_normal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/ajuste_icon"
@@ -377,10 +377,10 @@
                         style="?attr/textInputFilledStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:hint="@string/rotulo_km_adicionais"
                         app:endIconMode="clear_text"
-                        app:helperText="@string/helper_km_adicionais"
+                        app:helperText="@string/ajuda_km_adicionais"
                         app:helperTextEnabled="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -398,7 +398,7 @@
                         android:id="@+id/adicionar_5km_button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:text="@string/atalho_mais_5"
                         android:textSize="@dimen/text_size_small"
                         app:cornerRadius="@dimen/corner_radius_small"
@@ -435,8 +435,8 @@
                         android:id="@+id/confirmar_ajuste_button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
-                        android:text="@string/botao_confirmar_ajuste"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:text="@string/btn_confirmar_ajuste"
                         android:textSize="@dimen/text_size_small"
                         app:cornerRadius="@dimen/corner_radius_small"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -450,7 +450,7 @@
                 style="?attr/materialCardViewFilledStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 android:visibility="gone"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -461,7 +461,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_medium">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/rota_resumo_card"
@@ -478,7 +478,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_card">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/origem_label_text"
@@ -494,8 +494,8 @@
                                 android:id="@+id/origem_valor_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_section"
-                                android:text="@string/preview_origem_sp"
+                                android:layout_marginTop="@dimen/margin_large"
+                                android:text="@string/preview_origem"
                                 android:textSize="@dimen/text_size_normal"
                                 app:layout_constraintEnd_toStartOf="@id/divider_vertical"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -505,7 +505,7 @@
                                 android:id="@+id/divider_vertical"
                                 android:layout_width="1dp"
                                 android:layout_height="0dp"
-                                android:layout_marginHorizontal="@dimen/margin_section"
+                                android:layout_marginHorizontal="@dimen/margin_large"
                                 android:alpha="0.15"
                                 android:background="?attr/colorOutline"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -528,9 +528,9 @@
                                 android:id="@+id/destino_valor_text"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_section"
+                                android:layout_marginTop="@dimen/margin_large"
                                 android:gravity="end"
-                                android:text="@string/preview_destino_mt"
+                                android:text="@string/preview_destino"
                                 android:textSize="@dimen/text_size_normal"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/divider_vertical"
@@ -542,7 +542,7 @@
                         android:id="@+id/distancia_label_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:text="@string/rotulo_distancia_km"
                         android:textSize="@dimen/text_size_normal"
                         app:layout_constraintStart_toStartOf="parent"
@@ -552,7 +552,7 @@
                         android:id="@+id/distancia_valor_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_section"
+                        android:layout_marginStart="@dimen/margin_large"
                         android:text="@string/preview_distancia_zero"
                         android:textSize="@dimen/text_size_normal"
                         app:layout_constraintBaseline_toBaselineOf="@id/distancia_label_text"
@@ -562,7 +562,7 @@
                         android:id="@+id/separador_distancia"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:alpha="0.15"
                         android:background="?attr/colorOutline"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -573,7 +573,7 @@
                         android:id="@+id/valor_frete_label_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:text="@string/rotulo_valor_frete"
                         android:textSize="@dimen/text_size_normal"
                         app:layout_constraintEnd_toStartOf="@id/valor_frete_text"
@@ -589,12 +589,11 @@
                         app:layout_constraintBaseline_toBaselineOf="@id/valor_frete_label_text"
                         app:layout_constraintEnd_toEndOf="parent" />
 
-                    <!-- Separador -->
                     <View
                         android:id="@+id/separador_fino"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_marginVertical="@dimen/margin_section"
+                        android:layout_marginVertical="@dimen/margin_large"
                         android:alpha="0.15"
                         android:background="?attr/colorOutline"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -605,7 +604,7 @@
                         android:id="@+id/valor_total_final_label_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_section"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:text="@string/rotulo_valor_total_final"
                         android:textSize="@dimen/text_size_normal"
                         app:layout_constraintEnd_toStartOf="@id/valor_total_final_text"
@@ -629,17 +628,13 @@
         android:id="@+id/enviar_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_card"
-        android:text="@string/botao_enviar"
+        android:layout_margin="@dimen/padding_medium"
+        android:text="@string/btn_enviar_generico"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 
-
-    <include
-        layout="@layout/bottom_sheet_location"
-        tools:visibility="gone" />
-
+    <include layout="@layout/bottom_sheet_location" tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

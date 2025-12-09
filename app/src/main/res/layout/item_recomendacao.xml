@@ -26,10 +26,10 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
+            tools:text="10"
             android:gravity="center"
             android:textSize="14sp"
-            android:textStyle="bold"
-            tools:text="10" />
+            android:textStyle="bold" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -45,5 +45,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/quantidade_card"
         app:layout_constraintBottom_toBottomOf="@id/quantidade_card" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/icon_origin"
-            android:layout_width="@dimen/icon_size_small"
-            android:layout_height="@dimen/icon_size_small"
+            android:layout_width="@dimen/size_small"
+            android:layout_height="@dimen/size_small"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_location_on"
             app:layout_constraintBottom_toBottomOf="@id/text_origin"
@@ -80,16 +80,16 @@
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="@dimen/padding_card"
-            android:layout_marginBottom="@dimen/padding_card"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:layout_marginBottom="@dimen/padding_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/text_origin"
             app:layout_constraintTop_toBottomOf="@id/text_origin" />
 
         <ImageView
             android:id="@+id/icon_destination"
-            android:layout_width="@dimen/icon_size_small"
-            android:layout_height="@dimen/icon_size_small"
+            android:layout_width="@dimen/size_small"
+            android:layout_height="@dimen/size_small"
             android:contentDescription="@string/todo"
             android:src="@drawable/ic_location_on"
             app:layout_constraintBottom_toBottomOf="@id/text_destination"
@@ -102,7 +102,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_medium"
-            android:layout_marginTop="@dimen/padding_card"
+            android:layout_marginTop="@dimen/padding_medium"
             android:layout_marginEnd="@dimen/margin_small"
             android:ellipsize="end"
             android:maxLines="1"

@@ -1,178 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Avaliação de Preço</string>
 
-    <string name="app_name">Alguma coisa</string>
-
-    <string name="title_calculo_valor">Calcular Valor</string>
-    <string name="title_calculo_frete">Calcular Frete</string>
-    <string name="title_recomendacao_transporte">Recomendação de Transporte</string>
-
-    <string name="subtitle_preencha_campos">Preencha os campos abaixo</string>
-
-    <string name="label_categoria_animal">Categoria do Animal</string>
-    <string name="label_preco_arroba">Preço da Arroba</string>
-    <string name="label_percentual_agio">Percentual de Ágio (%)</string>
-    <string name="label_quantidade_animais">Quantidade de Animais</string>
-    <string name="label_peso_animal">Peso do Animal (kg)</string>
-    <string name="label_distancia_km">Distância (km)</string>
-
-    <string name="placeholder_preco">0,00</string>
-    <string name="placeholder_percentual">0,00</string>
-    <string name="placeholder_quantidade">0</string>
-    <string name="placeholder_peso">0,00</string>
-    <string name="placeholder_distancia">0</string>
-
-    <string name="resultado_valor_por_cabeca">Valor por Cabeça</string>
-    <string name="resultado_valor_total">Valor Total</string>
-    <string name="resultado_tipo_transporte">Tipo de Transporte</string>
-    <string name="resultado_distancia">Distância</string>
-    <string name="resultado_valor_frete">Valor do Frete</string>
-
-    <string name="recomendacao_transporte">Recomendação de Transporte</string>
-    <string name="recomendado_para">Recomendado para</string>
-    <string name="animais_suffix">animais</string>
-    <string name="bois_suffix">bois</string>
-    <string name="vacas_suffix">vacas</string>
-    <string name="bezerros_suffix">bezerros</string>
-
-    <string name="categoria_bezerro">Bezerro</string>
-    <string name="categoria_garrote">Garrote</string>
-    <string name="categoria_novilho">Novilho</string>
-    <string name="categoria_boi_gordo">Boi Gordo</string>
-    <string name="categoria_vaca_gorda">Vaca Gorda</string>
-    <string name="categoria_touro">Touro</string>
-
-    <string name="transporte_truck">TRUCK - Caminhão Truck</string>
-    <string name="transporte_carreta_baixa">CARRETA BAIXA - 2 eixos</string>
-    <string name="transporte_carreta_alta">CARRETA ALTA - 3 eixos</string>
-    <string name="transporte_bitrem">BITREM - 9 eixos</string>
-
-    <string name="btn_send">Enviar</string>
-    <string name="btn_limpar">Limpar</string>
-    <string name="btn_analisar">Analisar Proposta</string>
-
-    <string name="prefix_moeda">R$  </string>
-    <string name="suffix_km"> km</string>
-    <string name="suffix_porcentagem">%</string>
-
-    <string name="erro_campo_vazio">Preencha todos os campos obrigatórios</string>
-    <string name="erro_valor_invalido">Digite um valor válido</string>
-    <string name="erro_calculo">Erro ao realizar cálculo</string>
-    <string name="sucesso_calculo">Cálculo realizado com sucesso!</string>
-    <string name="info_sem_recomendacao">Selecione a categoria para ver a recomendação</string>
-
-    <string name="formato_moeda">R$ %s</string>
-    <string name="formato_moeda_sem_simbolo">%s</string>
-    <string name="formato_porcentagem">%s%%</string>
-    <string name="formato_distancia">%s km</string>
-    <string name="formato_peso">%.2f kg</string>
-    <string name="formato_quantidade">%d animais</string>
-
-    <string name="desc_icone_info">Informação sobre recomendação de transporte</string>
-    <string name="desc_botao_calcular">Botão para calcular valor e frete</string>
-    <string name="permission_denied_title">Permissão de localização</string>
-    <string name="permission_denied">A permissão de localização é obrigatoria</string>
-    <string name="cancel">Cancelar</string>
-    <string name="valor_total_estimado">Valor Total</string>
-    <string name="valor_cabeca">Valor Cabeça</string>
-    <string name="valor_por_kg">Valor por KG</string>
-
-    <string name="placeholder_peso_animal">150 kg</string>
-    <string name="placeholder_preco_arroba">0,00</string>
-    <string name="placeholder_quantidade_animais">0</string>
-    <string name="placeholder_distancia_km">0</string>
-    <string name="info_adicionar_localizacao">Adicione a Localização</string>
-    <string name="info_buscar_localizacao">Toque no botão abaixo para buscar ou selecionar sua localização atual</string>
-    <string name="label_endereco_origem">Digite o Endereço de Destino</string>
-    <string name="label_endereco_destino">Cuiabá - Mato Grosso</string>
-    <string name="tools_text_endereco_partida">Avenida Modelo, 1234 – Zona Teste</string>
-    <string name="tools_text_endereco_partida_secundario">Praça da República</string>
-    <string name="tools_text_endereco_destino">Rua Alfa, 42 – Setor Beta</string>
-    <string name="tools_text_endereco_destino_secundario">Avenida Verde</string>
-    <string name="tools_text_valor_cabeca">R$ 2.500,00</string>
-    <string name="tools_text_valor_kg">R$ 15,50</string>
-    <string name="tools_text_valor_total">R$ 2.657,14</string>
-    <string name="tools_text_motivo_recomendacao">Otimização para redução de custo por km.</string>
-    <string name="hint_searchbar">Pesquisar...</string>
+    <string name="titulo_destino">Destino</string>
+    <string name="titulo_origem">Origem</string>
+    <string name="titulo_rotulo_destino">Destino</string>
+    <string name="titulo_rotulo_origem">Origem</string>
+    <string name="titulo_calcular_frete">Calcular Frete</string>
+    <string name="titulo_calcular_valor">Calcular Valor</string>
+    <string name="titulo_recomendacao_transporte">Recomendação de Transporte</string>
     <string name="titulo_calculo_frete">Cálculo do Frete</string>
-    <string name="label_origem">Origem</string>
-    <string name="label_destino">Destino</string>
-    <string name="label_distancia">Distância</string>
-    <string name="valor_frete">Valor do Frete</string>
-    <string name="valor_final_total">Total</string>
-    <string name="helper_calculo_arroba">1 arroba = 15kg | Valores aproximados</string>
-    <string name="todo">TODO</string>
-    <string name="info_search_location_is_null">Digite para buscar um endereço</string>
-    <string name="text_info_rota_card">A rota calculada é aproximada. Adicione quilômetros extras se necessário para compensar desvios ou acessos internos.</string>
+
+    <string name="subtitulo_preencher_campos">Preencha os campos abaixo</string>
+
+    <string name="info_preencher_campos_para_calcular">Preencha os campos abaixo para calcular.</string>
+    <string name="info_quilometros_adicionais">Quilômetros adicionais</string>
+    <string name="info_buscar_endereco_nulo">Digite para buscar um endereço</string>
+    <string name="info_sem_recomendacao">Selecione a categoria para ver a recomendação</string>
+    <string name="info_adicionar_localizacao">Adicione a Localização</string>
     <string name="info_ajuste">Informação sobre ajuste</string>
     <string name="info_ajuste_distancia">Ajuste de Distância</string>
-    <string name="km_adicionais">Quilômetros adicionais</string>
+    <string name="info_buscar_localizacao">Toque no botão abaixo para buscar ou selecionar sua localização atual</string>
+    <string name="info_card_rota">Informação da Rota</string>
+    <string name="info_ajuste_rota">A rota calculada é aproximada. Adicione quilômetros extras se necessário para compensar desvios ou acessos internos.</string>
+    <string name="info_ajuste_distancia_frete">Ajuste a distância do frete</string>
 
-    <string name="instrucao_preencher_campos">Preencha os campos abaixo para calcular.</string>
+    <string name="rotulo_distancia">Distância</string>
+    <string name="rotulo_tempo">Tempo</string>
+    <string name="rotulo_categoria_animal">Categoria do Animal</string>
+    <string name="rotulo_destino">Destino</string>
+    <string name="rotulo_origem">Origem</string>
+    <string name="rotulo_distancia_km">Distância (km)</string>
+    <string name="rotulo_endereco_destino">Cuiabá - Mato Grosso</string>
+    <string name="rotulo_endereco_origem">Digite o Endereço de Origem</string>
+    <string name="rotulo_percentual_agio">Percentual de Ágio (%)</string>
+    <string name="rotulo_peso_animal">Peso do Animal (kg)</string>
+    <string name="rotulo_preco_arroba">Preço da Arroba</string>
+    <string name="rotulo_quantidade_animais">Quantidade de Animais</string>
+    <string name="rotulo_atalhos">Atalhos:</string>
+    <string name="rotulo_km_adicionais">Km Adicionais</string>
     <string name="rotulo_recomendacao_transporte">Recomendação de Transporte</string>
     <string name="rotulo_valor_frete">Valor do Frete</string>
-    <string name="rotulo_valor_total_final">Valor Final Total</string>
-    <string name="rotulo_categoria_animal">Categoria do Animal</string>
-    <string name="rotulo_preco_arroba">Preço da Arroba</string>
-    <string name="rotulo_peso_animal">Peso do Animal</string>
-    <string name="rotulo_quantidade_animais">Quantidade de Animais</string>
-    <string name="rotulo_origem">Origem</string>
-    <string name="rotulo_destino">Destino</string>
-    <string name="rotulo_distancia_km">Distância (Km)</string>
-    <string name="rotulo_km_adicionais">Km Adicionais</string>
-    <string name="botao_enviar">Enviar</string>
-    <string name="botao_adicionar_localizacao">Adicionar Localização</string>
-    <string name="botao_buscar_localizacao">Buscar Localização</string>
     <string name="rotulo_valor_por_cabeca">Valor por Cabeça</string>
     <string name="rotulo_valor_por_kg">Valor por Kg</string>
     <string name="rotulo_valor_total_estimado">Valor Total Estimado</string>
-    <string name="informacao_ajuste_distancia">Ajuste a distância do frete</string>
-    <string name="informacao_rota_card">Informação da Rota</string>
-    <string name="informacao_ajuste">Informação de ajuste</string>
+    <string name="rotulo_valor_total_final">Valor Final Total</string>
+
+    <string name="placeholder_distancia">0</string>
+    <string name="placeholder_distancia_km">0</string>
+    <string name="placeholder_percentual">0,00</string>
+    <string name="placeholder_peso">0,00</string>
+    <string name="placeholder_peso_animal">150 kg</string>
+    <string name="placeholder_preco">0,00</string>
+    <string name="placeholder_preco_arroba">0,00</string>
+    <string name="placeholder_quantidade">0</string>
+    <string name="placeholder_quantidade_animais">0</string>
+
+    <string name="ajuda_calculo_arroba">1 arroba = 15kg | Valores aproximados</string>
+    <string name="ajuda_km_adicionais">Valor será somado à distância</string>
+
+    <string name="barra_busca">Pesquisar...</string>
+
+    <string name="btn_preview_card_rota">Visualizar percurso</string>
+    <string name="btn_buscar_localizacao">Buscar Localização</string>
+    <string name="btn_confirmar_ajuste">Confirmar ajuste</string>
+    <string name="btn_editar">Editar</string>
+    <string name="btn_enviar">Enviar</string>
+    <string name="btn_finalizar_rota">Finalizar rota</string>
+    <string name="btn_analisar_proposta">Analisar Proposta</string>
+    <string name="btn_limpar">Limpar</string>
+    <string name="btn_enviar_generico">Enviar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="btn_mais_opcoes">Mais opções</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_trocar_localizacoes">Trocar localizações</string>
+
+    <string name="resultado_distancia">Distância</string>
+    <string name="resultado_tipo_transporte">Tipo de Transporte</string>
+    <string name="resultado_valor_frete">Valor do Frete</string>
+    <string name="resultado_valor_por_cabeca">Valor por Cabeça</string>
+    <string name="resultado_valor_total">Valor Total</string>
+
+    <string name="valor_por_cabeca">Valor Cabeça</string>
+    <string name="valor_final_total">Total</string>
+    <string name="valor_frete">Valor do Frete</string>
+    <string name="valor_por_kg">Valor por KG</string>
+    <string name="valor_total_estimado">Valor Total</string>
+
+    <string name="recomendacao_transporte">Recomendação de Transporte</string>
+    <string name="recomendado_para">Recomendado para</string>
+
+    <string name="categoria_bezerro">Bezerro</string>
+    <string name="categoria_touro">Touro</string>
+    <string name="categoria_vaca_gorda">Vaca Gorda</string>
+
+    <string name="transporte_carreta_alta">CARRETA ALTA - 3 eixos</string>
+    <string name="transporte_carreta_baixa">CARRETA BAIXA - 2 eixos</string>
+    <string name="transporte_truck">TRUCK - Caminhão Truck</string>
+
+    <string name="sufixo_animais">animais</string>
+    <string name="sufixo_bezerros">bezerros</string>
+    <string name="sufixo_bois">bois</string>
+    <string name="sufixo_vacas">vacas</string>
+    <string name="sufixo_km">km</string>
+    <string name="sufixo_porcentagem">%</string>
+    <string name="prefixo_moeda">R$</string>
+
+    <string name="formato_distancia">%s km</string>
+    <string name="formato_moeda">R$ %s</string>
+    <string name="formato_moeda_sem_simbolo">%s</string>
+    <string name="formato_peso">%.2f kg</string>
+    <string name="formato_porcentagem">%s%%</string>
+    <string name="formato_quantidade">%d animais</string>
+    <string name="formato_info_rota">Distância: %1$s, Duração: %2$s</string>
+
+
+    <string name="atalho_mais_10">+10</string>
+    <string name="atalho_mais_20">+20</string>
+    <string name="atalho_mais_5">+5</string>
+
+    <string name="sucesso_calculo">Cálculo realizado com sucesso!</string>
+    <string name="sucesso_distancia_atualizada">"Distância atualizada! Agora: %1$s</string>
+
+    <string name="erro_generico">Erro Inesperado</string>
+    <string name="erro_calculo">Erro ao realizar cálculo</string>
+    <string name="erro_campos_vazio">Preencha todos os campos obrigatórios</string>
+    <string name="erro_campo_vazio">Digite um valor</string>
+    <string name="erro_valor_invalido">Digite um valor válido</string>
+    <string name="erro_carregar_chave_api">Erro ao carregar a chave da API do Google Maps. Verifique o AndroidManifest.xml.</string>
+    <string name="erro_tamanho_input_invalido">A origem deve ter pelo menos %d caracteres para iniciar a busca.</string>
+    <string name="erro_json_rotas">Erro ao processar a resposta da API de rotas. O formato dos dados está incorreto.</string>
+    <string name="erro_servico_localizacao">Erro de comunicação com o serviço de localização (Geocoder). Verifique sua conexão.</string>
+    <string name="erro_estilo_mapa">Erro ao aplicar o estilo do mapa. O mapa pode não ser exibido corretamente.</string>
+    <string name="erro_rede_rotas">Erro de rede ao buscar rotas. Verifique sua conexão com a internet.</string>
+    <string name="erro_sem_dados_localizacao">Não foi possível obter os dados de localização atual.</string>
+    <string name="erro_sem_rota">Não foi possível encontrar uma rota entre a origem e o destino selecionados.</string>
+    <string name="erro_permissao_negada">É necessário conceder as permissões de localização para usar este recurso.</string>
+    <string name="erro_titulo_permissao_negada">Permissão Negada</string>
+    <string name="erro_rotas_desconhecido">Ocorreu um erro desconhecido ao buscar as rotas.</string>
+    <string name="erro_chave_api_ausente">A chave da API não foi encontrada ou está vazia nos metadados do AndroidManifest.xml.</string>
+    <string name="erro_pacote_app_nao_encontrado">Não foi possível encontrar o pacote de aplicativos.</string>
+
+    <string name="preview_destino">Cuiabá, MT</string>
+    <string name="preview_origem">São Paulo, SP</string>
+    <string name="preview_distancia_zero">0 km</string>
+    <string name="preview_motivo_recomendacao">O peso total dos animais excede o limite de transporte.</string>
     <string name="preview_valor_por_cabeca">R$ 0,00</string>
     <string name="preview_valor_por_kg">R$ 0,00</string>
     <string name="preview_valor_total">R$ 0,00</string>
-    <string name="preview_motivo_recomendacao">O peso total dos animais excede o limite de transporte.</string>
-    <string name="descricao_generica_todo">Descrição de conteúdo pendente (TODO)</string>
-    <string name="titulo_rotulo_origem">Origem</string>
-    <string name="titulo_rotulo_destino">Destino</string>
-    <string name="rotulo_atalhos">Atalhos:</string>
-    <string name="atalho_mais_5">+5</string>
-    <string name="atalho_mais_10">+10</string>
-    <string name="atalho_mais_20">+20</string>
-    <string name="error_api_key">Erro ao carregar a chave da API do Google Maps. Verifique o AndroidManifest.xml.</string>
-    <string name="error_maps">Erro ao aplicar o estilo do mapa. O mapa pode não ser exibido corretamente.</string>
-    <string name="error_locations">Erro de comunicação com o serviço de localização (Geocoder). Verifique sua conexão.</string>
-    <string name="error_network_directions">Erro de rede ao buscar rotas. Verifique sua conexão com a internet.</string>
-    <string name="error_json_directions">Erro ao processar a resposta da API de rotas. O formato dos dados está incorreto.</string>
-    <string name="error_no_route">Não foi possível encontrar uma rota entre a origem e o destino selecionados.</string>
-    <string name="error_unknown_directions">Ocorreu um erro desconhecido ao buscar as rotas.</string>
-    <string name="error_permission_denied_title">Permissão Negada</string>
-    <string name="error_permission_denied">É necessário conceder as permissões de localização para usar este recurso.</string>
-    <string name="error_no_location_data">Não foi possível obter os dados de localização atual.</string>
-    <string name="error_invalid_input">A origem deve ter pelo menos %d caracteres para iniciar a busca.</string>
-    <string name="submit">OK</string>
-    <string name="origin_title">Origem</string>
-    <string name="destination_title">Destino</string>
-    <string name="route_info_format">Distância: %1$s, Duração: %2$s</string>
-    <string name="error">Erro Inesperado</string>
-    <string name="helper_km_adicionais">Valor será somado à distância</string>
-    <string name="preview_origem_sp">São Paulo, SP</string>
-    <string name="preview_destino_mt">Cuiabá, MT</string>
-    <string name="preview_distancia_zero">0 km</string>
     <string name="preview_valor_zero">R$ 0,00</string>
-    <string name="preview_rota_card">Visualizar percurso</string>
-    <string name="ERROR_API_KEY_MISSING">A chave da API não foi encontrada ou está vazia nos metadados do AndroidManifest.xml.</string>
-    <string name="META_KEY_GOOGLE_MAPS_API">com.google.android.geo.API_KEY</string>
-    <string name="ERROR_APP_PACKAGE_NOT_FOUND">Não foi possível encontrar o pacote de aplicativos.</string>
-    <string name="DIRECTIONS_API_QUERY_FORMAT">origin=%s&amp;destination=%s&amp;key=%s</string>
-    <string name="DIRECTIONS_API_BASE_URL">https://maps.googleapis.com/maps/api/directions/json</string>
-    <string name="destination_icon">Ícone de destino</string>
-    <string name="swap_locations">Trocar localizações</string>
-    <string name="more_options">Mais opções</string>
-    <string name="botao_confirmar_ajuste">Confirmar ajuste</string>
-    <string name="distancia_label">Distância</string>
-    <string name="tempo_label">Tempo</string>
-    <string name="botao_editar">Editar</string>
-    <string name="botao_finalizar_rota">Finalizar rota</string>
+    <string name="preview_tools_texto_endereco_destino">Rua Alfa, 42 – Setor Beta</string>
+    <string name="preview_tools_texto_endereco_destino_secundario">Avenida Verde</string>
+    <string name="preview_tools_texto_endereco_origem">Avenida Modelo, 1234 – Zona Teste</string>
+    <string name="preview_tools_texto_endereco_origem_secundario">Praça da República</string>
+    <string name="preview_tools_texto_motivo_recomendacao">Otimização para redução de custo por km.</string>
+    <string name="preview_tools_texto_valor_cabeca">R$ 2.500,00</string>
+    <string name="preview_tools_texto_valor_kg">R$ 15,50</string>
+    <string name="preview_tools_texto_valor_total">R$ 2.657,14</string>
+
+    <string name="api_url_base_rotas">https://maps.googleapis.com/maps/api/directions/json</string>
+    <string name="api_formato_query_rotas">origin=%s&amp;destination=%s&amp;key=%s</string>
+    <string name="api_key_google_maps">com.google.android.geo.API_KEY</string>
+
+    <string name="permissao_localizacao_negada">A permissão de localização é obrigatoria</string>
+    <string name="permissao_localizacao_titulo_negada">Permissão de localização</string>
+
+    <string name="todo">TODO</string>
 </resources>

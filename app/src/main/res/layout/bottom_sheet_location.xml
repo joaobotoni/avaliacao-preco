@@ -17,14 +17,14 @@
             android:id="@+id/layout_half_expanded"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_padrao"
+            android:padding="@dimen/padding_large"
             android:visibility="gone">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_info"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="@dimen/padding_card">
+                    android:padding="@dimen/padding_medium">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -61,7 +61,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="@string/distancia_label"
+                            android:text="@string/rotulo_distancia"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
@@ -93,7 +93,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="@string/tempo_label"
+                            android:text="@string/rotulo_tempo"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
@@ -105,9 +105,9 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
-                android:layout_marginTop="@dimen/margin_section"
-                android:layout_marginEnd="@dimen/margin_section"
-                android:text="@string/botao_editar"
+                android:layout_marginTop="@dimen/margin_large"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:text="@string/btn_editar"
                 android:textAllCaps="false"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 app:cornerRadius="@dimen/corner_radius_large"
@@ -121,8 +121,8 @@
                 style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
-                android:layout_marginTop="@dimen/margin_section"
-                android:text="@string/botao_finalizar_rota"
+                android:layout_marginTop="@dimen/margin_large"
+                android:text="@string/btn_finalizar_rota"
                 android:textAllCaps="false"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 app:cornerRadius="@dimen/corner_radius_large"
@@ -149,8 +149,8 @@
                 layout="@layout/unit_origem_destino"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_padrao"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginHorizontal="@dimen/padding_large"
+                android:layout_marginTop="@dimen/margin_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bottom_sheet_drag_handle" />
@@ -159,9 +159,9 @@
                 android:id="@+id/localizacoes_recycler_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/margin_section"
+                android:layout_marginTop="@dimen/margin_large"
                 android:clipToPadding="false"
-                android:paddingBottom="@dimen/padding_padrao"
+                android:paddingBottom="@dimen/padding_large"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
