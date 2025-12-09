@@ -14,6 +14,7 @@
     <dimen name="corner_radius_small">12dp</dimen>
     <dimen name="corner_radius_medium">16dp</dimen>
     <dimen name="corner_radius_large">20dp</dimen>
+    <dimen name="corner_radius_round">999dp</dimen>
 
     <dimen name="size_small">20dp</dimen>
     <dimen name="size_medium">32dp</dimen>

@@ -24,7 +24,12 @@ public interface AddressProvider {
     }
 
     default Address first(@Nullable List<Address> addresses) {
-        return hasAddresses(addresses) ? addresses.get(0) : null;
+        if (hasAddresses(addresses)) {
+            assert addresses != null;
+            return addresses.get(0);
+        } else {
+            return null;
+        }
     }
 
     default String format(@Nullable Address address) {

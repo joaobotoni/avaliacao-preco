@@ -120,7 +120,7 @@
     <string name="atalho_mais_5">+5</string>
 
     <string name="sucesso_calculo">Cálculo realizado com sucesso!</string>
-    <string name="sucesso_distancia_atualizada">"Distância atualizada! Agora: %1$s</string>
+    <string name="sucesso_distancia_atualizada">"Distância atualizada! Agora: %1$s Km</string>
 
     <string name="erro_generico">Erro Inesperado</string>
     <string name="erro_calculo">Erro ao realizar cálculo</string>
@@ -144,7 +144,6 @@
     <string name="preview_destino">Cuiabá, MT</string>
     <string name="preview_origem">São Paulo, SP</string>
     <string name="preview_distancia_zero">0 km</string>
-    <string name="preview_motivo_recomendacao">O peso total dos animais excede o limite de transporte.</string>
     <string name="preview_valor_por_cabeca">R$ 0,00</string>
     <string name="preview_valor_por_kg">R$ 0,00</string>
     <string name="preview_valor_total">R$ 0,00</string>

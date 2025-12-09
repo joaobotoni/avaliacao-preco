@@ -19,7 +19,6 @@ import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
 
 import java.util.concurrent.CompletableFuture;
 
-
 @Database(entities = {
         Frete.class,
         CapacidadeFrete.class,
