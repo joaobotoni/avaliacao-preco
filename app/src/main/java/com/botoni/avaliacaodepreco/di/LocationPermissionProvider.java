@@ -16,11 +16,11 @@ public interface LocationPermissionProvider {
     };
 
     default boolean isGranted(Context context) {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
     default void request(ActivityResultLauncher<String[]> launcher, Context context) {
-        if (isGranted(context)) {
+        if (!isGranted(context)) {
             launcher.launch(LOCATION_PERMISSIONS);
         }
     }
