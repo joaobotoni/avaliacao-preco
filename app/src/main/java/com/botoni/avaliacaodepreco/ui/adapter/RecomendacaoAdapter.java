@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.botoni.avaliacaodepreco.R;
 import com.botoni.avaliacaodepreco.domain.Recomendacao;
 
+import java.util.Collections;
 import java.util.List;
 
 public class RecomendacaoAdapter extends RecyclerView.Adapter<RecomendacaoAdapter.ViewHolder> {
     private final List<Recomendacao> recomendacoes;
     public RecomendacaoAdapter(List<Recomendacao> recomendacoes) {
-        this.recomendacoes = recomendacoes;
+        this.recomendacoes = recomendacoes != null ? recomendacoes : Collections.emptyList();
     }
 
     @NonNull

@@ -4,4 +4,5 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.secrets.gradle.plugin) apply false
+    alias(libs.plugins.room) apply false
 }

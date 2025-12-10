@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco.ui.fragments;
+package com.botoni.avaliacaodepreco.ui;
 
 import android.os.Bundle;
 
@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.botoni.avaliacaodepreco.R;
+import com.botoni.avaliacaodepreco.ui.fragments.MainFragment;
 
 public class MainActivity extends AppCompatActivity {
 

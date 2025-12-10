@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,7 +39,10 @@ import com.botoni.avaliacaodepreco.di.AddressProvider;
 import com.botoni.avaliacaodepreco.di.DirectionsProvider;
 import com.botoni.avaliacaodepreco.di.LocationPermissionProvider;
 import com.botoni.avaliacaodepreco.domain.Directions;
+import com.botoni.avaliacaodepreco.domain.Recomendacao;
+import com.botoni.avaliacaodepreco.ui.adapter.CategoriaAdapter;
 import com.botoni.avaliacaodepreco.ui.adapter.LocationAdapter;
+import com.botoni.avaliacaodepreco.ui.adapter.RecomendacaoAdapter;
 import com.botoni.avaliacaodepreco.ui.views.InputWatchers;
 import com.botoni.avaliacaodepreco.ui.views.SearchWatcher;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -67,7 +69,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MainFragment extends Fragment implements
         DirectionsProvider, LocationPermissionProvider, AddressProvider {
@@ -141,12 +142,13 @@ public class MainFragment extends Fragment implements
      *
      **/
     private CardView cardRecomendacaoTransporte;
-    private RecyclerView listaRecomendacoes;
+    private RecyclerView recyclerViewRecomendacoes;
+    private List<Recomendacao> recomendacoes;
+    private RecomendacaoAdapter recomendacaoAdapter;
     private List<TipoVeiculoFrete> tiposVeiculo = new ArrayList<>();
     private List<CategoriaFrete> categorias = new ArrayList<>();
     private List<CapacidadeFrete> capacidadesFrete = new ArrayList<>();
     private CategoriaFrete categoriaAtual;
-
     /**
      *
      **/
@@ -273,7 +275,7 @@ public class MainFragment extends Fragment implements
 
     private void initializeViewsRecomendacao(View root) {
         cardRecomendacaoTransporte = root.findViewById(R.id.card_recomendacao_transporte);
-        listaRecomendacoes = root.findViewById(R.id.rv_recomendacoes_transporte);
+        recyclerViewRecomendacoes = root.findViewById(R.id.rv_recomendacoes_transporte);
     }
 
     private void initializeBezerroViews(View root) {
@@ -311,7 +313,8 @@ public class MainFragment extends Fragment implements
 
     private void setupLocationUI() {
         setupBottomSheet();
-        setupRecyclerView();
+        setupRecyclerViewLocation();
+        setUpRecyclerViewRecomendacao();
         setupCard();
         setupOriginInput();
         setupDestinationInput();
@@ -369,13 +372,13 @@ public class MainFragment extends Fragment implements
     private void setupAutoCompleteCategoria() {
         executeAsync(() -> {
             categorias = database.categoriaFreteDao().getAll();
-            List<String> descriptions = categorias.stream()
-                    .map(CategoriaFrete::getDescricao)
-                    .collect(Collectors.toList());
             runOnMainThread(() -> {
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(),
-                        android.R.layout.simple_dropdown_item_1line, descriptions);
-                categoriaAnimalAutoComplete.setAdapter(arrayAdapter);
+                CategoriaAdapter adapter = new CategoriaAdapter(requireContext(), categorias);
+                categoriaAnimalAutoComplete.setAdapter(adapter);
+                categoriaAnimalAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+                    categoriaAtual = categorias.get(position);
+                    categoriaAnimalAutoComplete.setText(categoriaAtual.getDescricao(), false);
+                });
             });
         });
     }
@@ -609,11 +612,18 @@ public class MainFragment extends Fragment implements
         setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    private void setupRecyclerView() {
+    private void setupRecyclerViewLocation() {
         if (locationRecyclerView == null) return;
         locationAdapter = new LocationAdapter(addresses, this::onAddressSelected);
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         locationRecyclerView.setAdapter(locationAdapter);
+    }
+
+    private void setUpRecyclerViewRecomendacao() {
+        if (recyclerViewRecomendacoes == null) return;
+        recomendacaoAdapter = new RecomendacaoAdapter(recomendacoes);
+        recyclerViewRecomendacoes.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerViewRecomendacoes.setAdapter(recomendacaoAdapter);
     }
 
     private void setupCard() {
@@ -866,7 +876,6 @@ public class MainFragment extends Fragment implements
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     })
-
     private void fetchUserLocation() {
         Context context = getContext();
         if (context == null || !isGranted(context)) return;
@@ -1063,6 +1072,12 @@ public class MainFragment extends Fragment implements
     private void setButtonTransactionVisible(int visible) {
         if (buttonLocation != null) {
             buttonLocation.setVisibility(visible);
+        }
+    }
+
+    private void setCardRecomendacaoTransporte(int visible) {
+        if (cardRecomendacaoTransporte != null) {
+            cardRecomendacaoTransporte.setVisibility(visible);
         }
     }
 

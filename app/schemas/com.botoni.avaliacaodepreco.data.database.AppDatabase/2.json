@@ -1,0 +1,134 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "88a8ec92980706e4a6c6c091d8b1796a",
+    "entities": [
+      {
+        "tableName": "xgp_frete",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_frete` INTEGER PRIMARY KEY AUTOINCREMENT, `id_tipo_veiculo_frete` INTEGER, `km_inicial` REAL NOT NULL, `km_final` REAL NOT NULL, `valor` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "idTipoVeiculoFrete",
+            "columnName": "id_tipo_veiculo_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kmInicial",
+            "columnName": "km_inicial",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kmFinal",
+            "columnName": "km_final",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valor",
+            "columnName": "valor",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_frete"
+          ]
+        }
+      },
+      {
+        "tableName": "xgp_capacidade_frete",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_capacidade_frete` INTEGER PRIMARY KEY AUTOINCREMENT, `id_categoria_frete` INTEGER, `id_tipo_veiculo_frete` INTEGER, `qtde_inicial` INTEGER, `qtde_final` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id_capacidade_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "idCategoriaFrete",
+            "columnName": "id_categoria_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "idTipoVeiculoFrete",
+            "columnName": "id_tipo_veiculo_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "qtdeInicial",
+            "columnName": "qtde_inicial",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "qtdeFinal",
+            "columnName": "qtde_final",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_capacidade_frete"
+          ]
+        }
+      },
+      {
+        "tableName": "xgp_categoria_frete",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_categoria_frete` INTEGER PRIMARY KEY AUTOINCREMENT, `descricao` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id_categoria_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_categoria_frete"
+          ]
+        }
+      },
+      {
+        "tableName": "xgp_tipo_veiculo_frete",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_tipo_veiculo_frete` INTEGER PRIMARY KEY AUTOINCREMENT, `descricao` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id_tipo_veiculo_frete",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_tipo_veiculo_frete"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '88a8ec92980706e4a6c6c091d8b1796a')"
+    ]
+  }
+}
