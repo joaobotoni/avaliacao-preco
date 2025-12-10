@@ -44,6 +44,17 @@
                 app:layout_constraintStart_toEndOf="@id/iv_icone_info"
                 app:layout_constraintTop_toTopOf="@id/iv_icone_info" />
 
+            <TextView
+                android:id="@+id/tv_motivo_recomendacao"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/rv_recomendacoes_transporte"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="visible" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_recomendacoes_transporte"
                 android:layout_width="0dp"
