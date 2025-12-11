@@ -65,6 +65,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -172,6 +173,29 @@ public class MainFragment extends Fragment implements
     private TextView recommendationReasonText;
     private RecomendacaoAdapter recommendationAdapter;
 
+    private CardView valorFreteFinalCard;
+    private CardView rotaResumoCard;
+
+    private TextView origemLabelText;
+    private TextView origemValorText;
+
+    private TextView destinoLabelText;
+    private TextView destinoValorText;
+    private TextView distanciaValorText;
+    private TextView valorFreteText;
+    private TextView valorTotalText;
+
+    private static final double MAX_TABLE_DISTANCE = 300.0;
+    private static final Map<String, BigDecimal> ADDITIONAL_KM_RATES;
+
+    static {
+        ADDITIONAL_KM_RATES = new HashMap<>();
+        ADDITIONAL_KM_RATES.put("TRUK", new BigDecimal("9.30"));
+        ADDITIONAL_KM_RATES.put("CARRETA BAIXA", new BigDecimal("13.00"));
+        ADDITIONAL_KM_RATES.put("CARRETA ALTA", new BigDecimal("15.00"));
+        ADDITIONAL_KM_RATES.put("CARRETA TRES EIXOS", new BigDecimal("17.00"));
+    }
+
     private final ActivityResultLauncher<String[]> permissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
             this::handlePermissionsResult
@@ -250,6 +274,7 @@ public class MainFragment extends Fragment implements
         bindCalculationViews(root);
         bindRecommendationViews(root);
         bindDistanceAdjustmentViews(root);
+        bindValorFreteFinalCard(root);
     }
 
     private void bindLocationViews(View root) {
@@ -287,12 +312,29 @@ public class MainFragment extends Fragment implements
         confirmAdjustment = root.findViewById(R.id.confirmar_ajuste_button);
     }
 
+
+    private void bindValorFreteFinalCard(View root) {
+        valorFreteFinalCard = root.findViewById(R.id.valor_frete_final_card);
+        rotaResumoCard = root.findViewById(R.id.rota_resumo_card);
+
+        origemLabelText = root.findViewById(R.id.origem_label_text);
+        origemValorText = root.findViewById(R.id.origem_valor_text);
+
+        destinoLabelText = root.findViewById(R.id.destino_label_text);
+        destinoValorText = root.findViewById(R.id.destino_valor_text);
+
+        distanciaValorText = root.findViewById(R.id.distancia_valor_text);
+        valorFreteText = root.findViewById(R.id.valor_frete_text);
+        valorTotalText = root.findViewById(R.id.valor_total_final_text);
+    }
+
     private void configureAllUIComponents(View view) {
         if (!isFragmentActive()) return;
         requestLocationPermissions();
         configureCalculationComponents();
         configureLocationComponents(view);
         configureNavigationComponents();
+        configureValorFinal();
     }
 
     private void configureCalculationComponents() {
@@ -314,6 +356,10 @@ public class MainFragment extends Fragment implements
         configureLocationFragmentNavigation();
     }
 
+    private void configureValorFinal() {
+        configureFinalCard();
+    }
+
     private void loadDatabaseDataAndRestoreState(@Nullable Bundle savedInstanceState) {
         executeInBackground(() -> {
             try {
@@ -332,6 +378,7 @@ public class MainFragment extends Fragment implements
                         initializeDefaultDestination();
                         performCalfCalculation();
                         updateVehicleRecommendations();
+                        configureFinalCard();
                     }
                 });
             } catch (Exception e) {
@@ -550,6 +597,7 @@ public class MainFragment extends Fragment implements
 
         updateCalculationResultTexts(valuePerHead, valuePerKg, totalValue);
         showCalculationResult();
+        configureFinalCard();
     }
 
     private void updateCalculationResultTexts(BigDecimal headValue, BigDecimal kgValue, BigDecimal totalValue) {
@@ -829,6 +877,7 @@ public class MainFragment extends Fragment implements
         applyRecommendationAdapter(recommendations);
         displayRecommendationSummary(recommendations, totalQuantity);
         showRecommendationDisplay();
+        configureFinalCard();
     }
 
     private void applyRecommendationAdapter(List<Recomendacao> recommendations) {
@@ -930,10 +979,10 @@ public class MainFragment extends Fragment implements
                     if (!isFragmentActive() || getView() == null) return;
                     boolean shouldExpand = bundle.getBoolean(KEY_UP_ORIGIN, false);
                     if (shouldExpand) getView().post(() -> {
-                            if (isFragmentActive() && bottomSheet != null) {
-                                expandBottomSheet();
-                            }
-                        });
+                        if (isFragmentActive() && bottomSheet != null) {
+                            expandBottomSheet();
+                        }
+                    });
                 });
     }
 
@@ -941,7 +990,7 @@ public class MainFragment extends Fragment implements
         originAddress = address;
         applyOriginAddressToUI(address);
         updateConditionalComponentsVisibility();
-
+        configureFinalCard();
         if (destinationAddress != null) {
             initiateRouteCalculation();
         }
@@ -1025,6 +1074,106 @@ public class MainFragment extends Fragment implements
         });
     }
 
+    private void configureFinalCard() {
+        processAddressCardFinal(originAddress, origemValorText);
+        processAddressCardFinal(destinationAddress, destinoValorText);
+        processDistanceCardFinal(distance, distanciaValorText);
+
+        if (hasValidRouteAddresses() && distance > 0 && !recommendations.isEmpty()) {
+            BigDecimal freightValue = calculateTotalFreightValue();
+            setTextViewValue(valorFreteText, formatToCurrency(freightValue));
+            BigDecimal totalCalfValue = getTotalCalfValue();
+            BigDecimal totalValue = totalCalfValue.add(freightValue);
+            setTextViewValue(valorTotalText, formatToCurrency(totalValue));
+            setViewVisibility(valorFreteFinalCard, View.VISIBLE);
+        } else {
+            setViewVisibility(valorFreteFinalCard, View.GONE);
+        }
+    }
+
+    private void processAddressCardFinal(Address address, TextView textView) {
+        Optional.ofNullable(address).ifPresent(a -> textView.setText(format(a)));
+    }
+
+    private void processDistanceCardFinal(double distance, TextView textView) {
+        Optional.of(distance).ifPresent(d -> textView.setText(String.format("%.2f km", d)));
+    }
+
+    private BigDecimal calculateTotalFreightValue() {
+        if (recommendations.isEmpty() || distance <= 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal totalFreight = BigDecimal.ZERO;
+        for (Recomendacao recomendacao : recommendations) {
+            TipoVeiculoFrete vehicleType = findVehicleTypeByDescription(recomendacao.getTipoTransporte());
+            if (vehicleType != null) {
+                BigDecimal freightValue = findFreightValueByVehicleAndDistance(vehicleType.getId(), distance);
+                BigDecimal vehicleTotal = freightValue.multiply(new BigDecimal(recomendacao.getQtdeRecomendada()));
+                totalFreight = totalFreight.add(vehicleTotal);
+            }
+        }
+        return totalFreight.setScale(RESULT_SCALE, ROUNDING_MODE);
+    }
+
+    private TipoVeiculoFrete findVehicleTypeByDescription(String description) {
+        return vehicleTypes.stream()
+                .filter(v -> v.getDescricao().equals(description))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private BigDecimal findFreightValueByVehicleAndDistance(long vehicleTypeId, double distance) {
+        List<Frete> freights = freightsByVehicleTypeCache.get(vehicleTypeId);
+        if (freights == null || freights.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        TipoVeiculoFrete vehicleType = vehicleCache.get(vehicleTypeId);
+        if (vehicleType == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal baseValue;
+        if (distance <= MAX_TABLE_DISTANCE) {
+            baseValue = BigDecimal.valueOf(freights.stream()
+                    .filter(f -> distance >= f.getKmInicial() && distance <= f.getKmFinal())
+                    .findFirst()
+                    .map(Frete::getValor)
+                    .orElse(0.0));
+        } else {
+            baseValue = BigDecimal.valueOf(freights.stream()
+                    .filter(f -> f.getKmInicial() == 251 && f.getKmFinal() == 300)
+                    .findFirst()
+                    .map(Frete::getValor)
+                    .orElse(0.0));
+            BigDecimal additionalValue = calculateAdditionalKmValue(distance, vehicleType.getDescricao());
+            baseValue = baseValue.add(additionalValue);
+        }
+        return baseValue.setScale(RESULT_SCALE, ROUNDING_MODE);
+    }
+
+    private BigDecimal calculateAdditionalKmValue(double totalDistance, String vehicleTypeDescription) {
+        if (totalDistance <= MAX_TABLE_DISTANCE) {
+            return BigDecimal.ZERO;
+        }
+        double extraKm = totalDistance - MAX_TABLE_DISTANCE;
+        BigDecimal ratePerKm = ADDITIONAL_KM_RATES.getOrDefault(vehicleTypeDescription, BigDecimal.ZERO);
+        return ratePerKm.multiply(new BigDecimal(extraKm)).setScale(RESULT_SCALE, ROUNDING_MODE);
+    }
+
+    private BigDecimal getTotalCalfValue() {
+        String totalText = Optional.ofNullable(totalCalfValueText)
+                .map(TextView::getText)
+                .map(Object::toString)
+                .map(text -> text.replace("R$", "").trim())
+                .map(text -> text.replace(".", ""))
+                .map(text -> text.replace(",", "."))
+                .orElse("0");
+        try {
+            return new BigDecimal(totalText);
+        } catch (NumberFormatException e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
     private void processAddressSelection(Address address) {
         if (!isFragmentActive()) return;
 
@@ -1034,6 +1183,7 @@ public class MainFragment extends Fragment implements
         collapseBottomSheet();
         updateConditionalComponentsVisibility();
     }
+
 
     private void initializeDefaultDestination() {
         performGeocoding(DEFAULT_LOCATION, null,
@@ -1243,6 +1393,7 @@ public class MainFragment extends Fragment implements
         executeOnMainThread(() -> {
             if (isFragmentActive()) {
                 applyRouteDistance(directions);
+                configureFinalCard();
             }
             isCalculatingRoute.set(false);
         });
@@ -1290,6 +1441,7 @@ public class MainFragment extends Fragment implements
     private void adjustDistanceBy(double kilometers) {
         if (kilometers <= 0) return;
         distance += kilometers;
+        configureFinalCard();
         String message = getString(R.string.sucesso_distancia_atualizada, distance);
         displaySuccessMessage(message);
     }
@@ -1306,6 +1458,7 @@ public class MainFragment extends Fragment implements
             double kilometers = Double.parseDouble(inputValue);
             if (kilometers > 0) {
                 adjustDistanceBy(kilometers);
+                configureFinalCard();
                 clearEditTextValue(additionalKmInput);
             } else {
                 displayErrorMessage(R.string.erro_valor_invalido);
@@ -1416,9 +1569,11 @@ public class MainFragment extends Fragment implements
         boolean hasValidQuantity = isValidQuantity(quantity);
         boolean hasCategory = currentCategory != null;
         boolean hasOrigin = originAddress != null;
+        boolean hasAddress = originAddress != null && destinationAddress != null;
 
         updateAddLocationCardVisibility(hasValidQuantity && hasCategory);
         updateRouteComponentsVisibility(hasOrigin && hasValidQuantity && hasCategory);
+        updateValorFinalCardVisibility(hasAddress);
     }
 
     private void updateAddLocationCardVisibility(boolean shouldShow) {
@@ -1429,6 +1584,11 @@ public class MainFragment extends Fragment implements
         int visibility = shouldShow ? View.VISIBLE : View.GONE;
         setViewVisibility(adjustmentCardView, visibility);
         setViewVisibility(locationButton, visibility);
+    }
+
+    private void updateValorFinalCardVisibility(boolean shouldShow) {
+        int visibility = shouldShow ? View.VISIBLE : View.GONE;
+        setViewVisibility(valorFreteFinalCard, visibility);
     }
 
     private BigDecimal parseDecimalFromInput(TextInputEditText input) {
@@ -1471,10 +1631,6 @@ public class MainFragment extends Fragment implements
 
     private Optional<Address> extractAddressFromBundle(Bundle bundle, String key) {
         return Optional.ofNullable(bundle.getParcelable(key, Address.class));
-    }
-
-    private Optional<Boolean> extractBooleanFromBundle(Bundle bundle, String key) {
-        return Optional.of(bundle.getBoolean(key));
     }
 
     private void notifyOriginAddressSelected(Address address) {

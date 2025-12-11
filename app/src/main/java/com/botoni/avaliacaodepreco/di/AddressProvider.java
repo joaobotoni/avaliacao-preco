@@ -34,7 +34,11 @@ public interface AddressProvider {
     }
 
     default String format(@Nullable Address address) {
-        return address != null && address.getAddressLine(0) != null ? address.getAddressLine(0) : "";
+        return Optional.ofNullable(address)
+                .map(Address::getLocality)
+                .filter(city -> !city.trim().isEmpty())
+                .map(String::trim)
+                .orElse("");
     }
 
     default String code(@Nullable Address address) {
