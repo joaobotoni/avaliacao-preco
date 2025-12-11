@@ -48,8 +48,10 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
     private static final int BOTTOM_SHEET_PEEK_HEIGHT = 600;
     private static final String KEY_ORIGIN = "origin";
     private static final String KEY_DESTINATION = "destination";
+    private static final String KEY_UP_ORIGIN = "updateOrigin";
     private static final String RESULT_KEY_ORIGIN = "originKey";
     private static final String RESULT_KEY_DESTINATION = "destinationKey";
+    private static final String RESULT_KEY_UP_ORIGIN = "updateOriginKey";
     private static final String MARKER_TITLE_ORIGIN = "Origem";
     private static final String MARKER_TITLE_DESTINATION = "Destino";
     private static final String STATE_ORIGIN_ADDRESS = "originNew";
@@ -250,7 +252,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
         distanceText = root.findViewById(R.id.text_distance_summary);
         durationText = root.findViewById(R.id.text_duration_summary);
 
-        root.findViewById(R.id.button_edit).setOnClickListener(v -> navigateBack());
+        root.findViewById(R.id.button_edit).setOnClickListener(v -> navigateBackFromEdit());
         root.findViewById(R.id.button_finalizar).setOnClickListener(v -> navigateBack());
     }
 
@@ -602,6 +604,16 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
         if (isAdded()) {
             getParentFragmentManager().popBackStack();
         }
+    }
+
+    private void navigateBackFromEdit() {
+        if (!isAdded()) return;
+
+        Bundle result = new Bundle();
+        result.putBoolean(KEY_UP_ORIGIN, true);
+        getParentFragmentManager().setFragmentResult(RESULT_KEY_UP_ORIGIN, result);
+
+        getParentFragmentManager().popBackStack();
     }
 
     private void showError(int messageResId) {

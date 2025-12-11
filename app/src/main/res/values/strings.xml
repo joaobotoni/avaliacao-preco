@@ -24,6 +24,8 @@
     <string name="info_card_rota">Informação da Rota</string>
     <string name="info_ajuste_rota">A rota calculada é aproximada. Adicione quilômetros extras se necessário para compensar desvios ou acessos internos.</string>
     <string name="info_ajuste_distancia_frete">Ajuste a distância do frete</string>
+    <string name="info_ecomendacao_transporte_msg">Para %1$d %2$s(s), recomendamos %3$d veículo(s).</string>
+    <string name="info_recomendacao_transporte_sem_msg">Nenhuma recomendação disponível para %1$d %2$s.</string>
 
     <string name="rotulo_distancia">Distância</string>
     <string name="rotulo_tempo">Tempo</string>
@@ -140,6 +142,8 @@
     <string name="erro_rotas_desconhecido">Ocorreu um erro desconhecido ao buscar as rotas.</string>
     <string name="erro_chave_api_ausente">A chave da API não foi encontrada ou está vazia nos metadados do AndroidManifest.xml.</string>
     <string name="erro_pacote_app_nao_encontrado">Não foi possível encontrar o pacote de aplicativos.</string>
+    <string name="erro_coordenadas_invalidas">Coordenadas inválidas</string>
+    <string name="erro_update_adapter">Erro ao atualizar adapter</string>
 
     <string name="preview_destino">Cuiabá, MT</string>
     <string name="preview_origem">São Paulo, SP</string>

@@ -18,9 +18,7 @@ public class Frete {
     @ColumnInfo(name = "valor")
     private double valor;
 
-    public Frete() {
-    }
-
+    public Frete() {}
     public Frete(Long idTipoVeiculoFrete, double kmInicial, double kmFinal, double valor) {
         this.idTipoVeiculoFrete = idTipoVeiculoFrete;
         this.kmInicial = kmInicial;

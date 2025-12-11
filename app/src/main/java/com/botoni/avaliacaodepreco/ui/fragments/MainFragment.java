@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -64,49 +65,55 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainFragment extends Fragment implements
         DirectionsProvider, LocationPermissionProvider, AddressProvider {
-
-    // ========== CONSTANTES ==========
     private static final String DEFAULT_LOCATION = "Cuiabá";
     private static final int THREAD_POOL_SIZE = 4;
     private static final int MAX_SEARCH_RESULTS = 10;
-
-    // Keys para FragmentResult e SavedState
     private static final String KEY_ORIGIN = "origin";
     private static final String KEY_DESTINATION = "destination";
+    private static final String KEY_UP_ORIGIN = "updateOrigin";
     private static final String RESULT_KEY_ORIGIN = "originKey";
     private static final String RESULT_KEY_DESTINATION = "destinationKey";
+    private static final String RESULT_KEY_UP_ORIGIN = "updateOriginKey";
     private static final String STATE_ORIGIN = "newOrigin";
     private static final String STATE_DESTINATION = "newDestination";
+    private static final String STATE_ARROBA_PRICE = "arrobaPrice";
+    private static final String STATE_ANIMAL_WEIGHT = "animalWeight";
+    private static final String STATE_ANIMAL_QUANTITY = "animalQuantity";
+    private static final String STATE_CATEGORY_ID = "categoryId";
+    private static final String STATE_DISTANCE = "distance";
 
-    // Constantes de cálculo de precificação
-    private static final BigDecimal PESO_ARROBA_KG = new BigDecimal("30.0");
-    private static final BigDecimal ARROBAS_ABATE_ESPERADO = new BigDecimal("21.00");
-    private static final BigDecimal PESO_BASE_KG = new BigDecimal("180.0");
-    private static final BigDecimal TAXA_FIXA_ABATE = new BigDecimal("69.70");
-    private static final BigDecimal TAXA_FUNRURAL = new BigDecimal("0.015");
+    private static final BigDecimal ARROBA_WEIGHT_KG = new BigDecimal("30.0");
+    private static final BigDecimal EXPECTED_SLAUGHTER_ARROBAS = new BigDecimal("21.00");
+    private static final BigDecimal BASE_WEIGHT_KG = new BigDecimal("180.0");
+    private static final BigDecimal FIXED_SLAUGHTER_FEE = new BigDecimal("69.70");
+    private static final BigDecimal FUNRURAL_TAX = new BigDecimal("0.015");
     private static final BigDecimal AGIO = new BigDecimal("30");
-    private static final BigDecimal CEM = new BigDecimal("100");
-    private static final int ESCALA_CALCULO = 15;
-    private static final int ESCALA_RESULTADO = 2;
-    private static final RoundingMode MODO_ARREDONDAMENTO = RoundingMode.HALF_EVEN;
-    private static final DecimalFormatSymbols SIMBOLOS_BRASILEIROS = new DecimalFormatSymbols(new Locale("pt", "BR"));
-    private static final DecimalFormat FORMATADOR_MOEDA = new DecimalFormat("#,##0.00", SIMBOLOS_BRASILEIROS);
+    private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
+    private static final int CALCULATION_SCALE = 15;
+    private static final int RESULT_SCALE = 2;
+    private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_EVEN;
+    private static final DecimalFormatSymbols BRAZILIAN_SYMBOLS = new DecimalFormatSymbols(new Locale("pt", "BR"));
+    private static final DecimalFormat CURRENCY_FORMATTER = new DecimalFormat("#,##0.00", BRAZILIAN_SYMBOLS);
 
-    // ========== DEPENDÊNCIAS E SERVIÇOS ==========
     private ExecutorService executorService;
     private Handler mainHandler;
     private Geocoder geocoder;
@@ -114,28 +121,27 @@ public class MainFragment extends Fragment implements
     private FragmentManager manager;
     private AppDatabase database;
 
-    // ========== ESTADO DA APLICAÇÃO ==========
     private Address originAddress;
     private Address destinationAddress;
     private String userCountryCode;
     private volatile double distance;
-    private volatile boolean isNavigating = false;
+    private final AtomicBoolean isNavigating = new AtomicBoolean(false);
+    private final AtomicBoolean isCalculatingRoute = new AtomicBoolean(false);
 
-    // ========== DADOS DE NEGÓCIO ==========
-    private final List<Address> addresses = new ArrayList<>();
-    private List<TipoVeiculoFrete> tiposVeiculo = new ArrayList<>();
-    private List<CategoriaFrete> categorias = new ArrayList<>();
-    private List<CapacidadeFrete> capacidadesFrete = new ArrayList<>();
-    private List<Frete> tabelaFrete = new ArrayList<>();
-    private CategoriaFrete categoriaAtual;
-    private List<Recomendacao> recomendacoes = new ArrayList<>();
+    private final List<Address> addresses = Collections.synchronizedList(new ArrayList<>());
+    private List<TipoVeiculoFrete> vehicleTypes = new ArrayList<>();
+    private List<CategoriaFrete> categories = new ArrayList<>();
+    private List<CapacidadeFrete> freightCapacities = new ArrayList<>();
+    private List<Frete> freightTable = new ArrayList<>();
+    private CategoriaFrete currentCategory;
+    private List<Recomendacao> recommendations = new ArrayList<>();
+    private final AtomicBoolean isCalculatingRecommendations = new AtomicBoolean(false);
 
-    // Cache para otimização de buscas
-    private Map<Long, TipoVeiculoFrete> cacheVeiculos = new HashMap<>();
-    private Map<Long, List<CapacidadeFrete>> cacheCapacidadesPorCategoria = new HashMap<>();
-    private Map<Long, List<Frete>> cacheFretesPorTipoVeiculo = new HashMap<>();
 
-    // ========== VIEWS - LOCALIZAÇÃO ==========
+    private Map<Long, TipoVeiculoFrete> vehicleCache = new ConcurrentHashMap<>();
+    private Map<Long, List<CapacidadeFrete>> capacitiesByCategoryCache = new ConcurrentHashMap<>();
+    private Map<Long, List<Frete>> freightsByVehicleTypeCache = new ConcurrentHashMap<>();
+
     private TextInputEditText originInput;
     private TextInputEditText destinationInput;
     private TextInputLayout originInputLayout;
@@ -143,42 +149,39 @@ public class MainFragment extends Fragment implements
     private RecyclerView locationRecyclerView;
     private LocationAdapter locationAdapter;
     private BottomSheetBehavior<FrameLayout> bottomSheet;
-    private Button buttonLocation;
+    private Button locationButton;
 
-    // ========== VIEWS - CÁLCULO ANIMAL ==========
-    private AutoCompleteTextView categoriaAnimalAutoComplete;
-    private TextInputEditText precoArrobaInput;
-    private TextInputEditText pesoAnimalInput;
-    private TextInputEditText quantidadeAnimaisInput;
-    private CardView resultadoCardBezerro;
-    private TextView valorPorCabecaText;
-    private TextView valorPorKgText;
-    private TextView valorTotalBezerrosText;
+    private AutoCompleteTextView animalCategoryAutoComplete;
+    private TextInputEditText arrobaPriceInput;
+    private TextInputEditText animalWeightInput;
+    private TextInputEditText animalQuantityInput;
+    private CardView calfResultCard;
+    private TextView valuePerHeadText;
+    private TextView valuePerKgText;
+    private TextView totalCalfValueText;
 
-    // ========== VIEWS - AJUSTE DE DISTÂNCIA ==========
-    private CardView ajusteCardView;
-    private EditText kmAdicionalInput;
-    private Button adicionar5KmButton;
-    private Button adicionar10KmButton;
-    private Button adicionar20KmButton;
-    private Button confirmAjuste;
+    private CardView adjustmentCardView;
+    private EditText additionalKmInput;
+    private Button add5KmButton;
+    private Button add10KmButton;
+    private Button add20KmButton;
+    private Button confirmAdjustment;
 
-    // ========== VIEWS - RECOMENDAÇÃO DE TRANSPORTE ==========
-    private CardView cardRecomendacaoTransporte;
-    private RecyclerView recyclerViewRecomendacoes;
-    private TextView textoMotivoRecomendacao;
-    private RecomendacaoAdapter recomendacaoAdapter;
+    private CardView transportRecommendationCard;
+    private RecyclerView recommendationsRecyclerView;
+    private TextView recommendationReasonText;
+    private RecomendacaoAdapter recommendationAdapter;
 
     private final ActivityResultLauncher<String[]> permissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
-            this::onPermissionsResult
+            this::handlePermissionsResult
     );
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeDependencies();
-        setupFragmentResultListeners();
+        initializeCoreDependencies();
+        registerFragmentResultListeners();
     }
 
     @Nullable
@@ -191,803 +194,951 @@ public class MainFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initializeViews(view);
-        setupUI();
-        restoreState(savedInstanceState);
-        carregarDadosIniciais();
+        bindAllViews(view);
+        configureAllUIComponents(view);
+        loadDatabaseDataAndRestoreState(savedInstanceState);
+        view.post(this::synchronizeUIWithState);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateUIAfterReturn();
+        isNavigating.set(false);
+
+        if (getView() != null) {
+            getView().post(this::synchronizeUIWithState);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        isNavigating = false;
-        clearViewReferences();
+        isNavigating.set(false);
+        isCalculatingRoute.set(false);
+        isCalculatingRecommendations.set(false);
+
+        getParentFragmentManager().clearFragmentResultListener(RESULT_KEY_ORIGIN);
+        getParentFragmentManager().clearFragmentResultListener(RESULT_KEY_DESTINATION);
+
+        releaseAllViewReferences();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        shutdownExecutor();
+        cleanupResources();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        saveAddressState(outState);
+        persistCurrentState(outState);
     }
 
-    @Override
-    public List<Address> search(String query) {
-        try {
-            List<Address> results = geocoder.getFromLocationName(query, MAX_SEARCH_RESULTS);
-            return results != null ? results : emptyList();
-        } catch (IOException e) {
-            return emptyList();
-        }
-    }
-
-    @Override
-    public String load(@NonNull Context context) {
-        return DirectionsProvider.super.load(context);
-    }
-
-    @Override
-    public String build(LatLng origin, LatLng destination, Context context) {
-        return DirectionsProvider.super.build(origin, destination, context);
-    }
-
-    @Override
-    public String fetch(String curl) throws IOException {
-        return DirectionsProvider.super.fetch(curl);
-    }
-
-    @Override
-    public List<LatLng> decode(String code) {
-        return DirectionsProvider.super.decode(code);
-    }
-
-    @Override
-    public void parse(@NonNull String json, @NonNull Consumer<Directions> success,
-                      @NonNull Consumer<Integer> failure) {
-        DirectionsProvider.super.parse(json, success, failure);
-    }
-
-    private void initializeDependencies() {
-        database = AppDatabase.getDatabase(requireContext());
+    private void initializeCoreDependencies() {
+        Context context = requireContext();
         executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         mainHandler = new Handler(Looper.getMainLooper());
-        Context context = getContext();
-        if (context != null) {
-            locationClient = LocationServices.getFusedLocationProviderClient(context);
-            geocoder = new Geocoder(context, new Locale("pt", "BR"));
-            load(context);
-        }
+        locationClient = LocationServices.getFusedLocationProviderClient(context);
+        geocoder = new Geocoder(context, new Locale("pt", "BR"));
+        database = AppDatabase.getDatabase(context);
     }
 
-    private void initializeViews(View root) {
-        initializeLocationViews(root);
-        initializeBezerroViews(root);
-        initializeViewsRecomendacao(root);
-        initializeDistanceViews(root);
+
+    private void bindAllViews(View root) {
+        bindLocationViews(root);
+        bindCalculationViews(root);
+        bindRecommendationViews(root);
+        bindDistanceAdjustmentViews(root);
     }
 
-    private void initializeLocationViews(View root) {
+    private void bindLocationViews(View root) {
         originInput = root.findViewById(R.id.origem_input);
         destinationInput = root.findViewById(R.id.destino_input);
         originInputLayout = root.findViewById(R.id.origem_input_layout);
         addLocationCard = root.findViewById(R.id.adicionar_localizacao_card);
         locationRecyclerView = root.findViewById(R.id.localizacoes_recycler_view);
-        buttonLocation = root.findViewById(R.id.button_fragment_location);
+        locationButton = root.findViewById(R.id.button_fragment_location);
     }
 
-    private void initializeViewsRecomendacao(View root) {
-        cardRecomendacaoTransporte = root.findViewById(R.id.card_recomendacao_transporte);
-        recyclerViewRecomendacoes = root.findViewById(R.id.rv_recomendacoes_transporte);
-        textoMotivoRecomendacao = root.findViewById(R.id.tv_motivo_recomendacao);
+    private void bindCalculationViews(View root) {
+        animalCategoryAutoComplete = root.findViewById(R.id.categoria_animal_input);
+        arrobaPriceInput = root.findViewById(R.id.preco_arroba_input);
+        animalWeightInput = root.findViewById(R.id.peso_animal_input);
+        animalQuantityInput = root.findViewById(R.id.quantidade_animais_input);
+        calfResultCard = root.findViewById(R.id.resultado_card);
+        valuePerHeadText = root.findViewById(R.id.valor_por_cabeca_text);
+        valuePerKgText = root.findViewById(R.id.valor_por_kg_text);
+        totalCalfValueText = root.findViewById(R.id.valor_total_text);
     }
 
-    private void initializeBezerroViews(View root) {
-        categoriaAnimalAutoComplete = root.findViewById(R.id.categoria_animal_input);
-        precoArrobaInput = root.findViewById(R.id.preco_arroba_input);
-        pesoAnimalInput = root.findViewById(R.id.peso_animal_input);
-        quantidadeAnimaisInput = root.findViewById(R.id.quantidade_animais_input);
-        resultadoCardBezerro = root.findViewById(R.id.resultado_card);
-        valorPorCabecaText = root.findViewById(R.id.valor_por_cabeca_text);
-        valorPorKgText = root.findViewById(R.id.valor_por_kg_text);
-        valorTotalBezerrosText = root.findViewById(R.id.valor_total_text);
+    private void bindRecommendationViews(View root) {
+        transportRecommendationCard = root.findViewById(R.id.card_recomendacao_transporte);
+        recommendationsRecyclerView = root.findViewById(R.id.rv_recomendacoes_transporte);
+        recommendationReasonText = root.findViewById(R.id.tv_motivo_recomendacao);
     }
 
-    private void initializeDistanceViews(View root) {
-        ajusteCardView = root.findViewById(R.id.ajuste_km_card);
-        kmAdicionalInput = root.findViewById(R.id.km_adicional_input);
-        adicionar5KmButton = root.findViewById(R.id.adicionar_5km_button);
-        adicionar10KmButton = root.findViewById(R.id.adicionar_10km_button);
-        adicionar20KmButton = root.findViewById(R.id.local_partida_adicionar_20km_button);
-        confirmAjuste = root.findViewById(R.id.confirmar_ajuste_button);
+    private void bindDistanceAdjustmentViews(View root) {
+        adjustmentCardView = root.findViewById(R.id.ajuste_km_card);
+        additionalKmInput = root.findViewById(R.id.km_adicional_input);
+        add5KmButton = root.findViewById(R.id.adicionar_5km_button);
+        add10KmButton = root.findViewById(R.id.adicionar_10km_button);
+        add20KmButton = root.findViewById(R.id.local_partida_adicionar_20km_button);
+        confirmAdjustment = root.findViewById(R.id.confirmar_ajuste_button);
     }
 
-    private void setupUI() {
-        if (!isAdded()) return;
-        requestPermissions();
-        setupBezerroUI();
-        setupLocationUI();
-        setupNavigationUI();
+    private void configureAllUIComponents(View view) {
+        if (!isFragmentActive()) return;
+        requestLocationPermissions();
+        configureCalculationComponents();
+        configureLocationComponents(view);
+        configureNavigationComponents();
     }
 
-    private void setupBezerroUI() {
-        setupAutoCompleteCategoria();
-        setupCalculoBezerroListeners();
+    private void configureCalculationComponents() {
+        configureCategorySelection();
+        attachCalculationListeners();
     }
 
-    private void setupLocationUI() {
-        setupBottomSheet();
-        setupRecyclerViewLocation();
-        setUpRecyclerViewRecomendacao();
-        setupCard();
-        setupOriginInput();
-        setupDestinationInput();
+    private void configureLocationComponents(View view) {
+        configureBottomSheetBehavior(view);
+        configureLocationRecyclerView();
+        configureRecommendationRecyclerView();
+        configureAddLocationCardClick();
+        configureOriginInputBehavior();
+        configureDestinationInputBehavior();
     }
 
-    private void setupNavigationUI() {
-        setupTransition();
-        setupAdditionalButtons();
+    private void configureNavigationComponents() {
+        configureDistanceAdjustmentButtons();
+        configureLocationFragmentNavigation();
     }
 
-    private void carregarDadosIniciais() {
-        executeAsync(() -> {
+    private void loadDatabaseDataAndRestoreState(@Nullable Bundle savedInstanceState) {
+        executeInBackground(() -> {
             try {
-                tiposVeiculo = database.tipoVeiculoFreteDao().getAll();
-                categorias = database.categoriaFreteDao().getAll();
-                capacidadesFrete = database.capacidadeFreteDao().getAll();
-                tabelaFrete = database.freteDao().getAll();
-                popularCaches();
-                runOnMainThread(() -> {
-                    if (isAdded()) {
-                        configurarAdapterCategoria();
+                if (!isFragmentActive()) return;
+
+                loadAllDatabaseEntities();
+
+                if (!isFragmentActive()) return;
+
+                buildEntityCaches();
+
+                executeOnMainThread(() -> {
+                    if (isFragmentActive() && getView() != null && getContext() != null) {
+                        applyCategoryAdapter();
+                        restorePersistedState(savedInstanceState);
+                        initializeDefaultDestination();
+                        performCalfCalculation();
+                        updateVehicleRecommendations();
                     }
                 });
             } catch (Exception e) {
-                runOnMainThread(() -> showError(R.string.erro_generico));
+                executeOnMainThread(() -> {
+                    if (isFragmentActive() && getContext() != null) {
+                        displayErrorMessage(R.string.erro_generico);
+                    }
+                });
             }
         });
     }
 
-    private void popularCaches() {
-        cacheVeiculos.clear();
-        for (TipoVeiculoFrete veiculo : tiposVeiculo) {
-            cacheVeiculos.put(veiculo.getId().longValue(), veiculo);
-        }
+    private void loadAllDatabaseEntities() {
+        vehicleTypes = database.tipoVeiculoFreteDao().getAll();
+        categories = database.categoriaFreteDao().getAll();
+        freightCapacities = database.capacidadeFreteDao().getAll();
+        freightTable = database.freteDao().getAll();
+    }
 
-        cacheCapacidadesPorCategoria.clear();
-        for (CapacidadeFrete cap : capacidadesFrete) {
-            Long idCategoria = cap.getIdCategoriaFrete();
-            if (!cacheCapacidadesPorCategoria.containsKey(idCategoria)) {
-                cacheCapacidadesPorCategoria.put(idCategoria, new ArrayList<>());
-            }
-            cacheCapacidadesPorCategoria.get(idCategoria).add(cap);
-        }
+    private void buildEntityCaches() {
+        buildVehicleCache();
+        buildCapacityCache();
+        buildFreightCache();
+    }
 
-        for (List<CapacidadeFrete> lista : cacheCapacidadesPorCategoria.values()) {
-            lista.sort((a, b) -> Integer.compare(b.getQtdeFinal(), a.getQtdeFinal()));
-        }
+    private void buildVehicleCache() {
+        vehicleCache = vehicleTypes.stream()
+                .collect(Collectors.toMap(v -> Long.valueOf(v.getId()), v -> v));
+    }
 
-        cacheFretesPorTipoVeiculo.clear();
-        for (Frete frete : tabelaFrete) {
-            Long idTipo = frete.getIdTipoVeiculoFrete();
-            if (!cacheFretesPorTipoVeiculo.containsKey(idTipo)) {
-                cacheFretesPorTipoVeiculo.put(idTipo, new ArrayList<>());
-            }
-            cacheFretesPorTipoVeiculo.get(idTipo).add(frete);
-        }
-        for (List<Frete> lista : cacheFretesPorTipoVeiculo.values()) {
-            lista.sort(Comparator.comparingDouble(Frete::getKmInicial));
+    private void buildCapacityCache() {
+        capacitiesByCategoryCache = freightCapacities.stream()
+                .collect(Collectors.groupingBy(CapacidadeFrete::getIdCategoriaFrete));
+
+        capacitiesByCategoryCache.values().forEach(list ->
+                list.sort(Comparator.comparingInt(CapacidadeFrete::getQtdeFinal).reversed()));
+    }
+
+    private void buildFreightCache() {
+        freightsByVehicleTypeCache = freightTable.stream()
+                .collect(Collectors.groupingBy(Frete::getIdTipoVeiculoFrete));
+
+        freightsByVehicleTypeCache.values().forEach(list ->
+                list.sort(Comparator.comparingDouble(Frete::getKmInicial)));
+    }
+
+    private void persistCurrentState(@NonNull Bundle outState) {
+        persistInputValues(outState);
+        persistAddresses(outState);
+        persistDistance(outState);
+    }
+
+    private void persistInputValues(@NonNull Bundle outState) {
+        saveTextInputValue(outState, arrobaPriceInput, STATE_ARROBA_PRICE);
+        saveTextInputValue(outState, animalWeightInput, STATE_ANIMAL_WEIGHT);
+        saveTextInputValue(outState, animalQuantityInput, STATE_ANIMAL_QUANTITY);
+
+        Optional.ofNullable(currentCategory)
+                .map(CategoriaFrete::getId)
+                .ifPresent(id -> outState.putLong(STATE_CATEGORY_ID, id));
+    }
+
+    private void persistAddresses(Bundle outState) {
+        Optional.ofNullable(originAddress)
+                .ifPresent(address -> outState.putParcelable(STATE_ORIGIN, address));
+        Optional.ofNullable(destinationAddress)
+                .ifPresent(address -> outState.putParcelable(STATE_DESTINATION, address));
+    }
+
+    private void persistDistance(Bundle outState) {
+        if (distance > 0) {
+            outState.putDouble(STATE_DISTANCE, distance);
         }
     }
 
-    private void setupAutoCompleteCategoria() {
-        if (categoriaAnimalAutoComplete != null) {
-            categoriaAnimalAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-                categoriaAtual = categorias.get(position);
-                categoriaAnimalAutoComplete.setText(categoriaAtual.getDescricao(), false);
-                atualizarRecomendacaoTransporte();
-            });
+    private void saveTextInputValue(Bundle outState, TextInputEditText input, String key) {
+        Optional.ofNullable(input)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .filter(text -> !text.trim().isEmpty())
+                .ifPresent(text -> outState.putString(key, text));
+    }
+
+    private void restorePersistedState(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) return;
+
+        restoreAddressesFromBundle(savedInstanceState);
+        restoreInputValuesFromBundle(savedInstanceState);
+        restoreDistanceFromBundle(savedInstanceState);
+
+        if (hasValidRouteAddresses() && distance == 0) {
+            initiateRouteCalculation();
+        } else if (!hasValidRouteAddresses() && distance > 0) {
+            distance = 0;
         }
     }
 
-    private void configurarAdapterCategoria() {
-        if (categoriaAnimalAutoComplete != null && !categorias.isEmpty()) {
-            CategoriaAdapter adapter = new CategoriaAdapter(requireContext(), categorias);
-            categoriaAnimalAutoComplete.setAdapter(adapter);
-        }
-    }
+    private void restoreAddressesFromBundle(Bundle savedInstanceState) {
+        extractAddressFromBundle(savedInstanceState, STATE_ORIGIN).ifPresent(address -> {
+            originAddress = address;
+            applyOriginAddressToUI(address);
+            updateConditionalComponentsVisibility();
+        });
 
-    private void setupCalculoBezerroListeners() {
-        Runnable recalcular = this::recalcularBezerro;
-        Runnable recalcularRecomendacao = this::atualizarRecomendacaoTransporte;
-
-        addTextWatcherIfNotNull(precoArrobaInput, recalcular);
-        addTextWatcherIfNotNull(pesoAnimalInput, recalcular);
-        addTextWatcherIfNotNull(quantidadeAnimaisInput, () -> {
-            recalcular.run();
-            recalcularRecomendacao.run();
+        extractAddressFromBundle(savedInstanceState, STATE_DESTINATION).ifPresent(address -> {
+            destinationAddress = address;
         });
     }
 
-    private void addTextWatcherIfNotNull(TextInputEditText input, Runnable action) {
-        if (input != null) {
-            input.addTextChangedListener(new InputWatchers(action));
+    private void restoreInputValuesFromBundle(Bundle savedInstanceState) {
+        restoreTextInputValue(savedInstanceState, arrobaPriceInput, STATE_ARROBA_PRICE);
+        restoreTextInputValue(savedInstanceState, animalWeightInput, STATE_ANIMAL_WEIGHT);
+        restoreTextInputValue(savedInstanceState, animalQuantityInput, STATE_ANIMAL_QUANTITY);
+
+        long categoryId = savedInstanceState.getLong(STATE_CATEGORY_ID, -1);
+        if (categoryId != -1) {
+            restoreCategorySelection(categoryId);
         }
     }
 
+    private void restoreDistanceFromBundle(Bundle savedInstanceState) {
+        double savedDistance = savedInstanceState.getDouble(STATE_DISTANCE, 0);
+        if (savedDistance > 0) {
+            distance = savedDistance;
+        }
+    }
 
-    private void recalcularBezerro() {
-        BigDecimal precoArroba = extrairPrecoArroba();
-        BigDecimal pesoAnimal = extrairPesoAnimal();
-        Integer quantidade = extrairQuantidade();
+    private void restoreTextInputValue(Bundle savedInstanceState, TextInputEditText input, String key) {
+        Optional.ofNullable(savedInstanceState.getString(key))
+                .ifPresent(savedText -> Optional.ofNullable(input)
+                        .ifPresent(i -> i.setText(savedText)));
+    }
 
-        if (possuiValoresValidos(precoArroba, pesoAnimal, quantidade)) {
-            calcularEExibir(precoArroba, pesoAnimal, quantidade);
+    private void restoreCategorySelection(long categoryId) {
+        categories.stream()
+                .filter(category -> category.getId() == categoryId)
+                .findFirst()
+                .ifPresent(category -> {
+                    currentCategory = category;
+                    Optional.ofNullable(animalCategoryAutoComplete)
+                            .ifPresent(autoComplete -> autoComplete.setText(category.getDescricao(), false));
+                    updateVehicleRecommendations();
+                });
+    }
+
+    private void configureCategorySelection() {
+        Optional.ofNullable(animalCategoryAutoComplete).ifPresent(autoComplete ->
+                autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+                    if (isValidCategoryPosition(position)) {
+                        handleCategorySelection(position);
+                    }
+                }));
+    }
+
+    private boolean isValidCategoryPosition(int position) {
+        return position >= 0 && position < categories.size();
+    }
+
+    private void handleCategorySelection(int position) {
+        currentCategory = categories.get(position);
+        updateCategoryAutoCompleteText(currentCategory.getDescricao());
+        updateConditionalComponentsVisibility();
+        updateVehicleRecommendations();
+    }
+
+    private void updateCategoryAutoCompleteText(String description) {
+        Optional.ofNullable(animalCategoryAutoComplete)
+                .ifPresent(autoComplete -> autoComplete.setText(description, false));
+    }
+
+    private void applyCategoryAdapter() {
+        if (animalCategoryAutoComplete != null && !categories.isEmpty()) {
+            CategoriaAdapter adapter = new CategoriaAdapter(requireContext(), categories);
+            animalCategoryAutoComplete.setAdapter(adapter);
+        }
+    }
+
+    private void attachCalculationListeners() {
+        attachInputListener(arrobaPriceInput, this::performCalfCalculation);
+        attachInputListener(animalWeightInput, this::performCalfCalculation);
+        attachInputListener(animalQuantityInput, this::handleQuantityChange);
+    }
+
+    private void handleQuantityChange() {
+        performCalfCalculation();
+        updateVehicleRecommendations();
+        updateConditionalComponentsVisibility();
+    }
+
+    private void attachInputListener(TextInputEditText input, Runnable action) {
+        Optional.ofNullable(input).ifPresent(i -> i.addTextChangedListener(new InputWatchers(action)));
+    }
+
+    private void performCalfCalculation() {
+        BigDecimal arrobaPrice = parseDecimalFromInput(arrobaPriceInput);
+        BigDecimal animalWeight = parseDecimalFromInput(animalWeightInput);
+        Integer quantity = parseIntegerFromInput(animalQuantityInput);
+
+        if (areCalculationInputsValid(arrobaPrice, animalWeight, quantity)) {
+            executeCalculationAndDisplay(arrobaPrice, animalWeight, quantity);
         } else {
-            ocultarResultado();
+            hideCalculationResult();
         }
     }
 
-    private BigDecimal extrairPrecoArroba() {
-        return extrairValorDecimal(precoArrobaInput);
+    private boolean areCalculationInputsValid(BigDecimal price, BigDecimal weight, Integer quantity) {
+        return price != null && price.compareTo(BigDecimal.ZERO) > 0
+                && weight != null && weight.compareTo(BigDecimal.ZERO) > 0
+                && quantity != null && quantity > 0;
     }
 
-    private BigDecimal extrairPesoAnimal() {
-        return extrairValorDecimal(pesoAnimalInput);
+    private void executeCalculationAndDisplay(BigDecimal arrobaPrice, BigDecimal animalWeight, Integer quantity) {
+        BigDecimal valuePerHead = calculateCalfTotalValue(animalWeight, arrobaPrice, AGIO);
+        BigDecimal valuePerKg = calculateTotalValuePerKg(animalWeight, arrobaPrice, AGIO);
+        BigDecimal totalValue = calculateTotalValueForAllCalves(valuePerHead, quantity);
+
+        updateCalculationResultTexts(valuePerHead, valuePerKg, totalValue);
+        showCalculationResult();
     }
 
-    private Integer extrairQuantidade() {
-        return extrairValorInteiro(quantidadeAnimaisInput);
+    private void updateCalculationResultTexts(BigDecimal headValue, BigDecimal kgValue, BigDecimal totalValue) {
+        setTextViewValue(valuePerHeadText, formatToCurrency(headValue));
+        setTextViewValue(valuePerKgText, formatToCurrency(kgValue));
+        setTextViewValue(totalCalfValueText, formatToCurrency(totalValue));
     }
 
-    private BigDecimal extrairValorDecimal(TextInputEditText input) {
-        if (input == null) return null;
-        try {
-            String texto = Objects.requireNonNull(input.getText()).toString().trim();
-            return texto.isEmpty() ? null : new BigDecimal(texto);
-        } catch (NumberFormatException e) {
-            return null;
+    private void showCalculationResult() {
+        setViewVisibility(calfResultCard, View.VISIBLE);
+    }
+
+    private void hideCalculationResult() {
+        setViewVisibility(calfResultCard, View.GONE);
+    }
+
+    private static BigDecimal calculateTotalValueForAllCalves(BigDecimal value, int quantity) {
+        return value.multiply(new BigDecimal(quantity)).setScale(RESULT_SCALE, ROUNDING_MODE);
+    }
+
+    private static BigDecimal calculateCalfTotalValue(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                      BigDecimal agioPercentage) {
+        BigDecimal baseValue = calculateBaseValueByWeight(weightKg, pricePerArroba);
+        BigDecimal agioValue = calculateTotalAgioValue(weightKg, pricePerArroba, agioPercentage);
+        return baseValue.add(agioValue).setScale(RESULT_SCALE, ROUNDING_MODE);
+    }
+
+    private static BigDecimal calculateTotalValuePerKg(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                       BigDecimal agioPercentage) {
+        BigDecimal totalValue = calculateCalfTotalValue(weightKg, pricePerArroba, agioPercentage);
+        return totalValue.divide(weightKg, CALCULATION_SCALE, ROUNDING_MODE);
+    }
+
+    private static BigDecimal calculateBaseValueByWeight(BigDecimal weightKg, BigDecimal pricePerArroba) {
+        return convertKgToArrobas(weightKg).multiply(pricePerArroba);
+    }
+
+    private static BigDecimal calculateTotalAgioValue(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                      BigDecimal agioPercentage) {
+        if (isAtOrAboveBaseWeight(weightKg)) {
+            return calculateAgioAboveBaseWeight(weightKg, pricePerArroba, agioPercentage);
         }
+        return calculateAgioBelowBaseWeight(weightKg, pricePerArroba, agioPercentage);
     }
 
-    private Integer extrairValorInteiro(TextInputEditText input) {
-        if (input == null) return null;
-        try {
-            String texto = Objects.requireNonNull(input.getText()).toString().trim();
-            return texto.isEmpty() ? null : Integer.parseInt(texto);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    private static BigDecimal calculateAgioAboveBaseWeight(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                           BigDecimal agioPercentage) {
+        BigDecimal agioPerArroba = calculateAgioPerArrobaAtBaseWeight(weightKg, pricePerArroba, agioPercentage);
+        BigDecimal remainingArrobas = getRemainingArrobasForSlaughter(weightKg);
+        return remainingArrobas.multiply(agioPerArroba);
     }
 
-    private void calcularEExibir(BigDecimal precoArroba, BigDecimal pesoAnimal, Integer quantidade) {
-        BigDecimal valorPorCabeca = calcularValorTotalBezerro(pesoAnimal, precoArroba, AGIO);
-        BigDecimal valorPorKg = calcularValorTotalPorKg(pesoAnimal, precoArroba, AGIO);
-        BigDecimal valorTotal = calcularValorTotalDeTodosBezerros(valorPorCabeca, quantidade);
-        atualizarTextos(valorPorCabeca, valorPorKg, valorTotal);
-        exibirResultado();
+    private static BigDecimal calculateAgioPerArrobaAtBaseWeight(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                                 BigDecimal agioPercentage) {
+        BigDecimal referenceValue = getReferenceAgioValueAtBaseWeight(pricePerArroba, agioPercentage);
+        BigDecimal feePerArroba = calculateFeePerRemainingArroba(weightKg, pricePerArroba);
+        return referenceValue.subtract(feePerArroba);
     }
 
-    private void atualizarTextos(BigDecimal valorCabeca, BigDecimal valorKg, BigDecimal valorTotal) {
-        if (valorPorCabecaText != null) valorPorCabecaText.setText(formatarMoeda(valorCabeca));
-        if (valorPorKgText != null) valorPorKgText.setText(formatarMoeda(valorKg));
-        if (valorTotalBezerrosText != null)
-            valorTotalBezerrosText.setText(formatarMoeda(valorTotal));
-    }
+    private static BigDecimal calculateAgioBelowBaseWeight(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                           BigDecimal agioPercentage) {
+        BigDecimal accumulated = BigDecimal.ZERO;
+        BigDecimal currentWeight = weightKg;
 
-    private void exibirResultado() {
-        setResultadoCardBezerroViewVisible(View.VISIBLE);
-    }
-
-    private void ocultarResultado() {
-        setResultadoCardBezerroViewVisible(View.GONE);
-    }
-
-    private boolean possuiValoresValidos(BigDecimal preco, BigDecimal peso, Integer qtde) {
-        return preco != null && peso != null && qtde != null && qtde > 0;
-    }
-
-    private static BigDecimal calcularValorTotalDeTodosBezerros(BigDecimal value, int quantity) {
-        return value.multiply(BigDecimal.valueOf(quantity));
-    }
-
-    private static BigDecimal calcularValorTotalBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                        BigDecimal percentualAgio) {
-        BigDecimal valorBase = calcularValorBasePorPeso(pesoKg, precoPorArroba);
-        BigDecimal valorAgio = calcularValorTotalAgio(pesoKg, precoPorArroba, percentualAgio);
-        return valorBase.add(valorAgio).setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
-    }
-
-    private static BigDecimal calcularValorTotalPorKg(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                      BigDecimal percentualAgio) {
-        BigDecimal valorTotal = calcularValorTotalBezerro(pesoKg, precoPorArroba, percentualAgio);
-        return valorTotal.divide(pesoKg, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
-    }
-
-    private static BigDecimal calcularValorBasePorPeso(BigDecimal pesoKg, BigDecimal precoPorArroba) {
-        return converterKgParaArrobas(pesoKg).multiply(precoPorArroba);
-    }
-
-    private static BigDecimal calcularValorTotalAgio(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                     BigDecimal percentualAgio) {
-        if (estaNoPesoBaseOuAcima(pesoKg)) {
-            return calcularAgioAcimaPesoBase(pesoKg, precoPorArroba, percentualAgio);
-        }
-        return calcularAgioAbaixoPesoBase(pesoKg, precoPorArroba, percentualAgio);
-    }
-
-    private static BigDecimal calcularAgioAcimaPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                        BigDecimal percentualAgio) {
-        BigDecimal agioPorArroba = calcularAgioPorArrobaNoPesoBase(pesoKg, precoPorArroba, percentualAgio);
-        BigDecimal arrobasRestantes = obterArrobasRestantesParaAbate(pesoKg);
-        return arrobasRestantes.multiply(agioPorArroba);
-    }
-
-    private static BigDecimal calcularAgioPorArrobaNoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                              BigDecimal percentualAgio) {
-        BigDecimal valorReferencia = obterValorReferenciaAgioPesoBase(precoPorArroba, percentualAgio);
-        BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(pesoKg, precoPorArroba);
-        return valorReferencia.subtract(taxaPorArroba);
-    }
-
-    private static BigDecimal calcularAgioAbaixoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                         BigDecimal percentualAgio) {
-        BigDecimal acumulado = BigDecimal.ZERO;
-        BigDecimal pesoAtual = pesoKg;
-
-        while (pesoAtual.compareTo(PESO_BASE_KG) < 0) {
-            acumulado = acumulado.add(calcularDiferencaAgioNoPeso(pesoAtual, precoPorArroba, percentualAgio));
-            pesoAtual = calcularProximoPesoSuperior(pesoAtual);
+        while (currentWeight.compareTo(BASE_WEIGHT_KG) < 0) {
+            accumulated = accumulated.add(calculateAgioDifferenceAtWeight(currentWeight, pricePerArroba, agioPercentage));
+            currentWeight = calculateNextHigherWeight(currentWeight);
         }
 
-        return acumulado.add(calcularAgioAcimaPesoBase(PESO_BASE_KG, precoPorArroba, percentualAgio));
+        return accumulated.add(calculateAgioAboveBaseWeight(BASE_WEIGHT_KG, pricePerArroba, agioPercentage));
     }
 
-    private static BigDecimal calcularDiferencaAgioNoPeso(BigDecimal pesoKg, BigDecimal precoPorArroba,
-                                                          BigDecimal percentualAgio) {
-        BigDecimal valorReferencia = obterValorReferenciaAgioPesoBase(precoPorArroba, percentualAgio);
-        BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(pesoKg, precoPorArroba);
-        return valorReferencia.subtract(taxaPorArroba);
+    private static BigDecimal calculateAgioDifferenceAtWeight(BigDecimal weightKg, BigDecimal pricePerArroba,
+                                                              BigDecimal agioPercentage) {
+        BigDecimal referenceValue = getReferenceAgioValueAtBaseWeight(pricePerArroba, agioPercentage);
+        BigDecimal feePerArroba = calculateFeePerRemainingArroba(weightKg, pricePerArroba);
+        return referenceValue.subtract(feePerArroba);
     }
 
-    private static BigDecimal calcularProximoPesoSuperior(BigDecimal pesoKg) {
-        BigDecimal arrobas = converterKgParaArrobas(pesoKg);
-        BigDecimal proximasArrobas = arredondarArrobasParaCima(arrobas);
-        BigDecimal proximoPeso = proximasArrobas.multiply(PESO_ARROBA_KG);
-        return limitarPesoAoPesoBase(proximoPeso);
+    private static BigDecimal calculateNextHigherWeight(BigDecimal weightKg) {
+        BigDecimal arrobas = convertKgToArrobas(weightKg);
+        BigDecimal nextArrobas = roundArrobasUp(arrobas);
+        BigDecimal nextWeight = nextArrobas.multiply(ARROBA_WEIGHT_KG);
+        return limitWeightToBaseWeight(nextWeight);
     }
 
-    private static BigDecimal converterKgParaArrobas(BigDecimal pesoKg) {
-        return pesoKg.divide(PESO_ARROBA_KG, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal convertKgToArrobas(BigDecimal weightKg) {
+        return weightKg.divide(ARROBA_WEIGHT_KG, CALCULATION_SCALE, ROUNDING_MODE);
     }
 
-    private static BigDecimal obterArrobasRestantesParaAbate(BigDecimal pesoKg) {
-        return ARROBAS_ABATE_ESPERADO.subtract(converterKgParaArrobas(pesoKg));
+    private static BigDecimal getRemainingArrobasForSlaughter(BigDecimal weightKg) {
+        return EXPECTED_SLAUGHTER_ARROBAS.subtract(convertKgToArrobas(weightKg));
     }
 
-    private static BigDecimal calcularTotalTaxasAbate(BigDecimal precoPorArroba) {
-        BigDecimal funrural = ARROBAS_ABATE_ESPERADO.multiply(precoPorArroba).multiply(TAXA_FUNRURAL);
-        return funrural.add(TAXA_FIXA_ABATE);
+    private static BigDecimal calculateTotalSlaughterFees(BigDecimal pricePerArroba) {
+        BigDecimal funrural = EXPECTED_SLAUGHTER_ARROBAS.multiply(pricePerArroba).multiply(FUNRURAL_TAX);
+        return funrural.add(FIXED_SLAUGHTER_FEE);
     }
 
-    private static BigDecimal calcularTaxaPorArrobaRestante(BigDecimal pesoKg, BigDecimal precoPorArroba) {
-        BigDecimal totalTaxas = calcularTotalTaxasAbate(precoPorArroba);
-        BigDecimal arrobasRestantes = obterArrobasRestantesParaAbate(pesoKg);
-        return totalTaxas.divide(arrobasRestantes, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal calculateFeePerRemainingArroba(BigDecimal weightKg, BigDecimal pricePerArroba) {
+        BigDecimal totalFees = calculateTotalSlaughterFees(pricePerArroba);
+        BigDecimal remainingArrobas = getRemainingArrobasForSlaughter(weightKg);
+        return totalFees.divide(remainingArrobas, CALCULATION_SCALE, ROUNDING_MODE);
     }
 
-    private static BigDecimal obterValorReferenciaAgioPesoBase(BigDecimal precoPorArroba,
-                                                               BigDecimal percentualAgio) {
-        BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(PESO_BASE_KG, precoPorArroba);
-        BigDecimal agioPorArroba = calcularAgioPorArrobaExatoPesoBase(precoPorArroba, percentualAgio);
-        return taxaPorArroba.add(agioPorArroba);
+    private static BigDecimal getReferenceAgioValueAtBaseWeight(BigDecimal pricePerArroba,
+                                                                BigDecimal agioPercentage) {
+        BigDecimal feePerArroba = calculateFeePerRemainingArroba(BASE_WEIGHT_KG, pricePerArroba);
+        BigDecimal agioPerArroba = calculateAgioPerArrobaAtExactBaseWeight(pricePerArroba, agioPercentage);
+        return feePerArroba.add(agioPerArroba);
     }
 
-    private static BigDecimal calcularAgioPorArrobaExatoPesoBase(BigDecimal precoPorArroba,
-                                                                 BigDecimal percentualAgio) {
-        BigDecimal valorTotalAgio = calcularValorAgioNoPesoBase(precoPorArroba, percentualAgio);
-        BigDecimal arrobasRestantes = obterArrobasRestantesParaAbate(PESO_BASE_KG);
-        return valorTotalAgio.divide(arrobasRestantes, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal calculateAgioPerArrobaAtExactBaseWeight(BigDecimal pricePerArroba,
+                                                                      BigDecimal agioPercentage) {
+        BigDecimal totalAgioValue = calculateAgioValueAtBaseWeight(pricePerArroba, agioPercentage);
+        BigDecimal remainingArrobas = getRemainingArrobasForSlaughter(BASE_WEIGHT_KG);
+        return totalAgioValue.divide(remainingArrobas, CALCULATION_SCALE, ROUNDING_MODE);
     }
 
-    private static BigDecimal calcularValorAgioNoPesoBase(BigDecimal precoPorArroba,
-                                                          BigDecimal percentualAgio) {
-        BigDecimal valorComAgio = calcularValorPesoBaseComAgio(precoPorArroba, percentualAgio);
-        BigDecimal valorSemAgio = converterKgParaArrobas(PESO_BASE_KG).multiply(precoPorArroba);
-        return valorComAgio.subtract(valorSemAgio);
+    private static BigDecimal calculateAgioValueAtBaseWeight(BigDecimal pricePerArroba,
+                                                             BigDecimal agioPercentage) {
+        BigDecimal valueWithAgio = calculateBaseWeightValueWithAgio(pricePerArroba, agioPercentage);
+        BigDecimal valueWithoutAgio = convertKgToArrobas(BASE_WEIGHT_KG).multiply(pricePerArroba);
+        return valueWithAgio.subtract(valueWithoutAgio);
     }
 
-    private static BigDecimal calcularValorPesoBaseComAgio(BigDecimal precoPorArroba,
-                                                           BigDecimal percentualAgio) {
-        BigDecimal arrobasBase = converterKgParaArrobas(PESO_BASE_KG);
-        BigDecimal fatorMultiplicador = obterFatorMultiplicadorAgio(percentualAgio);
-        return arrobasBase.multiply(precoPorArroba).divide(fatorMultiplicador, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal calculateBaseWeightValueWithAgio(BigDecimal pricePerArroba,
+                                                               BigDecimal agioPercentage) {
+        BigDecimal baseArrobas = convertKgToArrobas(BASE_WEIGHT_KG);
+        BigDecimal multiplierFactor = getAgioMultiplierFactor(agioPercentage);
+        return baseArrobas.multiply(pricePerArroba).divide(multiplierFactor, CALCULATION_SCALE, ROUNDING_MODE);
     }
 
-    private static BigDecimal obterFatorMultiplicadorAgio(BigDecimal percentualAgio) {
-        return CEM.subtract(percentualAgio).divide(CEM, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal getAgioMultiplierFactor(BigDecimal agioPercentage) {
+        return ONE_HUNDRED.subtract(agioPercentage).divide(ONE_HUNDRED, CALCULATION_SCALE, ROUNDING_MODE);
     }
 
-    private static BigDecimal arredondarArrobasParaCima(BigDecimal arrobas) {
-        BigDecimal arredondado = arrobas.setScale(0, RoundingMode.CEILING);
-        if (arredondado.compareTo(arrobas) == 0) {
-            arredondado = arredondado.add(BigDecimal.ONE);
+    private static BigDecimal roundArrobasUp(BigDecimal arrobas) {
+        BigDecimal rounded = arrobas.setScale(0, RoundingMode.CEILING);
+        if (rounded.compareTo(arrobas) == 0) {
+            rounded = rounded.add(BigDecimal.ONE);
         }
-        return arredondado;
+        return rounded;
     }
 
-    private static BigDecimal limitarPesoAoPesoBase(BigDecimal pesoKg) {
-        return pesoKg.compareTo(PESO_BASE_KG) > 0 ? PESO_BASE_KG : pesoKg;
+    private static BigDecimal limitWeightToBaseWeight(BigDecimal weightKg) {
+        return weightKg.compareTo(BASE_WEIGHT_KG) > 0 ? BASE_WEIGHT_KG : weightKg;
     }
 
-    private static boolean estaNoPesoBaseOuAcima(BigDecimal pesoKg) {
-        return pesoKg.compareTo(PESO_BASE_KG) >= 0;
+    private static boolean isAtOrAboveBaseWeight(BigDecimal weightKg) {
+        return weightKg.compareTo(BASE_WEIGHT_KG) >= 0;
     }
 
-    private void atualizarRecomendacaoTransporte() {
-        if (!validarPreRequisitosRecomendacao()) {
-            ocultarCardRecomendacao();
+    private void updateVehicleRecommendations() {
+        if (!canCalculateRecommendations()) {
+            hideRecommendationDisplay();
             return;
         }
 
-        Integer quantidade = extrairQuantidade();
-        if (quantidade == null || quantidade <= 0) {
-            ocultarCardRecomendacao();
+        Integer quantity = parseIntegerFromInput(animalQuantityInput);
+        if (!isValidQuantity(quantity)) {
+            hideRecommendationDisplay();
             return;
         }
 
-        final int qtdFinal = quantidade;
-        final Long idCategoria = categoriaAtual.getId();
+        if (!isCalculatingRecommendations.compareAndSet(false, true)) {
+            return;
+        }
 
-        executeAsync(() -> {
+        final int animalCount = quantity;
+        final Long categoryId = currentCategory.getId();
+
+        executeInBackground(() -> {
             try {
-                List<Recomendacao> novasRecomendacoes = calcularRecomendacoesOtimizadas(qtdFinal, idCategoria);
+                List<Recomendacao> calculated = computeVehicleRecommendations(animalCount, categoryId);
 
-                runOnMainThread(() -> {
-                    if (isAdded()) {
-                        recomendacoes = novasRecomendacoes;
-                        exibirRecomendacoes(novasRecomendacoes, qtdFinal);
+                executeOnMainThread(() -> {
+                    try {
+                        if (isFragmentActive() && getView() != null) {
+                            recommendations = calculated;
+                            renderRecommendations(calculated, animalCount);
+                        }
+                    } finally {
+                        isCalculatingRecommendations.set(false);
                     }
                 });
             } catch (Exception e) {
-                runOnMainThread(() -> {
-                    if (isAdded()) {
-                        showError(R.string.erro_generico);
-                        ocultarCardRecomendacao();
+                executeOnMainThread(() -> {
+                    try {
+                        if (isFragmentActive()) {
+                            displayErrorMessage(R.string.erro_generico);
+                            hideRecommendationDisplay();
+                        }
+                    } finally {
+                        isCalculatingRecommendations.set(false);
                     }
                 });
             }
         });
     }
 
-    private boolean validarPreRequisitosRecomendacao() {
-        return categoriaAtual != null
-                && !capacidadesFrete.isEmpty()
-                && !tiposVeiculo.isEmpty()
-                && cacheCapacidadesPorCategoria.containsKey(categoriaAtual.getId());
+    private boolean canCalculateRecommendations() {
+        return currentCategory != null
+                && !freightCapacities.isEmpty()
+                && !vehicleTypes.isEmpty()
+                && capacitiesByCategoryCache.containsKey(currentCategory.getId());
     }
 
-    private List<Recomendacao> calcularRecomendacoesOtimizadas(int totalAnimais, Long idCategoria) {
-        List<CapacidadeFrete> capacidadesDisponiveis = cacheCapacidadesPorCategoria.get(idCategoria);
+    private boolean isValidQuantity(Integer quantity) {
+        return quantity != null && quantity > 0;
+    }
 
-        if (capacidadesDisponiveis == null || capacidadesDisponiveis.isEmpty()) {
+    private List<Recomendacao> computeVehicleRecommendations(int totalAnimals, Long categoryId) {
+        List<CapacidadeFrete> availableCapacities = capacitiesByCategoryCache.getOrDefault(categoryId, new ArrayList<>());
+
+        assert availableCapacities != null;
+        if (availableCapacities.isEmpty()) {
             return new ArrayList<>();
         }
 
-        CapacidadeFrete veiculoIdeal = encontrarVeiculoIdeal(totalAnimais, capacidadesDisponiveis);
-        if (veiculoIdeal != null) {
-            Recomendacao rec = criarRecomendacao(1, veiculoIdeal.getIdTipoVeiculoFrete());
-            return rec != null ? List.of(rec) : new ArrayList<>();
-        }
-
-        return calcularCombinacaoOtima(totalAnimais, capacidadesDisponiveis);
+        return findSingleIdealVehicle(totalAnimals, availableCapacities)
+                .map(capacity -> createVehicleRecommendation(1, capacity.getIdTipoVeiculoFrete()))
+                .map(List::of)
+                .orElseGet(() -> computeMultiVehicleCombination(totalAnimals, availableCapacities));
     }
 
-    private CapacidadeFrete encontrarVeiculoIdeal(int total, List<CapacidadeFrete> capacidades) {
-        for (CapacidadeFrete cap : capacidades) {
-            if (total >= cap.getQtdeInicial() && total <= cap.getQtdeFinal()) {
-                return cap;
-            }
-        }
-        return null;
+    private Optional<CapacidadeFrete> findSingleIdealVehicle(int total, List<CapacidadeFrete> capacities) {
+        return capacities.stream()
+                .filter(capacity -> total >= capacity.getQtdeInicial() && total <= capacity.getQtdeFinal())
+                .findFirst();
     }
 
-    private List<Recomendacao> calcularCombinacaoOtima(int total, List<CapacidadeFrete> capacidades) {
-        Map<Long, Integer> contagemVeiculos = new HashMap<>();
-        int restantes = total;
+    private List<Recomendacao> computeMultiVehicleCombination(int total, List<CapacidadeFrete> capacities) {
+        Map<Long, Integer> vehicleDistribution = new HashMap<>();
+        int remainingAnimals = total;
 
-        CapacidadeFrete maiorCapacidade = capacidades.get(0);
-        int capacidadeMaxima = maiorCapacidade.getQtdeFinal();
+        CapacidadeFrete largestCapacity = capacities.get(0);
+        int maxCapacity = largestCapacity.getQtdeFinal();
 
-        if (capacidadeMaxima > 0 && restantes > capacidadeMaxima) {
-            int veiculosCompletos = restantes / capacidadeMaxima;
-            contagemVeiculos.put(maiorCapacidade.getIdTipoVeiculoFrete(), veiculosCompletos);
-            restantes = restantes % capacidadeMaxima;
+        if (maxCapacity <= 0) {
+            return new ArrayList<>();
         }
 
-        if (restantes > 0) {
-            CapacidadeFrete veiculoRestante = encontrarVeiculoIdeal(restantes, capacidades);
-            if (veiculoRestante == null) {
-                veiculoRestante = maiorCapacidade;
-            }
-
-            Long idTipo = veiculoRestante.getIdTipoVeiculoFrete();
-            contagemVeiculos.put(idTipo, contagemVeiculos.getOrDefault(idTipo, 0) + 1);
+        if (maxCapacity > 0 && remainingAnimals > maxCapacity) {
+            int fullVehicleCount = remainingAnimals / maxCapacity;
+            vehicleDistribution.put(largestCapacity.getIdTipoVeiculoFrete(), fullVehicleCount);
+            remainingAnimals = remainingAnimals % maxCapacity;
         }
 
-        return contagemVeiculos.entrySet().stream()
-                .map(entry -> criarRecomendacao(entry.getValue(), entry.getKey()))
+        if (remainingAnimals > 0) {
+            CapacidadeFrete partialVehicle = findSingleIdealVehicle(remainingAnimals, capacities)
+                    .orElse(largestCapacity);
+
+            Long typeId = partialVehicle.getIdTipoVeiculoFrete();
+            vehicleDistribution.merge(typeId, 1, Integer::sum);
+        }
+
+        return vehicleDistribution.entrySet().stream()
+                .map(entry -> createVehicleRecommendation(entry.getValue(), entry.getKey()))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(Recomendacao::getTipoTransporte))
                 .collect(Collectors.toList());
     }
 
-    private Recomendacao criarRecomendacao(int quantidade, Long idTipoVeiculo) {
-        TipoVeiculoFrete veiculo = cacheVeiculos.get(idTipoVeiculo);
-        if (veiculo == null) {
-            return null;
-        }
-
-        String nomeVeiculo = veiculo.getDescricao();
-        return new Recomendacao(quantidade, nomeVeiculo);
+    private Recomendacao createVehicleRecommendation(int quantity, Long vehicleTypeId) {
+        return Optional.ofNullable(vehicleCache.get(vehicleTypeId))
+                .map(vehicle -> new Recomendacao(quantity, vehicle.getDescricao()))
+                .orElse(null);
     }
 
-    private void exibirRecomendacoes(List<Recomendacao> recomendacoes, int qtdTotal) {
-        if (recomendacoes == null || recomendacoes.isEmpty()) {
-            exibirMensagemNenhumaRecomendacao(qtdTotal);
+    private void renderRecommendations(List<Recomendacao> recommendations, int totalQuantity) {
+        if (recommendations.isEmpty()) {
+            displayEmptyRecommendationMessage(totalQuantity);
             return;
         }
 
-        if (recomendacaoAdapter == null) {
-            recomendacaoAdapter = new RecomendacaoAdapter(recomendacoes);
-            if (recyclerViewRecomendacoes != null) {
-                recyclerViewRecomendacoes.setAdapter(recomendacaoAdapter);
-            }
-        } else {
-            recomendacaoAdapter = new RecomendacaoAdapter(recomendacoes);
-            if (recyclerViewRecomendacoes != null) {
-                recyclerViewRecomendacoes.setAdapter(recomendacaoAdapter);
-            }
-        }
+        applyRecommendationAdapter(recommendations);
+        displayRecommendationSummary(recommendations, totalQuantity);
+        showRecommendationDisplay();
+    }
 
-        int totalVeiculos = recomendacoes.stream()
+    private void applyRecommendationAdapter(List<Recomendacao> recommendations) {
+        recommendationAdapter = new RecomendacaoAdapter(recommendations);
+        Optional.ofNullable(recommendationsRecyclerView).ifPresent(rv -> {
+            if (rv.getLayoutManager() == null) {
+                rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            }
+            rv.setAdapter(recommendationAdapter);
+        });
+    }
+
+    private void displayRecommendationSummary(List<Recomendacao> recommendations, int totalQuantity) {
+        int totalVehicles = recommendations.stream()
                 .mapToInt(Recomendacao::getQtdeRecomendada)
                 .sum();
 
-        String categoriaDesc = categoriaAtual.getDescricao().toLowerCase();
-        String mensagem = String.format(Locale.getDefault(),
-                "Para %d %s(s), recomendamos %d veículo(s).",
-                qtdTotal, categoriaDesc, totalVeiculos);
+        String categoryDescription = extractCategoryDescription().toLowerCase();
+        String summaryMessage = formatRecommendationSummary(totalQuantity, categoryDescription, totalVehicles);
 
-        if (textoMotivoRecomendacao != null) {
-            textoMotivoRecomendacao.setText(mensagem);
-        }
-
-        // Exibe card
-        setCardRecomendacaoTransporte(View.VISIBLE);
+        setTextViewValue(recommendationReasonText, summaryMessage);
     }
 
-    private void exibirMensagemNenhumaRecomendacao(int qtd) {
-        String categoriaDesc = categoriaAtual != null ?
-                categoriaAtual.getDescricao().toLowerCase() : "animais";
-
-        String mensagem = String.format(Locale.getDefault(),
-                "Nenhuma recomendação disponível para %d %s.",
-                qtd, categoriaDesc);
-
-        if (textoMotivoRecomendacao != null) {
-            textoMotivoRecomendacao.setText(mensagem);
-        }
-
-        // Limpa adapter
-        if (recyclerViewRecomendacoes != null) {
-            recyclerViewRecomendacoes.setAdapter(new RecomendacaoAdapter(new ArrayList<>()));
-        }
-
-        setCardRecomendacaoTransporte(View.VISIBLE);
+    private String formatRecommendationSummary(int quantity, String category, int vehicles) {
+        return String.format(Locale.getDefault(),
+                getString(R.string.info_ecomendacao_transporte_msg),
+                quantity, category, vehicles);
     }
 
-    private void ocultarCardRecomendacao() {
-        setCardRecomendacaoTransporte(View.GONE);
+    private void displayEmptyRecommendationMessage(int quantity) {
+        String categoryDescription = extractCategoryDescription().toLowerCase();
+        String message = formatEmptyRecommendationMessage(quantity, categoryDescription);
+
+        setTextViewValue(recommendationReasonText, message);
+        clearRecommendationList();
+        showRecommendationDisplay();
     }
 
-    private void setupFragmentResultListeners() {
-        setupOriginResultListener();
-        setupDestinationResultListener();
+    private String formatEmptyRecommendationMessage(int quantity, String category) {
+        return String.format(Locale.getDefault(),
+                getString(R.string.info_recomendacao_transporte_sem_msg),
+                quantity, category);
     }
 
-    private void setupOriginResultListener() {
+    private String extractCategoryDescription() {
+        return Optional.ofNullable(currentCategory)
+                .map(CategoriaFrete::getDescricao)
+                .orElse("");
+    }
+
+    private void clearRecommendationList() {
+        Optional.ofNullable(recommendationsRecyclerView).ifPresent(rv ->
+                rv.setAdapter(new RecomendacaoAdapter(new ArrayList<>())));
+    }
+
+    private void showRecommendationDisplay() {
+        setViewVisibility(transportRecommendationCard, View.VISIBLE);
+    }
+
+    private void hideRecommendationDisplay() {
+        setViewVisibility(transportRecommendationCard, View.GONE);
+    }
+
+    private void registerFragmentResultListeners() {
+        registerOriginResultListener();
+        registerDestinationResultListener();
+        updateOriginResultListener();
+    }
+
+    private void registerOriginResultListener() {
         getParentFragmentManager().setFragmentResultListener(RESULT_KEY_ORIGIN, this,
                 (requestKey, bundle) -> {
-                    if (!isAdded()) return;
-                    Address address = getAddressFromBundle(bundle, KEY_ORIGIN);
-                    if (address != null) {
-                        handleOriginSelected(address);
-                    }
+                    if (!isFragmentActive() || getView() == null) return;
+
+                    extractAddressFromBundle(bundle, KEY_ORIGIN).ifPresent(address -> {
+                        if (isFragmentActive() && getView() != null) {
+                            processOriginSelection(address);
+                        }
+                    });
                 });
     }
 
-    private void setupDestinationResultListener() {
+    private void registerDestinationResultListener() {
         getParentFragmentManager().setFragmentResultListener(RESULT_KEY_DESTINATION, this,
                 (requestKey, bundle) -> {
-                    if (!isAdded()) return;
-                    Address address = getAddressFromBundle(bundle, KEY_DESTINATION);
-                    if (address != null) {
-                        handleDestinationSelected(address);
-                    }
+                    if (!isFragmentActive() || getView() == null) return;
+
+                    extractAddressFromBundle(bundle, KEY_DESTINATION).ifPresent(address -> {
+                        if (isFragmentActive() && getView() != null) {
+                            processDestinationSelection(address);
+                        }
+                    });
                 });
     }
 
-    private void handleOriginSelected(Address address) {
+    private void updateOriginResultListener() {
+        getParentFragmentManager().setFragmentResultListener(RESULT_KEY_UP_ORIGIN, this,
+                (requestKey, bundle) -> {
+                    if (!isFragmentActive() || getView() == null) return;
+                    boolean shouldExpand = bundle.getBoolean(KEY_UP_ORIGIN, false);
+                    if (shouldExpand) getView().post(() -> {
+                            if (isFragmentActive() && bottomSheet != null) {
+                                expandBottomSheet();
+                            }
+                        });
+                });
+    }
+
+    private void processOriginSelection(Address address) {
         originAddress = address;
-        updateOriginUI(address);
-        setAjusteCardViewVisible(View.VISIBLE);
-        setButtonTransactionVisible(View.VISIBLE);
+        applyOriginAddressToUI(address);
+        updateConditionalComponentsVisibility();
+
         if (destinationAddress != null) {
-            calculateRoute();
+            initiateRouteCalculation();
         }
     }
 
-    private void handleDestinationSelected(Address address) {
+    private void processDestinationSelection(Address address) {
         destinationAddress = address;
+
         if (originAddress != null) {
-            calculateRoute();
+            initiateRouteCalculation();
         }
     }
 
-    private void setupBottomSheet() {
-        View view = getView();
-        if (view == null) return;
+    private void configureBottomSheetBehavior(View view) {
         FrameLayout container = view.findViewById(R.id.localizacao_bottom_sheet_container);
-        if (container == null) return;
-        bottomSheet = BottomSheetBehavior.from(container);
-        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    private void setupRecyclerViewLocation() {
-        if (locationRecyclerView == null) return;
-        locationAdapter = new LocationAdapter(addresses, this::onAddressSelected);
-        locationRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        locationRecyclerView.setAdapter(locationAdapter);
-    }
-
-    private void setUpRecyclerViewRecomendacao() {
-        if (recyclerViewRecomendacoes == null) return;
-        recomendacaoAdapter = new RecomendacaoAdapter(new ArrayList<>());
-        recyclerViewRecomendacoes.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerViewRecomendacoes.setAdapter(recomendacaoAdapter);
-    }
-
-    private void setupCard() {
-        if (addLocationCard != null) {
-            addLocationCard.setOnClickListener(v ->
-                    setBottomSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED));
+        if (container != null) {
+            bottomSheet = BottomSheetBehavior.from(container);
+            setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
         }
     }
 
-    private void setupOriginInput() {
+    private void configureLocationRecyclerView() {
+        Optional.ofNullable(locationRecyclerView).ifPresent(rv -> {
+            locationAdapter = new LocationAdapter(addresses, this::processAddressSelection);
+            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rv.setAdapter(locationAdapter);
+        });
+    }
+
+    private void configureRecommendationRecyclerView() {
+        Optional.ofNullable(recommendationsRecyclerView).ifPresent(rv -> {
+            recommendationAdapter = new RecomendacaoAdapter(new ArrayList<>());
+            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rv.setAdapter(recommendationAdapter);
+        });
+    }
+
+    private void configureAddLocationCardClick() {
+        Optional.ofNullable(addLocationCard).ifPresent(card ->
+                card.setOnClickListener(v -> expandBottomSheet()));
+    }
+
+    private void configureOriginInputBehavior() {
         if (originInput == null || originInputLayout == null) return;
-        configureOriginFocusListener();
-        configureOriginTextWatcher();
+
+        configureOriginFocusHandling();
+        configureOriginSearching();
         configureOriginClearButton();
     }
 
-    private void setupDestinationInput() {
-        if (destinationInput == null) return;
-        setDestinationHint(DEFAULT_LOCATION);
-        setDestinationEnabled(false);
-        setDestinationCursorVisible(false);
-        if (destinationAddress == null) {
-            loadDefaultDestination();
-        }
+    private void configureOriginFocusHandling() {
+        Optional.ofNullable(originInput).ifPresent(input ->
+                input.setOnFocusChangeListener((v, hasFocus) -> handleOriginFocusChange(hasFocus)));
     }
 
-    private void configureOriginFocusListener() {
-        if (originInput == null) return;
-        originInput.setOnFocusChangeListener((v, hasFocus) -> {
-            setBottomSheetState(hasFocus ?
-                    BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_HIDDEN);
-            setOriginCursorVisible(hasFocus);
-        });
+    private void handleOriginFocusChange(boolean hasFocus) {
+        setBottomSheetState(hasFocus ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_HIDDEN);
+        setOriginCursorVisibility(hasFocus);
     }
 
     @SuppressLint("PrivateResource")
     private void configureOriginClearButton() {
-        if (originInputLayout == null) return;
-        originInputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-        originInputLayout.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
-        setOriginClearButtonVisible(false);
-        originInputLayout.setEndIconOnClickListener(v -> clearOrigin());
+        Optional.ofNullable(originInputLayout).ifPresent(layout -> {
+            layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            layout.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
+            setOriginClearButtonVisibility(false);
+            layout.setEndIconOnClickListener(v -> resetOriginAddress());
+        });
     }
 
-    private void configureOriginTextWatcher() {
-        if (originInput == null) return;
-        originInput.addTextChangedListener(new SearchWatcher(this::searchAddress));
+    private void configureOriginSearching() {
+        Optional.ofNullable(originInput).ifPresent(input ->
+                input.addTextChangedListener(new SearchWatcher(this::performAddressSearch)));
     }
 
-    private void onAddressSelected(Address address) {
-        if (!isAdded()) return;
-        updateOriginAddress(address);
-        notifyOriginSelected(address);
-        updateOriginUI(address);
-        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
-        if (originAddress != null) {
-            setAjusteCardViewVisible(View.VISIBLE);
-            setButtonTransactionVisible(View.VISIBLE);
+    private void configureDestinationInputBehavior() {
+        Optional.ofNullable(destinationInput).ifPresent(input -> {
+            input.setHint(DEFAULT_LOCATION);
+            input.setEnabled(false);
+            input.setCursorVisible(false);
+        });
+    }
+
+    private void processAddressSelection(Address address) {
+        if (!isFragmentActive()) return;
+
+        originAddress = address;
+        notifyOriginAddressSelected(address);
+        applyOriginAddressToUI(address);
+        collapseBottomSheet();
+        updateConditionalComponentsVisibility();
+    }
+
+    private void initializeDefaultDestination() {
+        performGeocoding(DEFAULT_LOCATION, null,
+                this::handleDefaultDestinationResult,
+                this::displayErrorMessage);
+    }
+
+    private void handleDefaultDestinationResult(List<Address> addresses) {
+        destinationAddress = first(addresses);
+        notifyDestinationAddressSelected(destinationAddress);
+    }
+
+    private void resetOriginAddress() {
+        originAddress = null;
+        clearOriginInputState();
+        updateConditionalComponentsVisibility();
+    }
+
+    private void clearOriginInputState() {
+        setOriginInputText("");
+        setOriginInputHint(getString(R.string.rotulo_endereco_origem));
+        setOriginInputEnabled(true);
+        setOriginInputFocusable(true);
+        setOriginClearButtonVisibility(false);
+    }
+
+    private void performAddressSearch(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            updateAddressSearchResults(new ArrayList<>());
+            return;
         }
-    }
 
-    private void loadDefaultDestination() {
-        geocodeByNameWithFilter(DEFAULT_LOCATION, null, this::handleDefaultDestination, this::showError);
-    }
-
-    private void handleDefaultDestination(List<Address> addresses) {
-        Address firstAddress = first(addresses);
-        if (firstAddress != null && isAdded()) {
-            updateDestinationAddress(firstAddress);
-            notifyDestinationSelected(firstAddress);
-        }
-    }
-
-    private void clearOrigin() {
-        updateOriginAddress(null);
-        resetOriginUI();
-        setAjusteCardViewVisible(View.GONE);
-        setButtonTransactionVisible(View.GONE);
-    }
-
-    private void searchAddress(String query) {
-        clearError();
-        geocodeByNameWithFilter(query, userCountryCode, this::updateSearchResults, this::handleSearchError);
+        clearOriginInputError();
+        performGeocoding(query, userCountryCode,
+                this::updateAddressSearchResults,
+                this::handleSearchError);
     }
 
     private void handleSearchError(Integer errorResId) {
-        updateSearchResults(emptyList());
-        showError(errorResId);
+        updateAddressSearchResults(new ArrayList<>());
+        displayErrorMessage(errorResId);
     }
 
-    private void geocodeByNameWithFilter(String query, String countryCode, Consumer<List<Address>> onSuccess, Consumer<Integer> onError) {
-        executeAsync(() -> {
+    private void performGeocoding(String query, String countryCode,
+                                  Consumer<List<Address>> onSuccess,
+                                  Consumer<Integer> onError) {
+        if (query == null || query.trim().isEmpty()) {
+            executeOnMainThread(() -> {
+                if (isFragmentActive()) {
+                    onError.accept(R.string.erro_campo_vazio);
+                }
+            });
+            return;
+        }
+
+        executeInBackground(() -> {
             try {
+                if (geocoder == null || !isFragmentActive()) {
+                    return;
+                }
+
                 List<Address> results = geocoder.getFromLocationName(query, MAX_SEARCH_RESULTS);
-                List<Address> filtered = filter(results != null ? results : emptyList(), countryCode);
-                runOnMainThread(() -> {
-                    if (isAdded()) {
+                if (!isFragmentActive()) {
+                    return;
+                }
+
+                List<Address> filtered = filter(
+                        results != null ? results : new ArrayList<>(),
+                        countryCode);
+
+                executeOnMainThread(() -> {
+                    if (isFragmentActive() && getView() != null) {
                         onSuccess.accept(filtered);
                     }
                 });
             } catch (IOException e) {
-                runOnMainThread(() -> {
-                    if (isAdded()) {
+                executeOnMainThread(() -> {
+                    if (isFragmentActive() && getContext() != null) {
                         onError.accept(R.string.erro_servico_localizacao);
+                    }
+                });
+            } catch (Exception e) {
+                executeOnMainThread(() -> {
+                    if (isFragmentActive() && getContext() != null) {
+                        onError.accept(R.string.erro_generico);
                     }
                 });
             }
         });
     }
 
-    private void reverseGeocode(double lat, double lng, Consumer<List<Address>> onSuccess, Consumer<Integer> onError) {
-        executeAsync(() -> {
+    private void performReverseGeocoding(double latitude, double longitude,
+                                         Consumer<List<Address>> onSuccess,
+                                         Consumer<Integer> onError) {
+        executeInBackground(() -> {
             try {
-                List<Address> results = geocoder.getFromLocation(lat, lng, 1);
-                runOnMainThread(() -> {
-                    if (isAdded()) {
-                        onSuccess.accept(results != null ? results : emptyList());
+                List<Address> results = geocoder.getFromLocation(latitude, longitude, 1);
+                executeOnMainThread(() -> {
+                    if (isFragmentActive()) {
+                        onSuccess.accept(results != null ? results : new ArrayList<>());
                     }
                 });
             } catch (IOException e) {
-                runOnMainThread(() -> {
-                    if (isAdded()) {
+                executeOnMainThread(() -> {
+                    if (isFragmentActive()) {
                         onError.accept(R.string.erro_servico_localizacao);
                     }
                 });
@@ -995,143 +1146,212 @@ public class MainFragment extends Fragment implements
         });
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void updateSearchResults(List<Address> results) {
-        addresses.clear();
-        addresses.addAll(results);
-        if (locationAdapter != null) {
-            locationAdapter.notifyDataSetChanged();
+    private void updateAddressSearchResults(List<Address> results) {
+        if (results == null) {
+            results = new ArrayList<>();
+        }
+
+        final List<Address> finalResults = results;
+
+        executeOnMainThread(() -> {
+            if (!isFragmentActive() || getView() == null) {
+                return;
+            }
+
+            synchronized (addresses) {
+                addresses.clear();
+                addresses.addAll(finalResults);
+            }
+
+            Optional.ofNullable(locationAdapter)
+                    .ifPresent(adapter -> {
+                        try {
+                            adapter.notifyDataSetChanged();
+                        } catch (Exception e) {
+                            displayErrorMessage(R.string.erro_update_adapter);
+                        }
+                    });
+        });
+    }
+
+    private void initiateRouteCalculation() {
+        if (!canCalculateRoute()) return;
+        if (!isCalculatingRoute.compareAndSet(false, true)) return;
+
+        try {
+            LatLng origin = extractLatLng(originAddress);
+            LatLng destination = extractLatLng(destinationAddress);
+
+            fetchRouteDirections(origin, destination,
+                    this::handleRouteCalculationSuccess,
+                    this::handleRouteCalculationError);
+        } catch (IllegalArgumentException e) {
+            isCalculatingRoute.set(false);
+            displayErrorMessage(R.string.erro_coordenadas_invalidas);
         }
     }
 
-    private void calculateRoute() {
-        if (!isAdded() || originAddress == null || destinationAddress == null) return;
-        LatLng origin = extractCoordinates(originAddress);
-        LatLng destination = extractCoordinates(destinationAddress);
-        fetchDirections(origin, destination, this::handleDirectionsSuccess, this::handleDirectionsError);
+    private boolean canCalculateRoute() {
+        return isFragmentActive() && hasValidRouteAddresses();
     }
 
-    private LatLng extractCoordinates(Address address) {
-        return new LatLng(address.getLatitude(), address.getLongitude());
+    private boolean hasValidRouteAddresses() {
+        return originAddress != null && destinationAddress != null;
     }
 
-    private void fetchDirections(LatLng origin, LatLng destination, Consumer<Directions> onSuccess, Consumer<Integer> onError) {
-        executeAsync(() -> {
+    private LatLng extractLatLng(Address address) {
+        double lat = address.getLatitude();
+        double lng = address.getLongitude();
+
+        if (lat == 0.0 && lng == 0.0) {
+            throw new IllegalArgumentException("Invalid coordinates: 0.0, 0.0");
+        }
+
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            throw new IllegalArgumentException("Coordinates out of range");
+        }
+
+        return new LatLng(lat, lng);
+    }
+
+    private void fetchRouteDirections(LatLng origin, LatLng destination,
+                                      Consumer<Directions> onSuccess,
+                                      Consumer<Integer> onError) {
+        executeInBackground(() -> {
             try {
                 Context context = getContext();
-                if (context == null) return;
+                if (context == null) {
+                    isCalculatingRoute.set(false);
+                    return;
+                }
+
                 String url = build(origin, destination, context);
                 String json = fetch(url);
                 parse(json, onSuccess, onError);
             } catch (Exception e) {
-                runOnMainThread(() -> {
-                    if (isAdded()) {
+                executeOnMainThread(() -> {
+                    if (isFragmentActive()) {
                         onError.accept(R.string.erro_rede_rotas);
                     }
+                    isCalculatingRoute.set(false);
                 });
             }
         });
     }
 
-    private void handleDirectionsSuccess(Directions directions) {
-        runOnMainThread(() -> {
-            if (isAdded()) {
-                updateRouteInfo(directions);
+    private void handleRouteCalculationSuccess(Directions directions) {
+        executeOnMainThread(() -> {
+            if (isFragmentActive()) {
+                applyRouteDistance(directions);
             }
+            isCalculatingRoute.set(false);
         });
     }
 
-    private void updateRouteInfo(Directions directions) {
-        distance = formatDistance(directions.getDistance());
+    private void applyRouteDistance(Directions directions) {
+        distance = parseDistanceValue(directions.getDistance());
     }
 
-    private double formatDistance(String distanceStr) {
-        return Double.parseDouble(distanceStr.replaceAll("[^0-9.]", ""));
+    private double parseDistanceValue(String distanceStr) {
+        try {
+            return Double.parseDouble(distanceStr.replaceAll("[^0-9.]", ""));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
-    private void handleDirectionsError(Integer errorResId) {
-        runOnMainThread(() -> {
-            if (isAdded()) {
-                showError(errorResId);
+    private void handleRouteCalculationError(Integer errorResId) {
+        executeOnMainThread(() -> {
+            if (isFragmentActive()) {
+                displayErrorMessage(errorResId);
             }
+            isCalculatingRoute.set(false);
         });
     }
 
-    @SuppressLint("DefaultLocale")
-    private void setupAdditionalButtons() {
-        setupDistanceButton(adicionar5KmButton, 5);
-        setupDistanceButton(adicionar10KmButton, 10);
-        setupDistanceButton(adicionar20KmButton, 20);
-        if (confirmAjuste != null) {
-            confirmAjuste.setOnClickListener(v -> handleCustomDistance());
-        }
+    private void configureDistanceAdjustmentButtons() {
+        configureFixedDistanceButton(add5KmButton, 5);
+        configureFixedDistanceButton(add10KmButton, 10);
+        configureFixedDistanceButton(add20KmButton, 20);
+        configureCustomDistanceButton();
     }
 
-    private void setupDistanceButton(Button button, double kmToAdd) {
-        if (button != null) {
-            button.setOnClickListener(v -> updateDistance(kmToAdd));
-        }
+    private void configureFixedDistanceButton(Button button, double kilometers) {
+        Optional.ofNullable(button).ifPresent(btn ->
+                btn.setOnClickListener(v -> adjustDistanceBy(kilometers)));
+    }
+
+    private void configureCustomDistanceButton() {
+        Optional.ofNullable(confirmAdjustment).ifPresent(button ->
+                button.setOnClickListener(v -> applyCustomDistanceAdjustment()));
     }
 
     @SuppressLint("StringFormatMatches")
-    private void updateDistance(double kmToAdd) {
-        distance += kmToAdd;
+    private void adjustDistanceBy(double kilometers) {
+        if (kilometers <= 0) return;
+        distance += kilometers;
         String message = getString(R.string.sucesso_distancia_atualizada, distance);
-        runOnMainThread(() -> showSuccess(message));
+        displaySuccessMessage(message);
     }
 
-    private void handleCustomDistance() {
-        String value = kmAdicionalInput.getText().toString().trim();
+    private void applyCustomDistanceAdjustment() {
+        String inputValue = extractEditTextValue(additionalKmInput);
 
-        if (value.isEmpty()) {
-            runOnMainThread(() -> showError(R.string.erro_campo_vazio));
+        if (inputValue.isEmpty()) {
+            displayErrorMessage(R.string.erro_campo_vazio);
             return;
         }
 
         try {
-            double newValue = Double.parseDouble(value);
-            updateDistance(newValue);
+            double kilometers = Double.parseDouble(inputValue);
+            if (kilometers > 0) {
+                adjustDistanceBy(kilometers);
+                clearEditTextValue(additionalKmInput);
+            } else {
+                displayErrorMessage(R.string.erro_valor_invalido);
+            }
         } catch (NumberFormatException e) {
-            runOnMainThread(() -> showError(R.string.erro_valor_invalido));
+            displayErrorMessage(R.string.erro_valor_invalido);
         }
     }
 
-    private void requestPermissions() {
-        Context context = getContext();
-        if (context != null) {
-            request(permissionLauncher, context);
-        }
+    private void requestLocationPermissions() {
+        Context context = requireContext();
+        request(permissionLauncher, context);
     }
 
-    private void onPermissionsResult(Map<String, Boolean> results) {
-        onResult(results, this::fetchUserLocation, this::showPermissionDeniedDialog);
+
+    private void handlePermissionsResult(Map<String, Boolean> results) {
+        onResult(results, this::retrieveUserLocation, this::showPermissionDeniedMessage);
     }
 
     @RequiresPermission(allOf = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     })
-    private void fetchUserLocation() {
-        Context context = getContext();
-        if (context == null || !isGranted(context)) return;
-        locationClient.getLastLocation().addOnSuccessListener(requireActivity(), this::processUserLocation);
-    }
-
-    private void processUserLocation(Location location) {
-        if (location == null || !isAdded()) return;
-        reverseGeocode(location.getLatitude(), location.getLongitude(),
-                this::handleUserLocationResult, this::showError);
-    }
-
-    private void handleUserLocationResult(List<Address> addresses) {
-        Address firstAddress = first(addresses);
-        if (firstAddress != null) {
-            updateUserCountryCode(code(firstAddress));
+    private void retrieveUserLocation() {
+        Context context = requireContext();
+        if (isGranted(context)) {
+            locationClient.getLastLocation()
+                    .addOnSuccessListener(requireActivity(), this::handleUserLocationResult);
         }
     }
 
-    private void showPermissionDeniedDialog() {
-        if (!isAdded()) return;
+    private void handleUserLocationResult(Location location) {
+        if (location == null || !isFragmentActive()) return;
+
+        performReverseGeocoding(location.getLatitude(), location.getLongitude(),
+                this::extractUserCountryFromLocation,
+                this::displayErrorMessage);
+    }
+
+    private void extractUserCountryFromLocation(List<Address> addresses) {
+        userCountryCode = code(first(addresses));
+    }
+
+    private void showPermissionDeniedMessage() {
+        if (!isFragmentActive()) return;
+
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.erro_titulo_permissao_negada)
                 .setMessage(R.string.erro_permissao_negada)
@@ -1139,19 +1359,18 @@ public class MainFragment extends Fragment implements
                 .show();
     }
 
-    private void setupTransition() {
+    private void configureLocationFragmentNavigation() {
         manager = getParentFragmentManager();
-        if (buttonLocation != null) {
-            buttonLocation.setOnClickListener(v -> navigateToLocationFragment());
-        }
+        Optional.ofNullable(locationButton).ifPresent(button ->
+                button.setOnClickListener(v -> navigateToLocationDetails()));
     }
 
-    private void navigateToLocationFragment() {
-        if (!isAdded() || originAddress == null || destinationAddress == null || isNavigating) {
-            return;
-        }
-        isNavigating = true;
+    private void navigateToLocationDetails() {
+        if (!canNavigateToLocation()) return;
+
+        isNavigating.set(true);
         LocationFragment fragment = LocationFragment.newInstance(originAddress, destinationAddress);
+
         manager.beginTransaction()
                 .replace(R.id.fragment_container_view, fragment)
                 .addToBackStack(null)
@@ -1159,290 +1378,256 @@ public class MainFragment extends Fragment implements
                 .commit();
     }
 
-    private void restoreState(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) return;
-
-        Address savedOrigin = getAddressFromBundle(savedInstanceState, STATE_ORIGIN);
-        if (savedOrigin != null) {
-            originAddress = savedOrigin;
-            updateOriginUI(savedOrigin);
-            setAjusteCardViewVisible(View.VISIBLE);
-            setButtonTransactionVisible(View.VISIBLE);
-        }
-
-        Address savedDestination = getAddressFromBundle(savedInstanceState, STATE_DESTINATION);
-        if (savedDestination != null) {
-            destinationAddress = savedDestination;
-        }
-
-        if (originAddress != null && destinationAddress != null) {
-            calculateRoute();
-        }
+    private boolean canNavigateToLocation() {
+        return isFragmentActive()
+                && hasValidRouteAddresses()
+                && !isNavigating.get();
     }
 
-    private void saveAddressState(Bundle outState) {
+    private void applyOriginAddressToUI(Address address) {
+        if (!isFragmentActive()) return;
+
+        setOriginInputText(format(address));
+        setOriginInputEnabled(false);
+        setOriginInputFocusable(false);
+        setOriginCursorVisibility(false);
+        setOriginClearButtonVisibility(true);
+        clearOriginInputFocus();
+    }
+
+    private void synchronizeUIWithState() {
+        if (!isFragmentActive()) return;
+
         if (originAddress != null) {
-            outState.putParcelable(STATE_ORIGIN, originAddress);
+            applyOriginAddressToUI(originAddress);
+            updateConditionalComponentsVisibility();
         }
-        if (destinationAddress != null) {
-            outState.putParcelable(STATE_DESTINATION, destinationAddress);
+
+        clearAllInputFocus();
+    }
+
+    private void clearAllInputFocus() {
+        clearOriginInputFocus();
+        clearDestinationInputFocus();
+    }
+
+    private void updateConditionalComponentsVisibility() {
+        Integer quantity = parseIntegerFromInput(animalQuantityInput);
+        boolean hasValidQuantity = isValidQuantity(quantity);
+        boolean hasCategory = currentCategory != null;
+        boolean hasOrigin = originAddress != null;
+
+        updateAddLocationCardVisibility(hasValidQuantity && hasCategory);
+        updateRouteComponentsVisibility(hasOrigin && hasValidQuantity && hasCategory);
+    }
+
+    private void updateAddLocationCardVisibility(boolean shouldShow) {
+        setViewVisibility(addLocationCard, shouldShow ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateRouteComponentsVisibility(boolean shouldShow) {
+        int visibility = shouldShow ? View.VISIBLE : View.GONE;
+        setViewVisibility(adjustmentCardView, visibility);
+        setViewVisibility(locationButton, visibility);
+    }
+
+    private BigDecimal parseDecimalFromInput(TextInputEditText input) {
+        return Optional.ofNullable(input)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(text -> !text.isEmpty())
+                .flatMap(this::safeParseDecimal)
+                .orElse(null);
+    }
+
+    private Optional<BigDecimal> safeParseDecimal(String value) {
+        try {
+            BigDecimal parsed = new BigDecimal(value);
+            return parsed.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(parsed) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
         }
     }
 
-    private Address getAddressFromBundle(Bundle bundle, String key) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return bundle.getParcelable(key, Address.class);
-        } else {
-            return bundle.getParcelable(key);
+    private Integer parseIntegerFromInput(TextInputEditText input) {
+        return Optional.ofNullable(input)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(text -> !text.isEmpty())
+                .flatMap(this::safeParseInteger)
+                .orElse(null);
+    }
+
+    private Optional<Integer> safeParseInteger(String value) {
+        try {
+            int parsed = Integer.parseInt(value);
+            return parsed > 0 ? Optional.of(parsed) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
         }
     }
 
-    private void updateOriginAddress(Address address) {
-        this.originAddress = address;
+    private Optional<Address> extractAddressFromBundle(Bundle bundle, String key) {
+        return Optional.ofNullable(bundle.getParcelable(key, Address.class));
     }
 
-    private void updateDestinationAddress(Address address) {
-        this.destinationAddress = address;
+    private Optional<Boolean> extractBooleanFromBundle(Bundle bundle, String key) {
+        return Optional.of(bundle.getBoolean(key));
     }
 
-    private void updateUserCountryCode(String countryCode) {
-        this.userCountryCode = countryCode;
+    private void notifyOriginAddressSelected(Address address) {
+        initiateRouteCalculation();
+        publishFragmentResult(RESULT_KEY_ORIGIN, KEY_ORIGIN, address);
     }
 
-    private void notifyOriginSelected(Address address) {
-        calculateRoute();
-        sendFragmentResult(RESULT_KEY_ORIGIN, KEY_ORIGIN, address);
+    private void notifyDestinationAddressSelected(Address address) {
+        publishFragmentResult(RESULT_KEY_DESTINATION, KEY_DESTINATION, address);
     }
 
-    private void notifyDestinationSelected(Address address) {
-        sendFragmentResult(RESULT_KEY_DESTINATION, KEY_DESTINATION, address);
-    }
-
-    private void sendFragmentResult(String resultKey, String bundleKey, Address address) {
+    private void publishFragmentResult(String resultKey, String bundleKey, Address address) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(bundleKey, address);
         getParentFragmentManager().setFragmentResult(resultKey, bundle);
     }
 
-    private void updateUIAfterReturn() {
-        if (!isAdded()) return;
-
-        if (originAddress != null) {
-            updateOriginUI(originAddress);
-            setAjusteCardViewVisible(View.VISIBLE);
-            setButtonTransactionVisible(View.VISIBLE);
-        }
-
-        if (bottomSheet != null) {
-            setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
-        }
-
-        clearInputFocus();
-    }
-
-    private void clearInputFocus() {
-        if (originInput != null) {
-            originInput.clearFocus();
-        }
-        if (destinationInput != null) {
-            destinationInput.clearFocus();
+    @Override
+    public List<Address> search(String query) {
+        try {
+            List<Address> results = geocoder.getFromLocationName(query, MAX_SEARCH_RESULTS);
+            return results != null ? results : new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<>();
         }
     }
 
-    private void updateOriginUI(Address address) {
-        if (!isAdded()) return;
-        setOriginText("");
-        setOriginHint(format(address));
-        setOriginEnabled(false);
-        setOriginFocusable(false);
-        setOriginCursorVisible(false);
-        setOriginClearButtonVisible(true);
-        clearOriginFocus();
-    }
 
-    private void resetOriginUI() {
-        if (!isAdded()) return;
-        setOriginText("");
-        setOriginHint(getString(R.string.rotulo_endereco_origem));
-        setOriginEnabled(true);
-        setOriginFocusable(true);
-        setOriginClearButtonVisible(false);
-    }
-
-
-    private static String formatarMoeda(BigDecimal valor) {
-        return "R$ " + FORMATADOR_MOEDA.format(valor);
-    }
-
-    public List<Address> emptyList() {
-        return new ArrayList<>();
-    }
-
-    public List<Address> filter(List<Address> addresses, String countryCode) {
-        if (countryCode == null || countryCode.isEmpty()) {
-            return addresses;
-        }
-        return addresses.stream()
-                .filter(addr -> countryCode.equals(addr.getCountryCode()))
-                .collect(Collectors.toList());
-    }
-
-    public Address first(List<Address> addresses) {
-        return addresses != null && !addresses.isEmpty() ? addresses.get(0) : null;
-    }
-
-    public String code(Address address) {
-        return address != null ? address.getCountryCode() : null;
-    }
-
-    public String format(Address address) {
-        if (address == null) return "";
-        String locality = address.getLocality();
-        String adminArea = address.getAdminArea();
-        if (locality != null && adminArea != null) {
-            return locality + " - " + adminArea;
-        }
-        return locality != null ? locality : (adminArea != null ? adminArea : "");
+    private static String formatToCurrency(BigDecimal value) {
+        return "R$ " + CURRENCY_FORMATTER.format(value);
     }
 
     private void setBottomSheetState(int state) {
-        if (bottomSheet != null) {
-            bottomSheet.setState(state);
+        Optional.ofNullable(bottomSheet).ifPresent(sheet -> sheet.setState(state));
+    }
+
+    private void expandBottomSheet() {
+        setBottomSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+    }
+
+    private void collapseBottomSheet() {
+        setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    private void setOriginInputText(String text) {
+        Optional.ofNullable(originInput).ifPresent(input -> input.setText(text));
+    }
+
+    private void setOriginInputHint(String hint) {
+        Optional.ofNullable(originInput).ifPresent(input -> input.setHint(hint));
+    }
+
+    private void setOriginInputEnabled(boolean enabled) {
+        Optional.ofNullable(originInput).ifPresent(input -> input.setEnabled(enabled));
+    }
+
+    private void setOriginInputFocusable(boolean focusable) {
+        Optional.ofNullable(originInput).ifPresent(input -> {
+            input.setFocusable(focusable);
+            input.setFocusableInTouchMode(focusable);
+        });
+    }
+
+    private void setOriginCursorVisibility(boolean visible) {
+        Optional.ofNullable(originInput).ifPresent(input -> input.setCursorVisible(visible));
+    }
+
+    private void setOriginClearButtonVisibility(boolean visible) {
+        Optional.ofNullable(originInputLayout).ifPresent(layout -> layout.setEndIconVisible(visible));
+    }
+
+    private void clearOriginInputFocus() {
+        Optional.ofNullable(originInput).ifPresent(View::clearFocus);
+    }
+
+    private void clearDestinationInputFocus() {
+        Optional.ofNullable(destinationInput).ifPresent(View::clearFocus);
+    }
+
+    private void clearOriginInputError() {
+        Optional.ofNullable(originInputLayout).ifPresent(layout -> layout.setError(null));
+    }
+
+    private void setTextViewValue(TextView textView, String value) {
+        Optional.ofNullable(textView).ifPresent(tv -> tv.setText(value));
+    }
+
+    private void setViewVisibility(View view, int visibility) {
+        Optional.ofNullable(view).ifPresent(v -> v.setVisibility(visibility));
+    }
+
+    private String extractEditTextValue(EditText editText) {
+        return Optional.ofNullable(editText)
+                .map(EditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .orElse("");
+    }
+
+    private void clearEditTextValue(EditText editText) {
+        Optional.ofNullable(editText).ifPresent(et -> et.setText(""));
+    }
+
+    private void displaySuccessMessage(String message) {
+        displaySnackbar(message, Color.parseColor("#279958"), Color.WHITE);
+    }
+
+    private void displayErrorMessage(int messageResId) {
+        if (isFragmentActive() && getContext() != null) {
+            displaySnackbar(getContext().getString(messageResId), Color.RED, Color.WHITE);
         }
     }
 
-    private void setOriginText(String text) {
-        if (originInput != null) {
-            originInput.setText(text);
-        }
-    }
-
-    private void setOriginHint(String hint) {
-        if (originInput != null) {
-            originInput.setHint(hint);
-        }
-    }
-
-    private void setOriginEnabled(boolean enabled) {
-        if (originInput != null) {
-            originInput.setEnabled(enabled);
-        }
-    }
-
-    private void setOriginFocusable(boolean focusable) {
-        if (originInput != null) {
-            originInput.setFocusable(focusable);
-            originInput.setFocusableInTouchMode(focusable);
-        }
-    }
-
-    private void setButtonTransactionVisible(int visible) {
-        if (buttonLocation != null) {
-            buttonLocation.setVisibility(visible);
-        }
-    }
-
-    private void setCardRecomendacaoTransporte(int visible) {
-        if (cardRecomendacaoTransporte != null) {
-            cardRecomendacaoTransporte.setVisibility(visible);
-        }
-    }
-
-    private void setResultadoCardBezerroViewVisible(int visible) {
-        if (resultadoCardBezerro != null) {
-            resultadoCardBezerro.setVisibility(visible);
-        }
-    }
-
-    private void setAjusteCardViewVisible(int visible) {
-        if (ajusteCardView != null) {
-            ajusteCardView.setVisibility(visible);
-        }
-    }
-
-    private void setOriginCursorVisible(boolean visible) {
-        if (originInput != null) {
-            originInput.setCursorVisible(visible);
-        }
-    }
-
-    private void setOriginClearButtonVisible(boolean visible) {
-        if (originInputLayout != null) {
-            originInputLayout.setEndIconVisible(visible);
-        }
-    }
-
-    private void clearOriginFocus() {
-        if (originInput != null) {
-            originInput.clearFocus();
-        }
-    }
-
-    private void clearError() {
-        if (originInputLayout != null) {
-            originInputLayout.setError(null);
-        }
-    }
-
-    private void setDestinationHint(String hint) {
-        if (destinationInput != null) {
-            destinationInput.setHint(hint);
-        }
-    }
-
-    private void setDestinationEnabled(boolean enabled) {
-        if (destinationInput != null) {
-            destinationInput.setEnabled(enabled);
-        }
-    }
-
-    private void setDestinationCursorVisible(boolean visible) {
-        if (destinationInput != null) {
-            destinationInput.setCursorVisible(visible);
-        }
-    }
-
-    private void showSuccess(String message) {
-        if (isAdded()) {
-            showSnackbar(message, Color.parseColor("#279958"), Color.WHITE);
-        }
-    }
-
-    private void showError(int messageResId) {
-        if (isAdded()) {
-            showSnackbar(messageResId, Color.RED, Color.WHITE);
-        }
-    }
-
-    private void showSnackbar(String message, int backgroundColor, int textColor) {
-        View view = getView();
-        if (view != null && isAdded()) {
-            Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+    private void displaySnackbar(String message, int backgroundColor, int textColor) {
+        if (isFragmentActive() && getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT)
                     .setBackgroundTint(backgroundColor)
-                    .setTextColor(textColor);
-            snackbar.show();
+                    .setTextColor(textColor)
+                    .show();
         }
     }
 
-    private void showSnackbar(int messageResId, int backgroundColor, int textColor) {
-        if (getContext() != null) {
-            showSnackbar(getContext().getString(messageResId), backgroundColor, textColor);
-        }
+    private void executeInBackground(Runnable task) {
+        Optional.ofNullable(executorService)
+                .filter(executor -> !executor.isShutdown())
+                .ifPresent(executor -> executor.execute(task));
     }
 
-    private void executeAsync(Runnable task) {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.execute(task);
+    private void executeOnMainThread(Runnable action) {
+        if (!isFragmentActive()) {
+            return;
         }
+
+        Optional.ofNullable(mainHandler)
+                .filter(handler -> handler.getLooper().getThread().isAlive())
+                .ifPresent(handler -> {
+                    handler.post(() -> {
+                        if (isFragmentActive() && getView() != null) {
+                            try {
+                                action.run();
+                            } catch (Exception e) {
+                                onDestroy();
+                            }
+                        }
+                    });
+                });
     }
 
-    private void runOnMainThread(Runnable action) {
-        if (isAdded() && mainHandler != null) {
-            mainHandler.post(action);
-        }
+    private boolean isFragmentActive() {
+        return isAdded() && !isRemoving() && !isDetached();
     }
 
-    private void clearViewReferences() {
+    private void releaseAllViewReferences() {
         originInput = null;
         destinationInput = null;
         originInputLayout = null;
@@ -1450,46 +1635,50 @@ public class MainFragment extends Fragment implements
         locationRecyclerView = null;
         locationAdapter = null;
         bottomSheet = null;
-        buttonLocation = null;
-
-        categoriaAnimalAutoComplete = null;
-        precoArrobaInput = null;
-        pesoAnimalInput = null;
-        quantidadeAnimaisInput = null;
-        resultadoCardBezerro = null;
-        valorPorCabecaText = null;
-        valorPorKgText = null;
-        valorTotalBezerrosText = null;
-
-        ajusteCardView = null;
-        kmAdicionalInput = null;
-        adicionar5KmButton = null;
-        adicionar10KmButton = null;
-        adicionar20KmButton = null;
-        confirmAjuste = null;
-
-        cardRecomendacaoTransporte = null;
-        recyclerViewRecomendacoes = null;
-        textoMotivoRecomendacao = null;
-        recomendacaoAdapter = null;
+        locationButton = null;
+        animalCategoryAutoComplete = null;
+        arrobaPriceInput = null;
+        animalWeightInput = null;
+        animalQuantityInput = null;
+        calfResultCard = null;
+        valuePerHeadText = null;
+        valuePerKgText = null;
+        totalCalfValueText = null;
+        adjustmentCardView = null;
+        additionalKmInput = null;
+        add5KmButton = null;
+        add10KmButton = null;
+        add20KmButton = null;
+        confirmAdjustment = null;
+        transportRecommendationCard = null;
+        recommendationsRecyclerView = null;
+        recommendationReasonText = null;
+        recommendationAdapter = null;
     }
 
-    private void shutdownExecutor() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-            try {
-                if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-                    executorService.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                showError(R.string.erro_generico);
-                Thread.currentThread().interrupt();
-            } finally {
-                executorService.shutdownNow();
-            }
-        }
-        if (mainHandler != null) {
-            mainHandler.removeCallbacksAndMessages(null);
-        }
+    private void cleanupResources() {
+        shutdownExecutorService();
+        clearMainHandlerCallbacks();
+    }
+
+    private void shutdownExecutorService() {
+        Optional.ofNullable(executorService)
+                .filter(executor -> !executor.isShutdown())
+                .ifPresent(executor -> {
+                    executor.shutdown();
+                    try {
+                        if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                            executor.shutdownNow();
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        executor.shutdownNow();
+                    }
+                });
+    }
+
+    private void clearMainHandlerCallbacks() {
+        Optional.ofNullable(mainHandler)
+                .ifPresent(handler -> handler.removeCallbacksAndMessages(null));
     }
 }
