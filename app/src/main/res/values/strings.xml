@@ -47,6 +47,8 @@
     <string name="rotulo_valor_por_kg">Valor por Kg</string>
     <string name="rotulo_valor_total_estimado">Valor Total Estimado</string>
     <string name="rotulo_valor_total_final">Valor Final Total</string>
+    <string name="rotulo_valor_total">Valor Total</string>
+    <string name="rotulo_valor_final_por_kg">Valor final por Kg</string>
 
     <string name="placeholder_distancia">0</string>
     <string name="placeholder_distancia_km">0</string>
