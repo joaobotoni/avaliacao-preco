@@ -11,8 +11,8 @@ room = "2.8.4"
 roomRuntime = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.2.0"
-kotlinAndroid = "2.2.21"
-kotlinCompose = "2.2.21"
+kotlinAndroid = "2.3.0"
+kotlinCompose = "2.3.0"
 secretsGradle = "2.0.1"
 
 [libraries]

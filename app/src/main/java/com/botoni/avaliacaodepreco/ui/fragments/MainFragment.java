@@ -18,6 +18,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -102,7 +103,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private static final String ESTADO_QUANTIDADE_ANIMAL = "quantidadeAnimal";
     private static final String ESTADO_ID_CATEGORIA = "idCategoria";
     private static final String ESTADO_DISTANCIA = "distancia";
-    private static final String ESTADO_PERCENTUAL_AGIO = "percentualAgio";
+    private static final String ESTADO_PERCENTUAL_AGIO = "inputPercentualAgio";
 
     private static final BigDecimal PESO_ARROBA_KG = new BigDecimal("30.0");
     private static final BigDecimal ARROBAS_ABATE_ESPERADAS = new BigDecimal("21.00");
@@ -147,50 +148,53 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private Map<Long, List<CapacidadeFrete>> cacheCapacidadesPorCategoria = new ConcurrentHashMap<>();
     private Map<Long, List<Frete>> cacheFretePorTipoVeiculo = new ConcurrentHashMap<>();
 
-    private TextInputEditText campoOrigem;
-    private TextInputEditText campoDestino;
-    private TextInputLayout layoutCampoOrigem;
-    private MaterialCardView cartaoAdicionarLocalizacao;
-    private RecyclerView recyclerViewLocalizacoes;
+    private TextInputEditText inputOrigem;
+    private TextInputEditText inputDestino;
+    private TextInputLayout layoutOrigem;
+    private MaterialCardView cardAddLocalizacao;
+    private RecyclerView recyclerLocalizacoes;
     private LocationAdapter adaptadorLocalizacoes;
-    private BottomSheetBehavior<FrameLayout> bottomSheet;
-    private Button botaoLocalizacao;
+    private BottomSheetBehavior<FrameLayout> bottomSheetLocalizacao;
+    private Button btnLocalizacao;
 
-    private AutoCompleteTextView autoCompleteCategoriaAnimal;
-    private TextInputEditText campoPrecoArroba;
-    private TextInputEditText percentualAgio;
-    private TextInputEditText campoPesoAnimal;
-    private TextInputEditText campoQuantidadeAnimais;
-    private CardView cartaoResultadoBezerro;
-    private TextView textoValorPorCabeca;
-    private TextView textoValorPorKg;
-    private TextView textoValorTotalBezerro;
+    private AutoCompleteTextView autoCompleteCategoria;
+    private TextInputEditText inputPrecoArroba;
+    private TextInputEditText inputPercentualAgio;
+    private TextInputEditText inputPesoAnimal;
+    private TextInputEditText inputQuantidadeAnimais;
+    private CardView cardResultadoBezerro;
+    private TextView textValorPorCabeca;
+    private TextView textValorPorKg;
+    private TextView textValorTotalBezerro;
 
-    private CardView cartaoAjusteKm;
-    private EditText campoKmAdicional;
-    private Button botaoAdicionar5Km;
-    private Button botaoAdicionar10Km;
-    private Button botaoAdicionar20Km;
-    private Button botaoConfirmarAjuste;
+    private CardView cardAjusteKm;
+    private EditText inputKmAdicional;
+    private Button btnAdd5Km;
+    private Button btnAdd10Km;
+    private Button btnAdd20Km;
+    private Button btnConfirmarAjuste;
 
-    private CardView cartaoRecomendacaoTransporte;
-    private RecyclerView recyclerViewRecomendacoes;
-    private TextView textoMotivoRecomendacao;
+    private CardView cardRecomendacaoTransporte;
+    private RecyclerView recyclerRecomendacoes;
+    private TextView textMotivoRecomendacao;
     private RecomendacaoAdapter adaptadorRecomendacoes;
 
-    private CardView cartaoValorFreteFinal;
-    private CardView cartaoResumoRota;
-    private TextView textoLabelOrigem;
-    private TextView textoValorOrigem;
-    private TextView textoLabelDestino;
-    private TextView textoValorDestino;
-    private TextView textoValorDistancia;
-    private TextView textoValorFrete;
-    private TextView textoValorTotalFinal;
+    private CardView cardContainerRota;
+    private LinearLayout containerRota;
+    private CardView cardOrigemRota;
+    private CardView cardDestinoRota;
+    private CardView cardDistanciaRota;
+    private TextView textLabelOrigem;
+    private TextView textValorOrigem;
+    private TextView textLabelDestino;
+    private TextView textValorDestino;
+    private TextView textValorDistancia;
+    private TextView textValorFrete;
+    private TextView textValorTotalFinal;
 
-    private CardView valueFinalCard;
-    private TextView valorTotalTextBz;
-    private TextView valorFinalPorKgText;
+    private CardView cardValorFinal;
+    private TextView textValorTotal;
+    private TextView textValorFinalPorKg;
 
     private final ActivityResultLauncher<String[]> lancadorPermissoes = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
@@ -278,54 +282,57 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void vincularViewsLocalizacao(View raiz) {
-        campoOrigem = raiz.findViewById(R.id.origem_input);
-        campoDestino = raiz.findViewById(R.id.destino_input);
-        layoutCampoOrigem = raiz.findViewById(R.id.origem_input_layout);
-        cartaoAdicionarLocalizacao = raiz.findViewById(R.id.adicionar_localizacao_card);
-        recyclerViewLocalizacoes = raiz.findViewById(R.id.localizacoes_recycler_view);
-        botaoLocalizacao = raiz.findViewById(R.id.button_fragment_location);
+        inputOrigem = raiz.findViewById(R.id.origem_input);
+        inputDestino = raiz.findViewById(R.id.destino_input);
+        layoutOrigem = raiz.findViewById(R.id.origem_input_layout);
+        cardAddLocalizacao = raiz.findViewById(R.id.adicionar_localizacao_card);
+        recyclerLocalizacoes = raiz.findViewById(R.id.localizacoes_recycler_view);
+        btnLocalizacao = raiz.findViewById(R.id.button_fragment_location);
     }
 
     private void vincularViewsCalculo(View raiz) {
-        autoCompleteCategoriaAnimal = raiz.findViewById(R.id.categoria_animal_input);
-        campoPrecoArroba = raiz.findViewById(R.id.preco_arroba_input);
-        campoPesoAnimal = raiz.findViewById(R.id.peso_animal_input);
-        campoQuantidadeAnimais = raiz.findViewById(R.id.quantidade_animais_input);
-        cartaoResultadoBezerro = raiz.findViewById(R.id.resultado_card);
-        textoValorPorCabeca = raiz.findViewById(R.id.valor_por_cabeca_text);
-        textoValorPorKg = raiz.findViewById(R.id.valor_por_kg_text);
-        textoValorTotalBezerro = raiz.findViewById(R.id.valor_total_text);
-        percentualAgio = raiz.findViewById(R.id.percentual_agio_input);
+        autoCompleteCategoria = raiz.findViewById(R.id.auto_complete_text_view_categoria_animal);
+        inputPrecoArroba = raiz.findViewById(R.id.text_input_edit_text_preco_arroba);
+        inputPesoAnimal = raiz.findViewById(R.id.text_input_edit_text_peso_animal);
+        inputQuantidadeAnimais = raiz.findViewById(R.id.text_input_edit_text_quantidade_animais);
+        inputPercentualAgio = raiz.findViewById(R.id.text_input_edit_text_percentual_agio);
+        cardResultadoBezerro = raiz.findViewById(R.id.material_card_view_resultado);
+        textValorPorCabeca = raiz.findViewById(R.id.text_view_valor_por_cabeca);
+        textValorPorKg = raiz.findViewById(R.id.text_view_valor_por_kg);
+        textValorTotalBezerro = raiz.findViewById(R.id.text_view_valor_total);
     }
 
     private void vincularViewsRecomendacao(View raiz) {
-        cartaoRecomendacaoTransporte = raiz.findViewById(R.id.card_recomendacao_transporte);
-        recyclerViewRecomendacoes = raiz.findViewById(R.id.rv_recomendacoes_transporte);
-        textoMotivoRecomendacao = raiz.findViewById(R.id.tv_motivo_recomendacao);
+        cardRecomendacaoTransporte = raiz.findViewById(R.id.card_recomendacao_transporte);
+        recyclerRecomendacoes = raiz.findViewById(R.id.rv_recomendacoes_transporte);
+        textMotivoRecomendacao = raiz.findViewById(R.id.tv_motivo_recomendacao);
     }
 
     private void vincularViewsAjusteDistancia(View raiz) {
-        cartaoAjusteKm = raiz.findViewById(R.id.ajuste_km_card);
-        campoKmAdicional = raiz.findViewById(R.id.km_adicional_input);
-        botaoAdicionar5Km = raiz.findViewById(R.id.adicionar_5km_button);
-        botaoAdicionar10Km = raiz.findViewById(R.id.adicionar_10km_button);
-        botaoAdicionar20Km = raiz.findViewById(R.id.local_partida_adicionar_20km_button);
-        botaoConfirmarAjuste = raiz.findViewById(R.id.confirmar_ajuste_button);
+        cardAjusteKm = raiz.findViewById(R.id.material_card_view_ajuste_km);
+        inputKmAdicional = raiz.findViewById(R.id.text_input_edit_text_km_adicional);
+        btnAdd5Km = raiz.findViewById(R.id.adicionar_5km_button);
+        btnAdd10Km = raiz.findViewById(R.id.adicionar_10km_button);
+        btnAdd20Km = raiz.findViewById(R.id.local_partida_adicionar_20km_button);
+        btnConfirmarAjuste = raiz.findViewById(R.id.confirmar_ajuste_button);
     }
 
     private void vincularViewsValorFreteFinal(View raiz) {
-        cartaoValorFreteFinal = raiz.findViewById(R.id.valor_frete_final_card);
-        cartaoResumoRota = raiz.findViewById(R.id.rota_resumo_card);
-        textoLabelOrigem = raiz.findViewById(R.id.origem_label_text);
-        textoValorOrigem = raiz.findViewById(R.id.origem_valor_text);
-        textoLabelDestino = raiz.findViewById(R.id.destino_label_text);
-        textoValorDestino = raiz.findViewById(R.id.destino_valor_text);
-        textoValorDistancia = raiz.findViewById(R.id.distancia_valor_text);
-        textoValorFrete = raiz.findViewById(R.id.valor_frete_text);
-        textoValorTotalFinal = raiz.findViewById(R.id.valor_total_final_text);
-        valorTotalTextBz = raiz.findViewById(R.id.valor_total_text_final);
-        valorFinalPorKgText = raiz.findViewById(R.id.valor_final_por_kg_text);
-        valueFinalCard = raiz.findViewById(R.id.value_final_card);
+        cardContainerRota = raiz.findViewById(R.id.material_card_view_container_rota);
+        containerRota = raiz.findViewById(R.id.linear_layout_container_rota_cards);
+        cardOrigemRota = raiz.findViewById(R.id.material_card_view_origem);
+        cardDestinoRota = raiz.findViewById(R.id.material_card_view_destino);
+        cardDistanciaRota = raiz.findViewById(R.id.material_card_view_distancia);
+        cardValorFinal = raiz.findViewById(R.id.material_card_view_valor_final);
+        textLabelOrigem = raiz.findViewById(R.id.text_view_label_origem);
+        textValorOrigem = raiz.findViewById(R.id.text_view_valor_origem);
+        textLabelDestino = raiz.findViewById(R.id.text_view_label_destino);
+        textValorDestino = raiz.findViewById(R.id.text_view_valor_destino);
+        textValorDistancia = raiz.findViewById(R.id.text_view_valor_distancia);
+        textValorTotal = raiz.findViewById(R.id.text_view_valor_total_final);
+        textValorFrete = raiz.findViewById(R.id.text_view_valor_frete_final);
+        textValorTotalFinal = raiz.findViewById(R.id.text_view_valor_total_com_frete);
+        textValorFinalPorKg = raiz.findViewById(R.id.text_view_valor_final_por_kg);
     }
 
     private void configurarTodosComponentesUI(View view) {
@@ -422,10 +429,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void persistirValoresInput(@NonNull Bundle estadoSaida) {
-        salvarValorCampoTexto(estadoSaida, campoPrecoArroba, ESTADO_PRECO_ARROBA);
-        salvarValorCampoTexto(estadoSaida, campoPesoAnimal, ESTADO_PESO_ANIMAL);
-        salvarValorCampoTexto(estadoSaida, campoQuantidadeAnimais, ESTADO_QUANTIDADE_ANIMAL);
-        salvarValorCampoTexto(estadoSaida, percentualAgio, ESTADO_PERCENTUAL_AGIO);
+        salvarValorCampoTexto(estadoSaida, inputPrecoArroba, ESTADO_PRECO_ARROBA);
+        salvarValorCampoTexto(estadoSaida, inputPesoAnimal, ESTADO_PESO_ANIMAL);
+        salvarValorCampoTexto(estadoSaida, inputQuantidadeAnimais, ESTADO_QUANTIDADE_ANIMAL);
+        salvarValorCampoTexto(estadoSaida, inputPercentualAgio, ESTADO_PERCENTUAL_AGIO);
         Optional.ofNullable(categoriaAtual)
                 .map(CategoriaFrete::getId)
                 .ifPresent(id -> estadoSaida.putLong(ESTADO_ID_CATEGORIA, id));
@@ -476,10 +483,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void restaurarValoresInputDoBundle(Bundle estadoSalvo) {
-        restaurarValorCampoTexto(estadoSalvo, campoPrecoArroba, ESTADO_PRECO_ARROBA);
-        restaurarValorCampoTexto(estadoSalvo, campoPesoAnimal, ESTADO_PESO_ANIMAL);
-        restaurarValorCampoTexto(estadoSalvo, campoQuantidadeAnimais, ESTADO_QUANTIDADE_ANIMAL);
-        restaurarValorCampoTexto(estadoSalvo, percentualAgio, ESTADO_PERCENTUAL_AGIO); // NOVO
+        restaurarValorCampoTexto(estadoSalvo, inputPrecoArroba, ESTADO_PRECO_ARROBA);
+        restaurarValorCampoTexto(estadoSalvo, inputPesoAnimal, ESTADO_PESO_ANIMAL);
+        restaurarValorCampoTexto(estadoSalvo, inputQuantidadeAnimais, ESTADO_QUANTIDADE_ANIMAL);
+        restaurarValorCampoTexto(estadoSalvo, inputPercentualAgio, ESTADO_PERCENTUAL_AGIO); // NOVO
         long idCategoria = estadoSalvo.getLong(ESTADO_ID_CATEGORIA, -1);
         if (idCategoria != -1) {
             restaurarSelecaoCategoria(idCategoria);
@@ -505,14 +512,14 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                 .findFirst()
                 .ifPresent(categoria -> {
                     categoriaAtual = categoria;
-                    Optional.ofNullable(autoCompleteCategoriaAnimal)
+                    Optional.ofNullable(autoCompleteCategoria)
                             .ifPresent(autoComplete -> autoComplete.setText(categoria.getDescricao(), false));
                     atualizarRecomendacoesVeiculos();
                 });
     }
 
     private void configurarSelecaoCategoria() {
-        Optional.ofNullable(autoCompleteCategoriaAnimal).ifPresent(autoComplete ->
+        Optional.ofNullable(autoCompleteCategoria).ifPresent(autoComplete ->
                 autoComplete.setOnItemClickListener((parent, view, posicao, id) -> {
                     if (ehPosicaoCategoriaValida(posicao)) {
                         processarSelecaoCategoria(posicao);
@@ -532,22 +539,22 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void atualizarTextoAutoCompleteCategoria(String descricao) {
-        Optional.ofNullable(autoCompleteCategoriaAnimal)
+        Optional.ofNullable(autoCompleteCategoria)
                 .ifPresent(autoComplete -> autoComplete.setText(descricao, false));
     }
 
     private void aplicarAdaptadorCategorias() {
-        if (autoCompleteCategoriaAnimal != null && !categorias.isEmpty()) {
+        if (autoCompleteCategoria != null && !categorias.isEmpty()) {
             CategoriaAdapter adaptador = new CategoriaAdapter(requireContext(), categorias);
-            autoCompleteCategoriaAnimal.setAdapter(adaptador);
+            autoCompleteCategoria.setAdapter(adaptador);
         }
     }
 
     private void anexarOuvintesCalculo() {
-        anexarOuvinteInput(campoPrecoArroba, this::realizarCalculoBezerro);
-        anexarOuvinteInput(campoPesoAnimal, this::realizarCalculoBezerro);
-        anexarOuvinteInput(campoQuantidadeAnimais, this::processarMudancaQuantidade);
-        anexarOuvinteInput(percentualAgio, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputPrecoArroba, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputPesoAnimal, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputQuantidadeAnimais, this::processarMudancaQuantidade);
+        anexarOuvinteInput(inputPercentualAgio, this::realizarCalculoBezerro);
 
     }
 
@@ -562,9 +569,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void realizarCalculoBezerro() {
-        BigDecimal precoArroba = converterDecimalDeInput(campoPrecoArroba);
-        BigDecimal pesoAnimal = converterDecimalDeInput(campoPesoAnimal);
-        Integer quantidade = converterInteiroDeInput(campoQuantidadeAnimais);
+        BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+        BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
 
         if (saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade)) {
             executarCalculoEExibir(precoArroba, pesoAnimal, quantidade);
@@ -580,8 +587,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void executarCalculoEExibir(BigDecimal precoArroba, BigDecimal pesoAnimal, Integer quantidade) {
-        BigDecimal valorPorCabeca = calcularValorTotalBezerro(pesoAnimal, precoArroba, converterDecimalDeInput(percentualAgio));
-        BigDecimal valorPorKg = calcularValorTotalPorKg(pesoAnimal, precoArroba, converterDecimalDeInput(percentualAgio));
+        BigDecimal valorPorCabeca = calcularValorTotalBezerro(pesoAnimal, precoArroba, converterDecimalDeInput(inputPercentualAgio));
+        BigDecimal valorPorKg = calcularValorTotalPorKg(pesoAnimal, precoArroba, converterDecimalDeInput(inputPercentualAgio));
         BigDecimal valorTotal = calcularValorTotalTodosBezerros(valorPorCabeca, quantidade);
 
         atualizarTextosResultadoCalculo(valorPorCabeca, valorPorKg, valorTotal);
@@ -590,31 +597,31 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void atualizarTextosResultadoCalculo(BigDecimal valorCabeca, BigDecimal valorKg, BigDecimal valorTotal) {
-        definirValorTextView(textoValorPorCabeca, formatarParaMoeda(valorCabeca));
-        definirValorTextView(textoValorPorKg, formatarParaMoeda(valorKg));
-        definirValorTextView(textoValorTotalBezerro, formatarParaMoeda(valorTotal));
+        definirValorTextView(textValorPorCabeca, formatarParaMoeda(valorCabeca));
+        definirValorTextView(textValorPorKg, formatarParaMoeda(valorKg));
+        definirValorTextView(textValorTotalBezerro, formatarParaMoeda(valorTotal));
     }
 
     private void exibirResultadoCalculo() {
-        definirVisibilidadeView(cartaoResultadoBezerro, View.VISIBLE);
+        definirVisibilidadeView(cardResultadoBezerro, View.VISIBLE);
     }
 
     private void esconderResultadoCalculo() {
-        definirVisibilidadeView(cartaoResultadoBezerro, View.GONE);
+        definirVisibilidadeView(cardResultadoBezerro, View.GONE);
     }
 
     private static BigDecimal calcularValorTotalTodosBezerros(BigDecimal valor, int quantidade) {
         return valor.multiply(new BigDecimal(quantidade)).setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
     }
 
-    private static BigDecimal calcularValorTotalBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+    private static BigDecimal calcularValorTotalBezerro(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
         BigDecimal valorBase = calcularValorBasePorPeso(pesoKg, precoPorArroba);
-        BigDecimal valorAgio = calcularValorTotalAgio(pesoKg, precoPorArroba, percentualAgio);
+        BigDecimal valorAgio = calcularValorTotalAgio(pesoKg, precoPorArroba, inputPercentualAgio);
         return valorBase.add(valorAgio).setScale(ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
     }
 
-    private static BigDecimal calcularValorTotalPorKg(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal valorTotal = calcularValorTotalBezerro(pesoKg, precoPorArroba, percentualAgio);
+    private static BigDecimal calcularValorTotalPorKg(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal valorTotal = calcularValorTotalBezerro(pesoKg, precoPorArroba, inputPercentualAgio);
         return valorTotal.divide(pesoKg, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
     }
 
@@ -622,39 +629,39 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         return converterKgParaArrobas(pesoKg).multiply(precoPorArroba);
     }
 
-    private static BigDecimal calcularValorTotalAgio(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+    private static BigDecimal calcularValorTotalAgio(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
         if (estaNoOuAcimaPesoBase(pesoKg)) {
-            return calcularAgioAcimaPesoBase(pesoKg, precoPorArroba, percentualAgio);
+            return calcularAgioAcimaPesoBase(pesoKg, precoPorArroba, inputPercentualAgio);
         }
-        return calcularAgioAbaixoPesoBase(pesoKg, precoPorArroba, percentualAgio);
+        return calcularAgioAbaixoPesoBase(pesoKg, precoPorArroba, inputPercentualAgio);
     }
 
-    private static BigDecimal calcularAgioAcimaPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal agioPorArroba = calcularAgioPorArrobaNoPesoBase(pesoKg, precoPorArroba, percentualAgio);
+    private static BigDecimal calcularAgioAcimaPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal agioPorArroba = calcularAgioPorArrobaNoPesoBase(pesoKg, precoPorArroba, inputPercentualAgio);
         BigDecimal arrobasRestantes = obterArrobasRestantesParaAbate(pesoKg);
         return arrobasRestantes.multiply(agioPorArroba);
     }
 
-    private static BigDecimal calcularAgioPorArrobaNoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal valorReferencia = obterValorReferenciaAgioNoPesoBase(precoPorArroba, percentualAgio);
+    private static BigDecimal calcularAgioPorArrobaNoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal valorReferencia = obterValorReferenciaAgioNoPesoBase(precoPorArroba, inputPercentualAgio);
         BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(pesoKg, precoPorArroba);
         return valorReferencia.subtract(taxaPorArroba);
     }
 
-    private static BigDecimal calcularAgioAbaixoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+    private static BigDecimal calcularAgioAbaixoPesoBase(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
         BigDecimal acumulado = BigDecimal.ZERO;
         BigDecimal pesoAtual = pesoKg;
 
         while (pesoAtual.compareTo(PESO_BASE_KG) < 0) {
-            acumulado = acumulado.add(calcularDiferencaAgioNoPeso(pesoAtual, precoPorArroba, percentualAgio));
+            acumulado = acumulado.add(calcularDiferencaAgioNoPeso(pesoAtual, precoPorArroba, inputPercentualAgio));
             pesoAtual = calcularProximoPesoSuperior(pesoAtual);
         }
 
-        return acumulado.add(calcularAgioAcimaPesoBase(PESO_BASE_KG, precoPorArroba, percentualAgio));
+        return acumulado.add(calcularAgioAcimaPesoBase(PESO_BASE_KG, precoPorArroba, inputPercentualAgio));
     }
 
-    private static BigDecimal calcularDiferencaAgioNoPeso(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal valorReferencia = obterValorReferenciaAgioNoPesoBase(precoPorArroba, percentualAgio);
+    private static BigDecimal calcularDiferencaAgioNoPeso(BigDecimal pesoKg, BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal valorReferencia = obterValorReferenciaAgioNoPesoBase(precoPorArroba, inputPercentualAgio);
         BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(pesoKg, precoPorArroba);
         return valorReferencia.subtract(taxaPorArroba);
     }
@@ -685,32 +692,32 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         return taxasTotal.divide(arrobasRestantes, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
     }
 
-    private static BigDecimal obterValorReferenciaAgioNoPesoBase(BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+    private static BigDecimal obterValorReferenciaAgioNoPesoBase(BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
         BigDecimal taxaPorArroba = calcularTaxaPorArrobaRestante(PESO_BASE_KG, precoPorArroba);
-        BigDecimal agioPorArroba = calcularAgioPorArrobaExatamenteNoPesoBase(precoPorArroba, percentualAgio);
+        BigDecimal agioPorArroba = calcularAgioPorArrobaExatamenteNoPesoBase(precoPorArroba, inputPercentualAgio);
         return taxaPorArroba.add(agioPorArroba);
     }
 
-    private static BigDecimal calcularAgioPorArrobaExatamenteNoPesoBase(BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal valorAgioTotal = calcularValorAgioNoPesoBase(precoPorArroba, percentualAgio);
+    private static BigDecimal calcularAgioPorArrobaExatamenteNoPesoBase(BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal valorAgioTotal = calcularValorAgioNoPesoBase(precoPorArroba, inputPercentualAgio);
         BigDecimal arrobasRestantes = obterArrobasRestantesParaAbate(PESO_BASE_KG);
         return valorAgioTotal.divide(arrobasRestantes, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
     }
 
-    private static BigDecimal calcularValorAgioNoPesoBase(BigDecimal precoPorArroba, BigDecimal percentualAgio) {
-        BigDecimal valorComAgio = calcularValorPesoBaseComAgio(precoPorArroba, percentualAgio);
+    private static BigDecimal calcularValorAgioNoPesoBase(BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
+        BigDecimal valorComAgio = calcularValorPesoBaseComAgio(precoPorArroba, inputPercentualAgio);
         BigDecimal valorSemAgio = converterKgParaArrobas(PESO_BASE_KG).multiply(precoPorArroba);
         return valorComAgio.subtract(valorSemAgio);
     }
 
-    private static BigDecimal calcularValorPesoBaseComAgio(BigDecimal precoPorArroba, BigDecimal percentualAgio) {
+    private static BigDecimal calcularValorPesoBaseComAgio(BigDecimal precoPorArroba, BigDecimal inputPercentualAgio) {
         BigDecimal arrobasBase = converterKgParaArrobas(PESO_BASE_KG);
-        BigDecimal fatorMultiplicador = obterFatorMultiplicadorAgio(percentualAgio);
+        BigDecimal fatorMultiplicador = obterFatorMultiplicadorAgio(inputPercentualAgio);
         return arrobasBase.multiply(precoPorArroba).divide(fatorMultiplicador, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
     }
 
-    private static BigDecimal obterFatorMultiplicadorAgio(BigDecimal percentualAgio) {
-        return CEM.subtract(percentualAgio).divide(CEM, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
+    private static BigDecimal obterFatorMultiplicadorAgio(BigDecimal inputPercentualAgio) {
+        return CEM.subtract(inputPercentualAgio).divide(CEM, ESCALA_CALCULO, MODO_ARREDONDAMENTO);
     }
 
     private static BigDecimal arredondarArrobasParaCima(BigDecimal arrobas) {
@@ -735,7 +742,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
             return;
         }
 
-        Integer quantidade = converterInteiroDeInput(campoQuantidadeAnimais);
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
         if (!ehQuantidadeValida(quantidade)) {
             esconderExibicaoRecomendacoes();
             return;
@@ -860,7 +867,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
 
     private void aplicarAdaptadorRecomendacoes(List<Recomendacao> recomendacoes) {
         adaptadorRecomendacoes = new RecomendacaoAdapter(recomendacoes);
-        Optional.ofNullable(recyclerViewRecomendacoes).ifPresent(rv -> {
+        Optional.ofNullable(recyclerRecomendacoes).ifPresent(rv -> {
             if (rv.getLayoutManager() == null) {
                 rv.setLayoutManager(new LinearLayoutManager(requireContext()));
             }
@@ -876,7 +883,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         String descricaoCategoria = extrairDescricaoCategoria().toLowerCase();
         String mensagemResumo = formatarResumoRecomendacao(quantidadeTotal, descricaoCategoria, totalVeiculos);
 
-        definirValorTextView(textoMotivoRecomendacao, mensagemResumo);
+        definirValorTextView(textMotivoRecomendacao, mensagemResumo);
     }
 
     private String formatarResumoRecomendacao(int quantidade, String categoria, int veiculos) {
@@ -889,7 +896,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         String descricaoCategoria = extrairDescricaoCategoria().toLowerCase();
         String mensagem = formatarMensagemRecomendacoesVazia(quantidade, descricaoCategoria);
 
-        definirValorTextView(textoMotivoRecomendacao, mensagem);
+        definirValorTextView(textMotivoRecomendacao, mensagem);
         limparListaRecomendacoes();
         exibirExibicaoRecomendacoes();
     }
@@ -907,16 +914,16 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void limparListaRecomendacoes() {
-        Optional.ofNullable(recyclerViewRecomendacoes).ifPresent(rv ->
+        Optional.ofNullable(recyclerRecomendacoes).ifPresent(rv ->
                 rv.setAdapter(new RecomendacaoAdapter(new ArrayList<>())));
     }
 
     private void exibirExibicaoRecomendacoes() {
-        definirVisibilidadeView(cartaoRecomendacaoTransporte, View.VISIBLE);
+        definirVisibilidadeView(cardRecomendacaoTransporte, View.VISIBLE);
     }
 
     private void esconderExibicaoRecomendacoes() {
-        definirVisibilidadeView(cartaoRecomendacaoTransporte, View.GONE);
+        definirVisibilidadeView(cardRecomendacaoTransporte, View.GONE);
     }
 
     private void registrarOuvintesResultadoFragment() {
@@ -957,7 +964,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                     if (!estaFragmentoAtivo() || getView() == null) return;
                     boolean deveExpandir = bundle.getBoolean(CHAVE_ATUALIZAR_ORIGEM, false);
                     if (deveExpandir) getView().post(() -> {
-                        if (estaFragmentoAtivo() && bottomSheet != null) {
+                        if (estaFragmentoAtivo() && bottomSheetLocalizacao != null) {
                             expandirBottomSheet();
                         }
                     });
@@ -985,13 +992,13 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private void configurarComportamentoBottomSheet(View view) {
         FrameLayout container = view.findViewById(R.id.localizacao_bottom_sheet_container);
         if (container != null) {
-            bottomSheet = BottomSheetBehavior.from(container);
+            bottomSheetLocalizacao = BottomSheetBehavior.from(container);
             definirEstadoBottomSheet(BottomSheetBehavior.STATE_HIDDEN);
         }
     }
 
     private void configurarRecyclerViewLocalizacoes() {
-        Optional.ofNullable(recyclerViewLocalizacoes).ifPresent(rv -> {
+        Optional.ofNullable(recyclerLocalizacoes).ifPresent(rv -> {
             adaptadorLocalizacoes = new LocationAdapter(enderecos, this::processarSelecaoEndereco);
             rv.setLayoutManager(new LinearLayoutManager(requireContext()));
             rv.setAdapter(adaptadorLocalizacoes);
@@ -999,7 +1006,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarRecyclerViewRecomendacoes() {
-        Optional.ofNullable(recyclerViewRecomendacoes).ifPresent(rv -> {
+        Optional.ofNullable(recyclerRecomendacoes).ifPresent(rv -> {
             adaptadorRecomendacoes = new RecomendacaoAdapter(new ArrayList<>());
             rv.setLayoutManager(new LinearLayoutManager(requireContext()));
             rv.setAdapter(adaptadorRecomendacoes);
@@ -1007,12 +1014,12 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarCliqueCartaoAdicionarLocalizacao() {
-        Optional.ofNullable(cartaoAdicionarLocalizacao).ifPresent(cartao ->
+        Optional.ofNullable(cardAddLocalizacao).ifPresent(cartao ->
                 cartao.setOnClickListener(v -> expandirBottomSheet()));
     }
 
     private void configurarComportamentoCampoOrigem() {
-        if (campoOrigem == null || layoutCampoOrigem == null) return;
+        if (inputOrigem == null || layoutOrigem == null) return;
 
         configurarTratamentoFocoCampoOrigem();
         configurarBuscaCampoOrigem();
@@ -1020,7 +1027,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarTratamentoFocoCampoOrigem() {
-        Optional.ofNullable(campoOrigem).ifPresent(campo ->
+        Optional.ofNullable(inputOrigem).ifPresent(campo ->
                 campo.setOnFocusChangeListener((v, temFoco) -> processarMudancaFocoCampoOrigem(temFoco)));
     }
 
@@ -1031,7 +1038,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
 
     @SuppressLint("PrivateResource")
     private void configurarBotaoLimparCampoOrigem() {
-        Optional.ofNullable(layoutCampoOrigem).ifPresent(layout -> {
+        Optional.ofNullable(layoutOrigem).ifPresent(layout -> {
             layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
             layout.setEndIconDrawable(com.google.android.material. R.drawable.mtrl_ic_cancel);
             definirVisibilidadeBotaoLimparCampoOrigem(false);
@@ -1040,12 +1047,12 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarBuscaCampoOrigem() {
-        Optional.ofNullable(campoOrigem).ifPresent(campo ->
+        Optional.ofNullable(inputOrigem).ifPresent(campo ->
                 campo.addTextChangedListener(new SearchWatcher(this::realizarBuscaEndereco)));
     }
 
     private void configurarComportamentoCampoDestino() {
-        Optional.ofNullable(campoDestino).ifPresent(campo -> {
+        Optional.ofNullable(inputDestino).ifPresent(campo -> {
             campo.setHint(LOCALIZACAO_PADRAO);
             campo.setEnabled(false);
             campo.setCursorVisible(false);
@@ -1053,22 +1060,61 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarCartaoValorFinal() {
-        processarEnderecoCartaoFinal(enderecoOrigem, textoValorOrigem);
-        processarEnderecoCartaoFinal(enderecoDestino, textoValorDestino);
-        processarDistanciaCartaoFinal(distancia, textoValorDistancia);
+        boolean temOrigem = enderecoOrigem != null;
+        boolean temDestino = enderecoDestino != null;
+        boolean temDistancia = distancia > 0;
+        boolean temRecomendacoes = !recomendacoes.isEmpty();
 
-        if (possuiEnderecosRotaValidos() && distancia > 0 && !recomendacoes.isEmpty()) {
+        if (temOrigem) {
+            processarEnderecoCartaoFinal(enderecoOrigem, textValorOrigem);
+            definirVisibilidadeView(cardOrigemRota, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardOrigemRota, View.GONE);
+        }
+
+        if (temDestino) {
+            processarEnderecoCartaoFinal(enderecoDestino, textValorDestino);
+            definirVisibilidadeView(cardDestinoRota, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDestinoRota, View.GONE);
+        }
+
+        if (temDistancia) {
+            processarDistanciaCartaoFinal(distancia, textValorDistancia);
+            definirVisibilidadeView(cardDistanciaRota, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDistanciaRota, View.GONE);
+        }
+
+        if (temOrigem || temDestino) {
+            definirVisibilidadeView(containerRota, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(containerRota, View.GONE);
+        }
+
+        if (possuiEnderecosRotaValidos() && temDistancia && temRecomendacoes) {
             BigDecimal valorFrete = calcularValorFreteTotal();
-            definirValorTextView(textoValorFrete, formatarParaMoeda(valorFrete));
+            definirValorTextView(textValorFrete, formatarParaMoeda(valorFrete));
+
             BigDecimal valorTotalBezerro = obterValorTotalBezerro();
             BigDecimal valorTotal = valorTotalBezerro.add(valorFrete);
-            calcularValorFinalPorKg(valorTotal, converterInteiroDeInput(campoQuantidadeAnimais), converterDecimalDeInput(campoPesoAnimal), valorFinalPorKgText);
-            definirValorTextView(valorTotalTextBz, formatarParaMoeda(valorTotalBezerro));
-            definirValorTextView(textoValorTotalFinal, formatarParaMoeda(valorTotal));
-            definirVisibilidadeView(cartaoValorFreteFinal, View.VISIBLE);
-            definirVisibilidadeView(valueFinalCard, View.VISIBLE);
+
+            calcularValorFinalPorKg(valorTotal, converterInteiroDeInput(inputQuantidadeAnimais),
+                    converterDecimalDeInput(inputPesoAnimal), textValorFinalPorKg);
+
+            definirValorTextView(textValorTotal, formatarParaMoeda(valorTotalBezerro));
+            definirValorTextView(textValorTotalFinal, formatarParaMoeda(valorTotal));
+
+            definirVisibilidadeView(cardContainerRota, View.VISIBLE);
+            definirVisibilidadeView(cardValorFinal, View.VISIBLE);
         } else {
-            definirVisibilidadeView(cartaoValorFreteFinal, View.GONE);
+            if (temDistancia) {
+                definirVisibilidadeView(cardContainerRota, View.VISIBLE);
+                definirVisibilidadeView(cardValorFinal, View.GONE);
+            } else {
+                definirVisibilidadeView(cardContainerRota, View.GONE);
+                definirVisibilidadeView(cardValorFinal, View.GONE);
+            }
         }
     }
 
@@ -1160,7 +1206,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private BigDecimal obterValorTotalBezerro() {
-        String textoTotal = Optional.ofNullable(textoValorTotalBezerro)
+        String textoTotal = Optional.ofNullable(textValorTotalBezerro)
                 .map(TextView::getText)
                 .map(Object::toString)
                 .map(texto -> texto.replace("R$", "").trim())
@@ -1183,7 +1229,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         colapsarBottomSheet();
         atualizarVisibilidadeComponentesCondicionais();
         configurarCartaoValorFinal();
-
         if (enderecoDestino != null) {
             iniciarCalculoRota();
         }
@@ -1204,6 +1249,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         enderecoOrigem = null;
         limparEstadoCampoOrigem();
         atualizarVisibilidadeComponentesCondicionais();
+        configurarCartaoValorFinal();
     }
 
     private void limparEstadoCampoOrigem() {
@@ -1425,9 +1471,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarBotoesAjusteDistancia() {
-        configurarBotaoDistanciaFixa(botaoAdicionar5Km, 5);
-        configurarBotaoDistanciaFixa(botaoAdicionar10Km, 10);
-        configurarBotaoDistanciaFixa(botaoAdicionar20Km, 20);
+        configurarBotaoDistanciaFixa(btnAdd5Km, 5);
+        configurarBotaoDistanciaFixa(btnAdd10Km, 10);
+        configurarBotaoDistanciaFixa(btnAdd20Km, 20);
         configurarBotaoDistanciaPersonalizada();
     }
 
@@ -1437,7 +1483,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarBotaoDistanciaPersonalizada() {
-        Optional.ofNullable(botaoConfirmarAjuste).ifPresent(botao ->
+        Optional.ofNullable(btnConfirmarAjuste).ifPresent(botao ->
                 botao.setOnClickListener(v -> aplicarAjusteDistanciaPersonalizado()));
     }
 
@@ -1451,7 +1497,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void aplicarAjusteDistanciaPersonalizado() {
-        String valorEntrada = extrairValorEditText(campoKmAdicional);
+        String valorEntrada = extrairValorEditText(inputKmAdicional);
 
         if (valorEntrada.isEmpty()) {
             exibirMensagemErro(R.string.erro_campo_vazio);
@@ -1463,7 +1509,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
             if (quilometros > 0) {
                 ajustarDistanciaPor(quilometros);
                 configurarCartaoValorFinal();
-                limparValorEditText(campoKmAdicional);
+                limparValorEditText(inputKmAdicional);
             } else {
                 exibirMensagemErro(R.string.erro_valor_invalido);
             }
@@ -1516,7 +1562,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void configurarNavegacaoFragmentoLocalizacao() {
-        Optional.ofNullable(botaoLocalizacao).ifPresent(botao ->
+        Optional.ofNullable(btnLocalizacao).ifPresent(botao ->
                 botao.setOnClickListener(v -> navegarParaDetalhesLocalizacao()));
     }
 
@@ -1567,7 +1613,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void atualizarVisibilidadeComponentesCondicionais() {
-        Integer quantidade = converterInteiroDeInput(campoQuantidadeAnimais);
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
         boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
         boolean temCategoria = categoriaAtual != null;
         boolean temOrigem = enderecoOrigem != null;
@@ -1579,18 +1625,18 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
-        definirVisibilidadeView(cartaoAdicionarLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
     }
 
     private void atualizarVisibilidadeComponentesRota(boolean deveExibir) {
         int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
-        definirVisibilidadeView(cartaoAjusteKm, visibilidade);
-        definirVisibilidadeView(botaoLocalizacao, visibilidade);
+        definirVisibilidadeView(cardAjusteKm, visibilidade);
+        definirVisibilidadeView(btnLocalizacao, visibilidade);
     }
 
     private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
         int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
-        definirVisibilidadeView(cartaoValorFreteFinal, visibilidade);
+        definirVisibilidadeView(cardContainerRota, visibilidade);
     }
 
     private BigDecimal converterDecimalDeInput(TextInputEditText campo) {
@@ -1665,7 +1711,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void definirEstadoBottomSheet(int estado) {
-        Optional.ofNullable(bottomSheet).ifPresent(sheet -> sheet.setState(estado));
+        Optional.ofNullable(bottomSheetLocalizacao).ifPresent(sheet -> sheet.setState(estado));
     }
 
     private void expandirBottomSheet() {
@@ -1677,42 +1723,42 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void definirTextoCampoOrigem(String texto) {
-        Optional.ofNullable(campoOrigem).ifPresent(campo -> campo.setText(texto));
+        Optional.ofNullable(inputOrigem).ifPresent(campo -> campo.setText(texto));
     }
 
     private void definirDicaCampoOrigem(String dica) {
-        Optional.ofNullable(campoOrigem).ifPresent(campo -> campo.setHint(dica));
+        Optional.ofNullable(inputOrigem).ifPresent(campo -> campo.setHint(dica));
     }
 
     private void definirCampoOrigemHabilitado(boolean habilitado) {
-        Optional.ofNullable(campoOrigem).ifPresent(campo -> campo.setEnabled(habilitado));
+        Optional.ofNullable(inputOrigem).ifPresent(campo -> campo.setEnabled(habilitado));
     }
 
     private void definirCampoOrigemFocavel(boolean focavel) {
-        Optional.ofNullable(campoOrigem).ifPresent(campo -> {
+        Optional.ofNullable(inputOrigem).ifPresent(campo -> {
             campo.setFocusable(focavel);
             campo.setFocusableInTouchMode(focavel);
         });
     }
 
     private void definirVisibilidadeCursorCampoOrigem(boolean visivel) {
-        Optional.ofNullable(campoOrigem).ifPresent(campo -> campo.setCursorVisible(visivel));
+        Optional.ofNullable(inputOrigem).ifPresent(campo -> campo.setCursorVisible(visivel));
     }
 
     private void definirVisibilidadeBotaoLimparCampoOrigem(boolean visivel) {
-        Optional.ofNullable(layoutCampoOrigem).ifPresent(layout -> layout.setEndIconVisible(visivel));
+        Optional.ofNullable(layoutOrigem).ifPresent(layout -> layout.setEndIconVisible(visivel));
     }
 
     private void limparFocoCampoOrigem() {
-        Optional.ofNullable(campoOrigem).ifPresent(View::clearFocus);
+        Optional.ofNullable(inputOrigem).ifPresent(View::clearFocus);
     }
 
     private void limparFocoCampoDestino() {
-        Optional.ofNullable(campoDestino).ifPresent(View::clearFocus);
+        Optional.ofNullable(inputDestino).ifPresent(View::clearFocus);
     }
 
     private void limparErroCampoOrigem() {
-        Optional.ofNullable(layoutCampoOrigem).ifPresent(layout -> layout.setError(null));
+        Optional.ofNullable(layoutOrigem).ifPresent(layout -> layout.setError(null));
     }
 
     private void definirValorTextView(TextView campoTexto, String valor) {
@@ -1785,31 +1831,44 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void liberarReferenciasViews() {
-        campoOrigem = null;
-        campoDestino = null;
-        layoutCampoOrigem = null;
-        cartaoAdicionarLocalizacao = null;
-        recyclerViewLocalizacoes = null;
+        containerRota = null;
+        cardOrigemRota = null;
+        cardDestinoRota = null;
+        cardDistanciaRota = null;
+        cardContainerRota = null;
+        textValorOrigem = null;
+        textValorDestino = null;
+        textValorDistancia = null;
+        textValorFrete = null;
+        textValorTotalFinal = null;
+        textValorTotal = null;
+        textValorFinalPorKg = null;
+        cardValorFinal = null;
+        inputOrigem = null;
+        inputDestino = null;
+        layoutOrigem = null;
+        cardAddLocalizacao = null;
+        recyclerLocalizacoes = null;
         adaptadorLocalizacoes = null;
-        bottomSheet = null;
-        botaoLocalizacao = null;
-        autoCompleteCategoriaAnimal = null;
-        campoPrecoArroba = null;
-        campoPesoAnimal = null;
-        campoQuantidadeAnimais = null;
-        cartaoResultadoBezerro = null;
-        textoValorPorCabeca = null;
-        textoValorPorKg = null;
-        textoValorTotalBezerro = null;
-        cartaoAjusteKm = null;
-        campoKmAdicional = null;
-        botaoAdicionar5Km = null;
-        botaoAdicionar10Km = null;
-        botaoAdicionar20Km = null;
-        botaoConfirmarAjuste = null;
-        cartaoRecomendacaoTransporte = null;
-        recyclerViewRecomendacoes = null;
-        textoMotivoRecomendacao = null;
+        bottomSheetLocalizacao = null;
+        btnLocalizacao = null;
+        autoCompleteCategoria = null;
+        inputPrecoArroba = null;
+        inputPesoAnimal = null;
+        inputQuantidadeAnimais = null;
+        cardResultadoBezerro = null;
+        textValorPorCabeca = null;
+        textValorPorKg = null;
+        textValorTotalBezerro = null;
+        cardAjusteKm = null;
+        inputKmAdicional = null;
+        btnAdd5Km = null;
+        btnAdd10Km = null;
+        btnAdd20Km = null;
+        btnConfirmarAjuste = null;
+        cardRecomendacaoTransporte = null;
+        recyclerRecomendacoes = null;
+        textMotivoRecomendacao = null;
         adaptadorRecomendacoes = null;
     }
 
