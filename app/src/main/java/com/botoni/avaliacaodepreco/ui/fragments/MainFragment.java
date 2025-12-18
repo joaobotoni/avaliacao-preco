@@ -1851,26 +1851,22 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void liberarReferenciasViews() {
-        // Adaptadores
         adaptadorLocalizacoes = null;
         adaptadorRecomendacoes = null;
 
-        // Bottom Sheet
         bottomSheetLocalizacao = null;
 
-        // RecyclerViews
         recyclerLocalizacoes = null;
         recyclerRecomendacoes = null;
 
-        // Views de Localização
         inputOrigem = null;
         inputDestino = null;
         layoutOrigem = null;
-        cardAddLocalizacao = null;  // ← ESTAVA FALTANDO
-        btnLocalizacao = null;       // ← ESTAVA FALTANDO
+        cardAddLocalizacao = null;
+        btnLocalizacao = null;
 
-        // Views de Cálculo
-        autoCompleteCategoria = null;  // ← ESTAVA FALTANDO
+
+        autoCompleteCategoria = null;
         inputPrecoArroba = null;
         inputPesoAnimal = null;
         inputQuantidadeAnimais = null;
@@ -1880,36 +1876,35 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         textValorPorKg = null;
         textValorTotalBezerro = null;
 
-        // Views de Recomendação
-        cardRecomendacaoTransporte = null;  // ← ESTAVA FALTANDO
+
+        cardRecomendacaoTransporte = null;
         textMotivoRecomendacao = null;
 
-        // Views de Ajuste de Distância
-        cardAjusteKm = null;         // ← ESTAVA FALTANDO
+
+        cardAjusteKm = null;
         inputKmAdicional = null;
         btnAdd5Km = null;
         btnAdd10Km = null;
         btnAdd20Km = null;
         btnConfirmarAjuste = null;
 
-        // Views de Valor Final e Rota
         cardContainerRota = null;
-        containerRota = null;         // ← ESTAVA FALTANDO
-        cardOrigemRota = null;        // ← ESTAVA FALTANDO
-        cardDestinoRota = null;       // ← ESTAVA FALTANDO
-        cardDistanciaInside = null;   // ← ESTAVA FALTANDO
-        cardDistanciaOutside = null;  // ← ESTAVA FALTANDO
-        textLabelOrigem = null;       // ← ESTAVA FALTANDO
-        textValorOrigem = null;       // ← ESTAVA FALTANDO
-        textLabelDestino = null;      // ← ESTAVA FALTANDO
-        textValorDestino = null;      // ← ESTAVA FALTANDO
-        textValorDistanciaInside = null;   // ← ESTAVA FALTANDO
-        textValorDistanciaOutside = null;  // ← ESTAVA FALTANDO
-        textValorFrete = null;        // ← ESTAVA FALTANDO
-        textValorTotalFinal = null;   // ← ESTAVA FALTANDO
-        cardValorFinal = null;        // ← ESTAVA FALTANDO
-        textValorTotal = null;        // ← ESTAVA FALTANDO
-        textValorFinalPorKg = null;   // ← ESTAVA FALTANDO
+        containerRota = null;
+        cardOrigemRota = null;
+        cardDestinoRota = null;
+        cardDistanciaInside = null;
+        cardDistanciaOutside = null;
+        textLabelOrigem = null;
+        textValorOrigem = null;
+        textLabelDestino = null;
+        textValorDestino = null;
+        textValorDistanciaInside = null;
+        textValorDistanciaOutside = null;
+        textValorFrete = null;
+        textValorTotalFinal = null;
+        cardValorFinal = null;
+        textValorTotal = null;
+        textValorFinalPorKg = null;
     }
 
     private void limparRecursos() {
