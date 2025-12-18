@@ -1,4 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="route_color">#2196F3</color>
+    <color name="light_primary">#5B9BD5</color>
+    <color name="light_on_primary">#FFFFFF</color>
+    <color name="light_primary_container">#D4E9F7</color>
+    <color name="light_on_primary_container">#1A4D7A</color>
+
+    <!-- Secundárias (Cinza Claro) -->
+    <color name="light_secondary">#8E9AAF</color>
+    <color name="light_on_secondary">#FFFFFF</color>
+    <color name="light_secondary_container">#E3E7EC</color>
+    <color name="light_on_secondary_container">#3A4556</color>
+
+    <!-- Terciárias (Azul Acinzentado) -->
+    <color name="light_tertiary">#7A9CB8</color>
+    <color name="light_on_tertiary">#FFFFFF</color>
+    <color name="light_tertiary_container">#D9E7F2</color>
+    <color name="light_on_tertiary_container">#2C4A5E</color>
+
+    <!-- Backgrounds -->
+    <color name="light_background">#F5F7FA</color>
+    <color name="light_on_background">#1A1C1E</color>
+    <color name="light_surface">#FFFFFF</color>
+    <color name="light_on_surface">#1A1C1E</color>
+    <color name="light_surface_variant">#E8EDF2</color>
+    <color name="light_on_surface_variant">#42474E</color>
+
+    <!-- Outlines -->
+    <color name="light_outline">#C4CAD0</color>
+    <color name="light_outline_variant">#E1E5EA</color>
+
+
+    <color name="dark_primary">#91C5F0</color>
+    <color name="dark_on_primary">#003A5D</color>
+    <color name="dark_primary_container">#2C5F87</color>
+    <color name="dark_on_primary_container">#C8E3F7</color>
+
+    <color name="dark_secondary">#B5C0D3</color>
+    <color name="dark_on_secondary">#252D3A</color>
+    <color name="dark_secondary_container">#4A5566</color>
+    <color name="dark_on_secondary_container">#D8E0EC</color>
+
+    <color name="dark_tertiary">#A8C5DC</color>
+    <color name="dark_on_tertiary">#1F3544</color>
+    <color name="dark_tertiary_container">#3F5A6E</color>
+    <color name="dark_on_tertiary_container">#D4E5F2</color>
+
+    <color name="dark_background">#1A1C1E</color>
+    <color name="dark_on_background">#E2E2E5</color>
+    <color name="dark_surface">#1A1C1E</color>
+    <color name="dark_on_surface">#E2E2E5</color>
+    <color name="dark_surface_variant">#42474E</color>
+    <color name="dark_on_surface_variant">#C4CAD0</color>
+
+    <color name="dark_outline">#8E9299</color>
+    <color name="dark_outline_variant">#42474E</color>
 </resources>

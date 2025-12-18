@@ -173,6 +173,7 @@
                         android:id="@+id/material_card_view_valor_por_cabeca"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        app:cardCornerRadius="@dimen/corner_radius_large"
                         app:cardElevation="0dp"
                         app:layout_constraintEnd_toStartOf="@id/material_card_view_valor_por_kg"
                         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -209,6 +210,7 @@
                         android:id="@+id/material_card_view_valor_por_kg"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        app:cardCornerRadius="@dimen/corner_radius_large"
                         app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/material_card_view_valor_por_cabeca"
@@ -245,6 +247,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_medium"
+                        app:cardCornerRadius="@dimen/corner_radius_large"
                         app:cardElevation="0dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -288,6 +291,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/material_card_view_resultado" />
 
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adicionar_localizacao_card"
                 style="?attr/materialCardViewElevatedStyle"
@@ -318,19 +322,65 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?attr/colorOnSurfaceVariant" />
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/localizacao_titulo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_marginEnd="@dimen/margin_medium"
+                        android:gravity="center"
+                        android:text="@string/titulo_selecao_localizacao"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/localizacao_icon" />
+
+                    <TextView
+                        android:id="@+id/localizacao_subtitulo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_large"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:layout_marginEnd="@dimen/margin_large"
+                        android:gravity="center"
+                        android:text="@string/subtitulo_selecao_localizacao"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/localizacao_titulo" />
+
+                    <ImageView
+                        android:id="@+id/touch_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:contentDescription="@string/todo"
+                        android:src="@drawable/touch_app_24px"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/localizacao_subtitulo"
+                        app:tint="?attr/colorPrimary" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <Button
                 android:id="@+id/button_fragment_location"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_large"
                 android:text="@string/btn_preview_card_rota"
                 android:textSize="@dimen/text_size_normal"
                 android:visibility="gone"
-                app:cornerRadius="@dimen/corner_radius_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/adicionar_localizacao_card"
@@ -343,7 +393,7 @@
                 android:layout_marginTop="@dimen/margin_large"
                 android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorSurfaceContainer"
-                app:cardCornerRadius="@dimen/corner_radius_medium"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -420,7 +470,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
-                        android:text="Atalhos rápidos"
+                        android:text="@string/info_atalhos_rapidos"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="@dimen/text_size_small"
                         android:textStyle="bold"
@@ -478,7 +528,7 @@
                             app:strokeWidth="1dp" />
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/confirmar_ajuste_button"
                         style="@style/Widget.Material3.Button"
                         android:layout_width="0dp"
@@ -486,7 +536,6 @@
                         android:layout_marginTop="@dimen/margin_large"
                         android:text="@string/btn_confirmar_ajuste"
                         android:textSize="@dimen/text_size_normal"
-                        app:cornerRadius="@dimen/corner_radius_small"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/atalhos_container" />
@@ -501,12 +550,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_large"
                 android:visibility="gone"
-                tools:visibility="visible"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/material_card_view_ajuste_km">
+                app:layout_constraintTop_toBottomOf="@id/material_card_view_ajuste_km"
+                tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -517,14 +566,15 @@
                         android:id="@+id/linear_layout_container_rota_cards"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:visibility="gone"
                         android:baselineAligned="false"
-                        tools:visibility="visible"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/card_distance_inside"
+                        tools:visibility="visible">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/material_card_view_origem"
@@ -532,6 +582,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainer"
                             app:cardCornerRadius="@dimen/corner_radius_large"
                             app:cardElevation="0dp">
 
@@ -587,8 +638,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            app:cardCornerRadius="@dimen/corner_radius_large"
-                            app:cardElevation="0dp">
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                            app:cardCornerRadius="@dimen/corner_radius_large">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -631,81 +683,30 @@
 
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
-
                     </LinearLayout>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/material_card_view_distancia"
-                        style="?attr/materialCardViewOutlinedStyle"
-                        android:layout_width="wrap_content"
+                    <include
+                        android:id="@+id/card_distance_inside"
+                        layout="@layout/unit_distance"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
-                        android:visibility="gone"
-                        tools:visibility="visible"
-                        app:cardCornerRadius="100dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/linear_layout_container_rota_cards">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingStart="18dp"
-                            android:paddingTop="10dp"
-                            android:paddingEnd="18dp"
-                            android:paddingBottom="10dp">
-
-                            <TextView
-                                android:id="@+id/text_view_label_distancia"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:alpha="0.7"
-                                android:maxLines="1"
-                                android:text="@string/rotulo_distancia_km"
-                                android:textAppearance="?attr/textAppearanceBodyMedium"
-                                android:textSize="14sp" />
-
-                            <View
-                                android:layout_width="6dp"
-                                android:layout_height="6dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginEnd="10dp"
-                                android:alpha="0.4"
-                                android:background="@drawable/ic_circle"
-                                android:backgroundTint="?attr/colorPrimary" />
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/material_card_view_badge_distancia"
-                                style="?attr/materialCardViewFilledStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="@dimen/corner_radius_round"
-                                app:cardElevation="0dp">
-
-                                <TextView
-                                    android:id="@+id/text_view_valor_distancia"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:maxLines="1"
-                                    android:paddingStart="12dp"
-                                    android:paddingTop="4dp"
-                                    android:paddingEnd="12dp"
-                                    android:paddingBottom="4dp"
-                                    android:text="@string/preview_distancia_zero"
-                                    android:textAppearance="?attr/textAppearanceLabelLarge"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </com.google.android.material.card.MaterialCardView>
-
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                        app:layout_constraintTop_toBottomOf="@id/linear_layout_container_rota_cards"
+                        app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <include
+                android:id="@+id/card_distance_outside"
+                layout="@layout/unit_distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/material_card_view_container_rota" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/material_card_view_valor_final"
@@ -718,7 +719,7 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/material_card_view_container_rota"
+                app:layout_constraintTop_toBottomOf="@id/card_distance_outside"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -730,14 +731,14 @@
                         android:id="@+id/text_view_label_valor_total_final"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:alpha="0.7"
                         android:text="@string/rotulo_valor_total"
                         android:textAppearance="?attr/textAppearanceBodyLarge"
                         android:textSize="@dimen/text_size_normal"
-                        android:alpha="0.7"
+                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_total"
                         app:layout_constraintEnd_toStartOf="@id/material_card_view_badge_valor_total"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/material_card_view_badge_valor_total"
-                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_total" />
+                        app:layout_constraintTop_toTopOf="@id/material_card_view_badge_valor_total" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/material_card_view_badge_valor_total"
@@ -754,8 +755,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="@dimen/padding_medium"
-                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingTop="@dimen/margin_small"
+                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingBottom="@dimen/margin_small"
                             android:text="@string/preview_valor_zero"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
@@ -779,24 +780,24 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
+                        android:alpha="0.7"
                         android:text="@string/rotulo_valor_frete"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textSize="@dimen/text_size_normal"
-                        android:alpha="0.7"
+                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_frete"
                         app:layout_constraintEnd_toStartOf="@id/material_card_view_badge_valor_frete"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_total"
-                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_frete" />
+                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_total" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/material_card_view_badge_valor_frete"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:cardElevation="0dp"
                         android:layout_marginTop="@dimen/margin_large"
-                        app:cardCornerRadius="@dimen/corner_radius_round"
                         android:textSize="@dimen/text_size_normal"
+                        app:cardCornerRadius="@dimen/corner_radius_round"
+                        app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/view_separador_valor_total">
 
@@ -805,8 +806,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="@dimen/padding_medium"
-                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingTop="@dimen/margin_small"
+                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingBottom="@dimen/margin_small"
                             android:text="@string/preview_valor_zero"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
@@ -833,10 +834,10 @@
                         android:text="@string/rotulo_valor_total_final"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
                         android:textSize="@dimen/text_size_normal"
+                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_total_final"
                         app:layout_constraintEnd_toStartOf="@id/material_card_view_badge_valor_total_final"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_frete"
-                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_total_final" />
+                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_frete" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/material_card_view_badge_valor_total_final"
@@ -854,8 +855,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="@dimen/padding_medium"
-                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingTop="@dimen/margin_small"
+                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingBottom="@dimen/margin_small"
                             android:text="@string/preview_valor_zero"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
@@ -879,23 +880,23 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
+                        android:alpha="0.7"
                         android:text="@string/rotulo_valor_final_por_kg"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textSize="@dimen/text_size_normal"
-                        android:alpha="0.7"
+                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_final_por_kg"
                         app:layout_constraintEnd_toStartOf="@id/material_card_view_badge_valor_final_por_kg"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_final"
-                        app:layout_constraintBottom_toBottomOf="@id/material_card_view_badge_valor_final_por_kg" />
+                        app:layout_constraintTop_toBottomOf="@id/view_separador_valor_final" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/material_card_view_badge_valor_final_por_kg"
                         style="?attr/materialCardViewFilledStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:cardElevation="0dp"
                         android:layout_marginTop="@dimen/margin_large"
                         app:cardCornerRadius="@dimen/corner_radius_round"
+                        app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/view_separador_valor_final">
 
@@ -904,8 +905,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="@dimen/padding_medium"
-                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingTop="@dimen/margin_small"
+                            android:paddingEnd="@dimen/padding_medium"
                             android:paddingBottom="@dimen/margin_small"
                             android:text="@string/preview_valor_zero"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
@@ -916,8 +917,9 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/material_button_enviar"
+        style="@style/Widget.Material3.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding_medium"
@@ -927,5 +929,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
-    <include layout="@layout/bottom_sheet_location" tools:visibility="gone" />
+
+    <include
+        layout="@layout/bottom_sheet_location"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

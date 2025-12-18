@@ -183,12 +183,14 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private LinearLayout containerRota;
     private CardView cardOrigemRota;
     private CardView cardDestinoRota;
-    private CardView cardDistanciaRota;
+    private View cardDistanciaInside;
+    private View cardDistanciaOutside;
     private TextView textLabelOrigem;
     private TextView textValorOrigem;
     private TextView textLabelDestino;
     private TextView textValorDestino;
-    private TextView textValorDistancia;
+    private TextView textValorDistanciaInside;
+    private TextView textValorDistanciaOutside;
     private TextView textValorFrete;
     private TextView textValorTotalFinal;
 
@@ -322,13 +324,24 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         containerRota = raiz.findViewById(R.id.linear_layout_container_rota_cards);
         cardOrigemRota = raiz.findViewById(R.id.material_card_view_origem);
         cardDestinoRota = raiz.findViewById(R.id.material_card_view_destino);
-        cardDistanciaRota = raiz.findViewById(R.id.material_card_view_distancia);
+
+        cardDistanciaInside = raiz.findViewById(R.id.card_distance_inside);
+        cardDistanciaOutside = raiz.findViewById(R.id.card_distance_outside);
+
         cardValorFinal = raiz.findViewById(R.id.material_card_view_valor_final);
         textLabelOrigem = raiz.findViewById(R.id.text_view_label_origem);
         textValorOrigem = raiz.findViewById(R.id.text_view_valor_origem);
         textLabelDestino = raiz.findViewById(R.id.text_view_label_destino);
         textValorDestino = raiz.findViewById(R.id.text_view_valor_destino);
-        textValorDistancia = raiz.findViewById(R.id.text_view_valor_distancia);
+
+
+        if (cardDistanciaInside != null) {
+            textValorDistanciaInside = cardDistanciaInside.findViewById(R.id.text_view_valor_distancia);
+        }
+        if (cardDistanciaOutside != null) {
+            textValorDistanciaOutside = cardDistanciaOutside.findViewById(R.id.text_view_valor_distancia);
+        }
+
         textValorTotal = raiz.findViewById(R.id.text_view_valor_total_final);
         textValorFrete = raiz.findViewById(R.id.text_view_valor_frete_final);
         textValorTotalFinal = raiz.findViewById(R.id.text_view_valor_total_com_frete);
@@ -374,6 +387,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                     if (estaFragmentoAtivo() && getView() != null && getContext() != null) {
                         aplicarAdaptadorCategorias();
                         restaurarEstadoPersistido(estadoSalvo);
+                        atualizarVisibilidadeComponentesCondicionais();
                         inicializarDestinoPadrao();
                         realizarCalculoBezerro();
                         atualizarRecomendacoesVeiculos();
@@ -514,6 +528,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                     categoriaAtual = categoria;
                     Optional.ofNullable(autoCompleteCategoria)
                             .ifPresent(autoComplete -> autoComplete.setText(categoria.getDescricao(), false));
+                    atualizarVisibilidadeComponentesCondicionais(); // ← ADICIONE ESTA LINHA
                     atualizarRecomendacoesVeiculos();
                 });
     }
@@ -1040,7 +1055,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private void configurarBotaoLimparCampoOrigem() {
         Optional.ofNullable(layoutOrigem).ifPresent(layout -> {
             layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-            layout.setEndIconDrawable(com.google.android.material. R.drawable.mtrl_ic_cancel);
+            layout.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
             definirVisibilidadeBotaoLimparCampoOrigem(false);
             layout.setEndIconOnClickListener(v -> resetarEnderecoOrigem());
         });
@@ -1062,62 +1077,63 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private void configurarCartaoValorFinal() {
         boolean temOrigem = enderecoOrigem != null;
         boolean temDestino = enderecoDestino != null;
+        boolean temRotaCompleta = temOrigem && temDestino;
         boolean temDistancia = distancia > 0;
         boolean temRecomendacoes = !recomendacoes.isEmpty();
 
+        definirVisibilidadeView(cardOrigemRota, temOrigem ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(cardDestinoRota, temDestino ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(containerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
+
+        definirVisibilidadeView(cardContainerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
+
+        if (temRotaCompleta && temDistancia) {
+            atualizarTextoDistancia(textValorDistanciaInside, distancia);
+            definirVisibilidadeView(cardDistanciaInside, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDistanciaInside, View.GONE);
+        }
+
+        if (temDistancia && !temRotaCompleta) {
+            atualizarTextoDistancia(textValorDistanciaOutside, distancia);
+            definirVisibilidadeView(cardDistanciaOutside, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDistanciaOutside, View.GONE);
+        }
+
         if (temOrigem) {
             processarEnderecoCartaoFinal(enderecoOrigem, textValorOrigem);
-            definirVisibilidadeView(cardOrigemRota, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardOrigemRota, View.GONE);
         }
-
         if (temDestino) {
             processarEnderecoCartaoFinal(enderecoDestino, textValorDestino);
-            definirVisibilidadeView(cardDestinoRota, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardDestinoRota, View.GONE);
         }
 
-        if (temDistancia) {
-            processarDistanciaCartaoFinal(distancia, textValorDistancia);
-            definirVisibilidadeView(cardDistanciaRota, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardDistanciaRota, View.GONE);
-        }
-
-        if (temOrigem || temDestino) {
-            definirVisibilidadeView(containerRota, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(containerRota, View.GONE);
-        }
-
-        if (possuiEnderecosRotaValidos() && temDistancia && temRecomendacoes) {
+        if (temDistancia && temRecomendacoes) {
             BigDecimal valorFrete = calcularValorFreteTotal();
-            definirValorTextView(textValorFrete, formatarParaMoeda(valorFrete));
-
             BigDecimal valorTotalBezerro = obterValorTotalBezerro();
-            BigDecimal valorTotal = valorTotalBezerro.add(valorFrete);
+            BigDecimal valorTotalComFrete = valorTotalBezerro.add(valorFrete);
 
-            calcularValorFinalPorKg(valorTotal, converterInteiroDeInput(inputQuantidadeAnimais),
-                    converterDecimalDeInput(inputPesoAnimal), textValorFinalPorKg);
-
+            definirValorTextView(textValorFrete, formatarParaMoeda(valorFrete));
             definirValorTextView(textValorTotal, formatarParaMoeda(valorTotalBezerro));
-            definirValorTextView(textValorTotalFinal, formatarParaMoeda(valorTotal));
+            definirValorTextView(textValorTotalFinal, formatarParaMoeda(valorTotalComFrete));
 
-            definirVisibilidadeView(cardContainerRota, View.VISIBLE);
+            calcularValorFinalPorKg(valorTotalComFrete,
+                    converterInteiroDeInput(inputQuantidadeAnimais),
+                    converterDecimalDeInput(inputPesoAnimal),
+                    textValorFinalPorKg);
+
             definirVisibilidadeView(cardValorFinal, View.VISIBLE);
         } else {
-            if (temDistancia) {
-                definirVisibilidadeView(cardContainerRota, View.VISIBLE);
-                definirVisibilidadeView(cardValorFinal, View.GONE);
-            } else {
-                definirVisibilidadeView(cardContainerRota, View.GONE);
-                definirVisibilidadeView(cardValorFinal, View.GONE);
-            }
+            definirVisibilidadeView(cardValorFinal, View.GONE);
         }
     }
 
+    private void atualizarTextoDistancia(TextView textView, double distancia) {
+        if (textView != null) {
+            String texto = String.format(Locale.getDefault(), "%.2f km", distancia);
+            textView.setText(texto);
+        }
+    }
 
     private void calcularValorFinalPorKg(BigDecimal valorTotal, Integer quantidade, BigDecimal pesoAnimal, TextView textView) {
         if (textView == null || valorTotal == null || quantidade == null || pesoAnimal == null) {
@@ -1138,10 +1154,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
 
     private void processarEnderecoCartaoFinal(Address endereco, TextView campoTexto) {
         Optional.ofNullable(endereco).ifPresent(e -> campoTexto.setText(format(e)));
-    }
-
-    private void processarDistanciaCartaoFinal(double distancia, TextView campoTexto) {
-        Optional.of(distancia).ifPresent(d -> campoTexto.setText(String.format("%.2f km", d)));
     }
 
     private BigDecimal calcularValorFreteTotal() {
@@ -1247,6 +1259,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
 
     private void resetarEnderecoOrigem() {
         enderecoOrigem = null;
+        distancia = 0;
         limparEstadoCampoOrigem();
         atualizarVisibilidadeComponentesCondicionais();
         configurarCartaoValorFinal();
@@ -1616,23 +1629,30 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
         boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
         boolean temCategoria = categoriaAtual != null;
-        boolean temOrigem = enderecoOrigem != null;
         boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
 
-        atualizarVisibilidadeCartaoAdicionarLocalizacao(temQuantidadeValida && temCategoria);
-        atualizarVisibilidadeComponentesRota(temOrigem && temQuantidadeValida && temCategoria);
-        atualizarVisibilidadeCartaoValorFinal(temEndereco);
+        boolean podeExibirComponentesRota = temQuantidadeValida && temCategoria;
+        atualizarVisibilidadeCartaoAdicionarLocalizacao(podeExibirComponentesRota);
+        definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
+        boolean podeCalcularValorFinal = (temEndereco || distancia > 0);
+        atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
     }
 
     private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
+        if (cardAddLocalizacao == null && getView() != null) {
+            cardAddLocalizacao = getView().findViewById(R.id.adicionar_localizacao_card);
+            if (cardAddLocalizacao != null) {
+                configurarCliqueCartaoAdicionarLocalizacao();
+            }
+        }
+
+        if (cardAddLocalizacao == null) {
+            return;
+        }
         definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
     }
 
-    private void atualizarVisibilidadeComponentesRota(boolean deveExibir) {
-        int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
-        definirVisibilidadeView(cardAjusteKm, visibilidade);
-        definirVisibilidadeView(btnLocalizacao, visibilidade);
-    }
 
     private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
         int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
@@ -1831,45 +1851,65 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void liberarReferenciasViews() {
-        containerRota = null;
-        cardOrigemRota = null;
-        cardDestinoRota = null;
-        cardDistanciaRota = null;
-        cardContainerRota = null;
-        textValorOrigem = null;
-        textValorDestino = null;
-        textValorDistancia = null;
-        textValorFrete = null;
-        textValorTotalFinal = null;
-        textValorTotal = null;
-        textValorFinalPorKg = null;
-        cardValorFinal = null;
+        // Adaptadores
+        adaptadorLocalizacoes = null;
+        adaptadorRecomendacoes = null;
+
+        // Bottom Sheet
+        bottomSheetLocalizacao = null;
+
+        // RecyclerViews
+        recyclerLocalizacoes = null;
+        recyclerRecomendacoes = null;
+
+        // Views de Localização
         inputOrigem = null;
         inputDestino = null;
         layoutOrigem = null;
-        cardAddLocalizacao = null;
-        recyclerLocalizacoes = null;
-        adaptadorLocalizacoes = null;
-        bottomSheetLocalizacao = null;
-        btnLocalizacao = null;
-        autoCompleteCategoria = null;
+        cardAddLocalizacao = null;  // ← ESTAVA FALTANDO
+        btnLocalizacao = null;       // ← ESTAVA FALTANDO
+
+        // Views de Cálculo
+        autoCompleteCategoria = null;  // ← ESTAVA FALTANDO
         inputPrecoArroba = null;
         inputPesoAnimal = null;
         inputQuantidadeAnimais = null;
+        inputPercentualAgio = null;
         cardResultadoBezerro = null;
         textValorPorCabeca = null;
         textValorPorKg = null;
         textValorTotalBezerro = null;
-        cardAjusteKm = null;
+
+        // Views de Recomendação
+        cardRecomendacaoTransporte = null;  // ← ESTAVA FALTANDO
+        textMotivoRecomendacao = null;
+
+        // Views de Ajuste de Distância
+        cardAjusteKm = null;         // ← ESTAVA FALTANDO
         inputKmAdicional = null;
         btnAdd5Km = null;
         btnAdd10Km = null;
         btnAdd20Km = null;
         btnConfirmarAjuste = null;
-        cardRecomendacaoTransporte = null;
-        recyclerRecomendacoes = null;
-        textMotivoRecomendacao = null;
-        adaptadorRecomendacoes = null;
+
+        // Views de Valor Final e Rota
+        cardContainerRota = null;
+        containerRota = null;         // ← ESTAVA FALTANDO
+        cardOrigemRota = null;        // ← ESTAVA FALTANDO
+        cardDestinoRota = null;       // ← ESTAVA FALTANDO
+        cardDistanciaInside = null;   // ← ESTAVA FALTANDO
+        cardDistanciaOutside = null;  // ← ESTAVA FALTANDO
+        textLabelOrigem = null;       // ← ESTAVA FALTANDO
+        textValorOrigem = null;       // ← ESTAVA FALTANDO
+        textLabelDestino = null;      // ← ESTAVA FALTANDO
+        textValorDestino = null;      // ← ESTAVA FALTANDO
+        textValorDistanciaInside = null;   // ← ESTAVA FALTANDO
+        textValorDistanciaOutside = null;  // ← ESTAVA FALTANDO
+        textValorFrete = null;        // ← ESTAVA FALTANDO
+        textValorTotalFinal = null;   // ← ESTAVA FALTANDO
+        cardValorFinal = null;        // ← ESTAVA FALTANDO
+        textValorTotal = null;        // ← ESTAVA FALTANDO
+        textValorFinalPorKg = null;   // ← ESTAVA FALTANDO
     }
 
     private void limparRecursos() {

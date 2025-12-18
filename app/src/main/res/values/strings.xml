@@ -10,8 +10,10 @@
     <string name="titulo_calcular_valor">Calcular Valor</string>
     <string name="titulo_recomendacao_transporte">Recomendação de Transporte</string>
     <string name="titulo_calculo_frete">Cálculo do Frete</string>
+    <string name="titulo_selecao_localizacao">Adicionar Localização</string>
 
     <string name="subtitulo_preencher_campos">Preencha os campos abaixo</string>
+    <string name="subtitulo_selecao_localizacao">Toque para selecionar a localização origem</string>
 
     <string name="info_preencher_campos_para_calcular">Preencha os campos abaixo para calcular.</string>
     <string name="info_quilometros_adicionais">Quilômetros adicionais</string>
@@ -26,6 +28,7 @@
     <string name="info_ajuste_distancia_frete">Ajuste a distância do frete</string>
     <string name="info_ecomendacao_transporte_msg">Para %1$d %2$s(s), recomendamos %3$d veículo(s).</string>
     <string name="info_recomendacao_transporte_sem_msg">Nenhuma recomendação disponível para %1$d %2$s.</string>
+    <string name="info_atalhos_rapidos">Atalhos rápidos</string>
 
     <string name="rotulo_distancia">Distância</string>
     <string name="rotulo_tempo">Tempo</string>

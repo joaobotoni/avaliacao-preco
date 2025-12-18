@@ -45,7 +45,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
     private static final int THREAD_POOL_SIZE = 2;
     private static final float POLYLINE_WIDTH = 10f;
     private static final int POLYLINE_COLOR = 0xFF2196F3;
-    private static final int BOTTOM_SHEET_PEEK_HEIGHT = 600;
+    private static final int BOTTOM_SHEET_PEEK_HEIGHT = 520;
     private static final String KEY_ORIGIN = "origin";
     private static final String KEY_DESTINATION = "destination";
     private static final String KEY_UP_ORIGIN = "updateOrigin";
@@ -113,7 +113,6 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Limpar referências para evitar memory leaks
         if (originMarker != null) {
             originMarker.remove();
             originMarker = null;
@@ -193,7 +192,6 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback, Di
     private void loadArguments() {
         Bundle args = getArguments();
         if (args != null) {
-            // Compatibilidade com todas as versões do Android
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 originAddress = args.getParcelable(ARG_ORIGIN, Address.class);
                 destinationAddress = args.getParcelable(ARG_DESTINATION, Address.class);
