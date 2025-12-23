@@ -2,11 +2,14 @@ package com.botoni.avaliacaodepreco.ui.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +21,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,6 +32,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +46,7 @@ import com.botoni.avaliacaodepreco.data.entities.Frete;
 import com.botoni.avaliacaodepreco.data.entities.TipoVeiculoFrete;
 import com.botoni.avaliacaodepreco.di.AddressProvider;
 import com.botoni.avaliacaodepreco.di.DirectionsProvider;
-import com.botoni.avaliacaodepreco.di.LocationPermissionProvider;
+import com.botoni.avaliacaodepreco.di.PermissionProvider;
 import com.botoni.avaliacaodepreco.domain.Directions;
 import com.botoni.avaliacaodepreco.domain.Recomendacao;
 import com.botoni.avaliacaodepreco.ui.adapter.CategoriaAdapter;
@@ -49,6 +54,7 @@ import com.botoni.avaliacaodepreco.ui.adapter.LocationAdapter;
 import com.botoni.avaliacaodepreco.ui.adapter.RecomendacaoAdapter;
 import com.botoni.avaliacaodepreco.ui.views.InputWatchers;
 import com.botoni.avaliacaodepreco.ui.views.SearchWatcher;
+import com.botoni.avaliacaodepreco.utils.PdfReport;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -59,6 +65,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -82,7 +89,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-public class MainFragment extends Fragment implements DirectionsProvider, LocationPermissionProvider, AddressProvider {
+public class MainFragment extends Fragment implements DirectionsProvider, AddressProvider {
 
     private static final String LOCALIZACAO_PADRAO = "Cuiabá";
     private static final int TAMANHO_POOL_THREADS = 4;
@@ -198,7 +205,26 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     private TextView textValorTotal;
     private TextView textValorFinalPorKg;
 
-    private final ActivityResultLauncher<String[]> lancadorPermissoes = registerForActivityResult(
+    private BottomSheetBehavior<FrameLayout> bottomSheetCompartilhamento;
+    private ImageButton whatsapp;
+    private ImageButton telegram;
+    private ImageButton googleDrive;
+
+    private Button buttonEnviarDoc;
+
+    private File pdfFileAtual = null;
+
+    private final PermissionProvider locationPermissionProvider = () -> new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+
+    private final PermissionProvider storagePermissionProvider = () -> new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+
+    private final ActivityResultLauncher<String[]> permissions = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
             this::processarResultadoPermissoes
     );
@@ -281,6 +307,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         vincularViewsRecomendacao(raiz);
         vincularViewsAjusteDistancia(raiz);
         vincularViewsValorFreteFinal(raiz);
+        vincularViewsBottonSheetToShare(raiz);
     }
 
     private void vincularViewsLocalizacao(View raiz) {
@@ -348,6 +375,18 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         textValorFinalPorKg = raiz.findViewById(R.id.text_view_valor_final_por_kg);
     }
 
+    private void vincularViewsBottonSheetToShare(View view) {
+        whatsapp = view.findViewById(R.id.button_whatsapp);
+        telegram = view.findViewById(R.id.button_telegram);
+        googleDrive = view.findViewById(R.id.buton_google_drive);
+        buttonEnviarDoc = view.findViewById(R.id.material_button_enviar);
+        setOnClickListenerSendDoc(whatsapp, "com.whatsapp");
+        setOnClickListenerSendDoc(telegram, "org.telegram.messenger");
+        setOnClickListenerSendDoc(googleDrive, "com.google.android.apps.docs");
+        configurarBottomSheetCompartilhamento(view);
+        definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+    }
+
     private void configurarTodosComponentesUI(View view) {
         if (!estaFragmentoAtivo()) return;
         solicitarPermissoesLocalizacao();
@@ -357,6 +396,56 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         configurarCartaoValorFinal();
     }
 
+    private void configurarBottomSheetCompartilhamento(View view) {
+        FrameLayout bottomSheet = view.findViewById(R.id.share_bottom_sheet);
+        if (bottomSheet != null) {
+            bottomSheetCompartilhamento = BottomSheetBehavior.from(bottomSheet);
+            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_HIDDEN);
+            bottomSheetCompartilhamento.setHideable(true);
+            bottomSheetCompartilhamento.setPeekHeight(0);
+
+            Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
+                    botao.setOnClickListener(v -> {
+                        if (gerarPdfComDadosReais()) {
+                            expandirBottomSheetCompartilhamento();
+                        } else {
+                            exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        }
+                    })
+            );
+        }
+    }
+
+    private void setOnClickListenerSendDoc(ImageButton button, String pack) {
+        button.setOnClickListener(v -> {
+            if (pdfFileAtual == null || !pdfFileAtual.exists()) {
+                if (!gerarPdfComDadosReais()) {
+                    exibirMensagemErro(R.string.erro_gerar_relatorio);
+                    return;
+                }
+            }
+
+            try {
+                Uri pdfUri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "com.botoni.avaliacaodepreco.provider",
+                        pdfFileAtual
+                );
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("application/pdf");
+                intent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                intent.putExtra(Intent.EXTRA_TEXT, "Aqui está o relatório de avaliação de preço 📄");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                startActivity(Intent.createChooser(intent, "Compartilhar PDF"));
+            } catch (IllegalArgumentException e) {
+                exibirMensagemErro(R.string.erro_gerar_relatorio);
+            } catch (ActivityNotFoundException e) {
+                exibirMensagemErro(R.string.erro_app_nao_instalado);
+            }
+        });
+    }
     private void configurarComponentesCalculo() {
         configurarSelecaoCategoria();
         anexarOuvintesCalculo();
@@ -500,7 +589,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         restaurarValorCampoTexto(estadoSalvo, inputPrecoArroba, ESTADO_PRECO_ARROBA);
         restaurarValorCampoTexto(estadoSalvo, inputPesoAnimal, ESTADO_PESO_ANIMAL);
         restaurarValorCampoTexto(estadoSalvo, inputQuantidadeAnimais, ESTADO_QUANTIDADE_ANIMAL);
-        restaurarValorCampoTexto(estadoSalvo, inputPercentualAgio, ESTADO_PERCENTUAL_AGIO); // NOVO
+        restaurarValorCampoTexto(estadoSalvo, inputPercentualAgio, ESTADO_PERCENTUAL_AGIO);
         long idCategoria = estadoSalvo.getLong(ESTADO_ID_CATEGORIA, -1);
         if (idCategoria != -1) {
             restaurarSelecaoCategoria(idCategoria);
@@ -528,7 +617,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                     categoriaAtual = categoria;
                     Optional.ofNullable(autoCompleteCategoria)
                             .ifPresent(autoComplete -> autoComplete.setText(categoria.getDescricao(), false));
-                    atualizarVisibilidadeComponentesCondicionais(); // ← ADICIONE ESTA LINHA
+                    atualizarVisibilidadeComponentesCondicionais();
                     atualizarRecomendacoesVeiculos();
                 });
     }
@@ -1123,8 +1212,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
                     textValorFinalPorKg);
 
             definirVisibilidadeView(cardValorFinal, View.VISIBLE);
+            definirVisibilidadeView(buttonEnviarDoc, View.VISIBLE);
         } else {
             definirVisibilidadeView(cardValorFinal, View.GONE);
+            definirVisibilidadeView(buttonEnviarDoc, View.GONE);
         }
     }
 
@@ -1532,12 +1623,23 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
     }
 
     private void solicitarPermissoesLocalizacao() {
-        Context contexto = requireContext();
-        request(lancadorPermissoes, contexto);
+        locationPermissionProvider.request(permissions, requireContext());
     }
 
     private void processarResultadoPermissoes(Map<String, Boolean> resultados) {
-        onResult(resultados, this::obterLocalizacaoUsuario, this::exibirMensagemPermissaoNegada);
+        locationPermissionProvider.onResult(
+                resultados,
+                true,
+                this::obterLocalizacaoUsuario,
+                this::exibirMensagemPermissaoNegada
+        );
+
+        storagePermissionProvider.onResult(
+                resultados,
+                true,
+                () -> {},
+                this::exibirMensagemPermissaoNegada
+        );
     }
 
     @RequiresPermission(allOf = {
@@ -1545,13 +1647,69 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
             Manifest.permission.ACCESS_COARSE_LOCATION
     })
     private void obterLocalizacaoUsuario() {
-        Context contexto = requireContext();
-        if (isGranted(contexto)) {
+        if (locationPermissionProvider.isGranted(requireContext())) {
             clienteLocalizacao.getLastLocation()
                     .addOnSuccessListener(requireActivity(), this::tratarResultadoLocalizacaoUsuario);
         }
     }
 
+
+    private boolean gerarPdfComDadosReais() {
+        try {
+            String categoria = Optional.ofNullable(categoriaAtual)
+                    .map(CategoriaFrete::getDescricao)
+                    .orElse("Não informado");
+
+            BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+            BigDecimal percentualAgio = converterDecimalDeInput(inputPercentualAgio);
+            BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+            Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+
+            if (precoArroba == null || pesoAnimal == null || quantidade == null) {
+                return false;
+            }
+
+            BigDecimal valorPorCabeca = calcularValorTotalBezerro(pesoAnimal, precoArroba, percentualAgio);
+            BigDecimal valorPorKg = calcularValorTotalPorKg(pesoAnimal, precoArroba, percentualAgio);
+            BigDecimal valorTotal = calcularValorTotalTodosBezerros(valorPorCabeca, quantidade);
+            BigDecimal valorFrete = calcularValorFreteTotal();
+            BigDecimal valorFinalTotal = valorTotal.add(valorFrete);
+
+            BigDecimal pesoTotal = pesoAnimal.multiply(new BigDecimal(quantidade));
+            BigDecimal valorFinalPorKg = valorFinalTotal.divide(pesoTotal, ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
+
+            String origem = Optional.ofNullable(enderecoOrigem)
+                    .map(this::format)
+                    .orElse("Não informado");
+
+            String destino = Optional.ofNullable(enderecoDestino)
+                    .map(this::format)
+                    .orElse("Não informado");
+
+            PdfReport report = PdfReport.builder()
+                    .categoriaAnimal(categoria)
+                    .precoArroba(precoArroba.doubleValue())
+                    .percentualAgio(percentualAgio != null ? percentualAgio.doubleValue() : 0)
+                    .pesoAnimal(pesoAnimal.doubleValue())
+                    .quantidadeAnimais(quantidade)
+                    .valorPorCabeca(valorPorCabeca.doubleValue())
+                    .valorPorKg(valorPorKg.doubleValue())
+                    .valorTotal(valorTotal.doubleValue())
+                    .origem(origem)
+                    .destino(destino)
+                    .distancia(distancia)
+                    .valorFrete(valorFrete.doubleValue())
+                    .valorFinalTotal(valorFinalTotal.doubleValue())
+                    .valorFinalPorKg(valorFinalPorKg.doubleValue())
+                    .build();
+
+            this.pdfFileAtual = report.create(requireContext());
+            return true;
+        } catch (Exception e) {
+            this.pdfFileAtual = null;
+            return false;
+        }
+    }
     private void tratarResultadoLocalizacaoUsuario(Location localizacao) {
         if (localizacao == null || !estaFragmentoAtivo()) return;
 
@@ -1734,6 +1892,12 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         Optional.ofNullable(bottomSheetLocalizacao).ifPresent(sheet -> sheet.setState(estado));
     }
 
+    private void expandirBottomSheetCompartilhamento() {
+        if (bottomSheetCompartilhamento != null) {
+            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    }
+
     private void expandirBottomSheet() {
         definirEstadoBottomSheet(BottomSheetBehavior.STATE_HALF_EXPANDED);
     }
@@ -1855,6 +2019,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         adaptadorRecomendacoes = null;
 
         bottomSheetLocalizacao = null;
+        bottomSheetCompartilhamento = null;
 
         recyclerLocalizacoes = null;
         recyclerRecomendacoes = null;
@@ -1864,7 +2029,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         layoutOrigem = null;
         cardAddLocalizacao = null;
         btnLocalizacao = null;
-
 
         autoCompleteCategoria = null;
         inputPrecoArroba = null;
@@ -1876,10 +2040,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         textValorPorKg = null;
         textValorTotalBezerro = null;
 
-
         cardRecomendacaoTransporte = null;
         textMotivoRecomendacao = null;
-
 
         cardAjusteKm = null;
         inputKmAdicional = null;
@@ -1905,6 +2067,11 @@ public class MainFragment extends Fragment implements DirectionsProvider, Locati
         cardValorFinal = null;
         textValorTotal = null;
         textValorFinalPorKg = null;
+
+        buttonEnviarDoc = null;
+        whatsapp = null;
+        telegram = null;
+        googleDrive = null;
     }
 
     private void limparRecursos() {

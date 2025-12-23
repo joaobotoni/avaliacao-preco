@@ -142,13 +142,15 @@
     <string name="erro_rede_rotas">Erro de rede ao buscar rotas. Verifique sua conexão com a internet.</string>
     <string name="erro_sem_dados_localizacao">Não foi possível obter os dados de localização atual.</string>
     <string name="erro_sem_rota">Não foi possível encontrar uma rota entre a origem e o destino selecionados.</string>
-    <string name="erro_permissao_negada">É necessário conceder as permissões de localização para usar este recurso.</string>
+    <string name="erro_permissao_negada">É necessário conceder as permissões para usar este App.</string>
     <string name="erro_titulo_permissao_negada">Permissão Negada</string>
     <string name="erro_rotas_desconhecido">Ocorreu um erro desconhecido ao buscar as rotas.</string>
     <string name="erro_chave_api_ausente">A chave da API não foi encontrada ou está vazia nos metadados do AndroidManifest.xml.</string>
     <string name="erro_pacote_app_nao_encontrado">Não foi possível encontrar o pacote de aplicativos.</string>
     <string name="erro_coordenadas_invalidas">Coordenadas inválidas</string>
     <string name="erro_update_adapter">Erro ao atualizar adapter</string>
+    <string name="erro_app_nao_instalado">Aplicativo não instalado</string>
+    <string name="erro_gerar_relatorio">Aplicativo não instalado</string>
 
     <string name="preview_destino">Cuiabá, MT</string>
     <string name="preview_origem">São Paulo, SP</string>

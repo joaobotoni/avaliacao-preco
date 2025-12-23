@@ -933,4 +933,9 @@
     <include
         layout="@layout/bottom_sheet_location"
         tools:visibility="gone" />
+
+    <include
+        layout="@layout/botton_sheet_to_share"
+        tools:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
