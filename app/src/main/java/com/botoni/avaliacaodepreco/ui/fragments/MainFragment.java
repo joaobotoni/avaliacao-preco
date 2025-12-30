@@ -93,10 +93,6 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainFragment extends Fragment implements DirectionsProvider, AddressProvider {
 
-    // =================================================================
-    // SEÇÃO 1: CONSTANTES E CONFIGURAÇÕES
-    // =================================================================
-
     private static final String LOCALIZACAO_PADRAO = "Cuiabá";
     private static final int TAMANHO_POOL_THREADS = 4;
     private static final int MAX_RESULTADOS_BUSCA = 10;
@@ -147,10 +143,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         taxas.put("CARRETA TRES EIXOS", new BigDecimal("17.00"));
         return taxas;
     }
-
-    // =================================================================
-    // SEÇÃO 2: DECLARAÇÃO DE VARIÁVEIS DE INSTÂNCIA
-    // =================================================================
 
     private ExecutorService servicoExecutor;
     private Handler manipuladorPrincipal;
@@ -247,9 +239,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private final ActivityResultLauncher<String[]> permissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::handlePermissionsResult);
 
-    // =================================================================
-    // SEÇÃO 3: MÉTODOS DO CICLO DE VIDA
-    // =================================================================
 
     @Override
     public void onCreate(@Nullable Bundle estadoSalvo) {
@@ -308,10 +297,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         super.onSaveInstanceState(estadoSaida);
         persistirEstadoAtual(estadoSaida);
     }
-
-    // =================================================================
-    // SEÇÃO 4: INICIALIZAÇÃO E CONFIGURAÇÃO BASE
-    // =================================================================
 
     private void inicializarDependenciasBase() {
         Context contexto = requireContext();
@@ -406,14 +391,31 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
                 botao.setOnClickListener(v -> {
                     if (getContext() == null) return;
-                    if (!gerarPdfComDadosReais()) {
+
+                    boolean temDadosFrete = distancia > 0 && !recomendacoes.isEmpty();
+                    boolean pdfGerado = false;
+
+                    try {
+                        if (temDadosFrete) {
+                            pdfGerado = gerarPdfComTodosOsDados();
+                        } else {
+                            pdfGerado = gerarPdfApenasBezerro();
+                        }
+                    } catch (Exception e) {
                         exibirMensagemErro(R.string.erro_gerar_relatorio);
                         return;
                     }
+
+                    if (!pdfGerado) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        return;
+                    }
+
                     if (pdfFileAtual == null || !pdfFileAtual.exists()) {
                         exibirMensagemErro(R.string.erro_gerar_relatorio);
                         return;
                     }
+
                     try {
                         Uri pdfUri = FileProvider.getUriForFile(
                                 requireContext(),
@@ -426,6 +428,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                         shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
                         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(shareIntent, "Compartilhar PDF"));
+                    } catch (IllegalArgumentException e) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
                     } catch (Exception e) {
                         exibirMensagemErro(R.string.erro_generico);
                     }
@@ -460,10 +464,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         configurarBotoesAjusteDistancia();
         configurarNavegacaoFragmentoLocalizacao();
     }
-
-    // =================================================================
-    // SEÇÃO 5: CARREGAMENTO DE DADOS E CACHE
-    // =================================================================
 
     private void carregarDadosBancoERestaurarEstado(@Nullable Bundle estadoSalvo) {
         executarEmBackground(() -> {
@@ -531,10 +531,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             autoCompleteCategoria.setAdapter(adaptador);
         }
     }
-
-    // =================================================================
-    // SEÇÃO 6: PERSISTÊNCIA E RESTAURAÇÃO DE ESTADO
-    // =================================================================
 
     private void persistirEstadoAtual(@NonNull Bundle estadoSaida) {
         persistirValoresInput(estadoSaida);
@@ -632,10 +628,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                     atualizarRecomendacoesVeiculos();
                 });
     }
-
-    // =================================================================
-    // SEÇÃO 7: LÓGICA DE NEGÓCIO - CÁLCULO DE BEZERRO
-    // =================================================================
 
     private void realizarCalculoBezerro() {
         BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
@@ -806,10 +798,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private static boolean estaNoOuAcimaPesoBase(BigDecimal pesoKg) {
         return pesoKg.compareTo(PESO_BASE_KG) >= 0;
     }
-
-    // =================================================================
-    // SEÇÃO 8: LÓGICA DE NEGÓCIO - RECOMENDAÇÃO DE VEÍCULOS
-    // =================================================================
 
     private void atualizarRecomendacoesVeiculos() {
         if (!podeCalcularRecomendacoes()) {
@@ -1001,10 +989,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         definirVisibilidadeView(cardRecomendacaoTransporte, View.GONE);
     }
 
-    // =================================================================
-    // SEÇÃO 9: LÓGICA DE NEGÓCIO - CÁLCULO DE FRETE
-    // =================================================================
-
     private BigDecimal calcularValorFreteTotal() {
         if (recomendacoes.isEmpty() || distancia <= 0) {
             return BigDecimal.ZERO;
@@ -1080,10 +1064,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             return BigDecimal.ZERO;
         }
     }
-
-    // =================================================================
-    // SEÇÃO 10: GEOLOCALIZAÇÃO E ENDEREÇOS
-    // =================================================================
 
     @Override
     public List<Address> search(String consulta) {
@@ -1309,11 +1289,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                 .setPositiveButton(R.string.btn_ok, (dialogo, qual) -> dialogo.dismiss())
                 .show();
     }
-
-    // =================================================================
-    // SEÇÃO 11: CÁLCULO DE ROTAS E DISTÂNCIAS
-    // =================================================================
-
     private void iniciarCalculoRota() {
         if (!podeCalcularRota()) return;
         if (!estaCalculandoRota.compareAndSet(false, true)) return;
@@ -1458,10 +1433,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         configurarBotaoDistanciaPersonalizada();
     }
 
-    // =================================================================
-    // SEÇÃO 12: CONFIGURAÇÃO DE COMPONENTES UI
-    // =================================================================
-
     private void configurarSelecaoCategoria() {
         Optional.ofNullable(autoCompleteCategoria).ifPresent(autoComplete ->
                 autoComplete.setOnItemClickListener((parent, view, posicao, id) -> {
@@ -1601,10 +1572,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                 && !estaNavegando.get();
     }
 
-    // =================================================================
-    // SEÇÃO 13: ATUALIZAÇÃO DE UI E VISIBILIDADE
-    // =================================================================
-
     private void sincronizarUIComEstado() {
         if (!estaFragmentoAtivo()) return;
 
@@ -1627,7 +1594,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         boolean temCategoria = categoriaAtual != null;
         boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
 
-        // Validação dos campos do bezerro
         BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
         BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
         boolean todosOsCamposBezerroPreenchidos = saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade) && temCategoria;
@@ -1637,7 +1603,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
         definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
 
-        // Só pode calcular valor final se todos os campos do bezerro estiverem preenchidos
         boolean podeCalcularValorFinal = (temEndereco || distancia > 0) && todosOsCamposBezerroPreenchidos;
         atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
     }
@@ -1667,12 +1632,12 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
         boolean todosOsCamposBezerroPreenchidos = saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade) && categoriaAtual != null;
 
-        // Se os campos não estiverem preenchidos, esconde tudo e retorna
         if (!todosOsCamposBezerroPreenchidos) {
             definirVisibilidadeView(cardContainerRota, View.GONE);
             definirVisibilidadeView(cardValorFinal, View.GONE);
             definirVisibilidadeView(buttonEnviarDoc, View.GONE);
             definirVisibilidadeView(cardDistanciaOutside, View.GONE);
+            definirVisibilidadeView(btnLocalizacao, View.GONE);
             return;
         }
 
@@ -1727,7 +1692,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             definirVisibilidadeView(buttonEnviarDoc, View.VISIBLE);
         } else {
             definirVisibilidadeView(cardValorFinal, View.GONE);
-            definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+            definirVisibilidadeView(buttonEnviarDoc, todosOsCamposBezerroPreenchidos ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -1769,11 +1734,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         definirVisibilidadeBotaoLimparCampoOrigem(true);
         limparFocoCampoOrigem();
     }
-
-    // =================================================================
-    // SEÇÃO 14: NAVEGAÇÃO E COMUNICAÇÃO ENTRE FRAGMENTS
-    // =================================================================
-
     private void registrarOuvintesResultadoFragment() {
         registrarOuvinteResultadoOrigem();
         registrarOuvinteResultadoDestino();
@@ -1851,10 +1811,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         pacote.putParcelable(chavePacote, endereco);
         getParentFragmentManager().setFragmentResult(chaveResultado, pacote);
     }
-
-    // =================================================================
-    // SEÇÃO 15: PERMISSÕES E SERVIÇOS DE SISTEMA
-    // =================================================================
 
     private void checkPermissions() {
         if (needsPermissions()) {
@@ -1957,11 +1913,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         requireActivity().finish();
     }
 
-    // =================================================================
-    // SEÇÃO 16: GERAÇÃO DE PDF E COMPARTILHAMENTO
-    // =================================================================
-
-    private boolean gerarPdfComDadosReais() {
+    private boolean gerarPdfComTodosOsDados() {
         try {
             String categoria = Optional.ofNullable(categoriaAtual)
                     .map(CategoriaFrete::getDescricao)
@@ -2018,9 +1970,49 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         }
     }
 
-    // =================================================================
-    // SEÇÃO 17: MÉTODOS UTILITÁRIOS E AUXILIARES
-    // =================================================================
+    private boolean gerarPdfApenasBezerro() {
+        try {
+            String categoria = Optional.ofNullable(categoriaAtual)
+                    .map(CategoriaFrete::getDescricao)
+                    .orElse("Não informado");
+
+            BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+            BigDecimal percentualAgio = converterDecimalDeInput(inputPercentualAgio);
+            BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+            Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+
+            if (precoArroba == null || pesoAnimal == null || quantidade == null) {
+                return false;
+            }
+
+            BigDecimal valorPorCabeca = calcularValorTotalBezerro(pesoAnimal, precoArroba, percentualAgio);
+            BigDecimal valorPorKg = calcularValorTotalPorKg(pesoAnimal, precoArroba, percentualAgio);
+            BigDecimal valorTotal = calcularValorTotalTodosBezerros(valorPorCabeca, quantidade);
+
+            PdfReport report = PdfReport.builder()
+                    .categoriaAnimal(categoria)
+                    .precoArroba(precoArroba.doubleValue())
+                    .percentualAgio(percentualAgio != null ? percentualAgio.doubleValue() : 0)
+                    .pesoAnimal(pesoAnimal.doubleValue())
+                    .quantidadeAnimais(quantidade)
+                    .valorPorCabeca(valorPorCabeca.doubleValue())
+                    .valorPorKg(valorPorKg.doubleValue())
+                    .valorTotal(valorTotal.doubleValue())
+                    .origem("Não informado")
+                    .destino("Não informado")
+                    .distancia(0.0)
+                    .valorFrete(0.0)
+                    .valorFinalTotal(valorTotal.doubleValue())
+                    .valorFinalPorKg(valorPorKg.doubleValue())
+                    .build();
+
+            this.pdfFileAtual = report.create(requireContext());
+            return true;
+        } catch (Exception e) {
+            this.pdfFileAtual = null;
+            return false;
+        }
+    }
 
     private static String formatarParaMoeda(BigDecimal valor) {
         return "R$ " + FORMATADOR_MOEDA.format(valor);
@@ -2187,11 +2179,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private boolean estaFragmentoAtivo() {
         return isAdded() && !isRemoving() && !isDetached();
     }
-
-    // =================================================================
-    // SEÇÃO 18: LIMPEZA E GERENCIAMENTO DE RECURSOS
-    // =================================================================
-
     private void liberarReferenciasViews() {
         adaptadorLocalizacoes = null;
         adaptadorRecomendacoes = null;

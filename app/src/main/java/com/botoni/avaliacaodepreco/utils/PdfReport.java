@@ -123,31 +123,58 @@ public class PdfReport {
         yPos = line(canvas, "Valor Total (s/ frete):", dfMoeda.format(valorTotal), yPos);
         yPos += 15;
 
-        yPos = session(canvas, "TRANSPORTE", yPos);
-        yPos = line(canvas, "Origem:", origem, yPos);
-        yPos = line(canvas, "Destino:", destino, yPos);
-        yPos = line(canvas, "Distância:", dfDecimal.format(distancia) + " km", yPos);
-        yPos = line(canvas, "Valor do Frete:", dfMoeda.format(valorFrete), yPos);
-        yPos += 15;
+        boolean temDadosTransporte = distancia > 0 && valorFrete > 0;
+
+        if (temDadosTransporte) {
+            yPos = session(canvas, "TRANSPORTE", yPos);
+
+            if (origem != null && !origem.equals("Não informado")) {
+                yPos = line(canvas, "Origem:", origem, yPos);
+            }
+
+            if (destino != null && !destino.equals("Não informado")) {
+                yPos = line(canvas, "Destino:", destino, yPos);
+            }
+
+            yPos = line(canvas, "Distância:", dfDecimal.format(distancia) + " km", yPos);
+            yPos = line(canvas, "Valor do Frete:", dfMoeda.format(valorFrete), yPos);
+            yPos += 15;
+        }
 
         paint.setColor(Color.DKGRAY);
         paint.setStrokeWidth(2);
         canvas.drawLine(MARGIN, yPos, PAGE_WIDTH - MARGIN, yPos, paint);
         yPos += 25;
 
-        paint.setTextSize(16);
-        paint.setColor(Color.BLACK);
-        paint.setFakeBoldText(true);
-        canvas.drawText("VALOR FINAL TOTAL:", MARGIN, yPos, paint);
-        paint.setColor(Color.rgb(0, 128, 0));
-        canvas.drawText(dfMoeda.format(valorFinalTotal), 300, yPos, paint);
-        yPos += 30;
+        if (temDadosTransporte) {
+            paint.setTextSize(16);
+            paint.setColor(Color.BLACK);
+            paint.setFakeBoldText(true);
+            canvas.drawText("VALOR FINAL TOTAL:", MARGIN, yPos, paint);
+            paint.setColor(Color.rgb(0, 128, 0));
+            canvas.drawText(dfMoeda.format(valorFinalTotal), 300, yPos, paint);
+            yPos += 30;
 
-        paint.setTextSize(14);
-        paint.setColor(Color.BLACK);
-        canvas.drawText("Valor Final por Kg:", MARGIN, yPos, paint);
-        paint.setColor(Color.rgb(0, 128, 0));
-        canvas.drawText(dfMoeda.format(valorFinalPorKg), 300, yPos, paint);
+            paint.setTextSize(14);
+            paint.setColor(Color.BLACK);
+            canvas.drawText("Valor Final por Kg:", MARGIN, yPos, paint);
+            paint.setColor(Color.rgb(0, 128, 0));
+            canvas.drawText(dfMoeda.format(valorFinalPorKg), 300, yPos, paint);
+        } else {
+            paint.setTextSize(16);
+            paint.setColor(Color.BLACK);
+            paint.setFakeBoldText(true);
+            canvas.drawText("VALOR TOTAL:", MARGIN, yPos, paint);
+            paint.setColor(Color.rgb(0, 128, 0));
+            canvas.drawText(dfMoeda.format(valorTotal), 300, yPos, paint);
+            yPos += 30;
+
+            paint.setTextSize(14);
+            paint.setColor(Color.BLACK);
+            canvas.drawText("Valor por Kg:", MARGIN, yPos, paint);
+            paint.setColor(Color.rgb(0, 128, 0));
+            canvas.drawText(dfMoeda.format(valorPorKg), 300, yPos, paint);
+        }
 
         paint.setTextSize(9);
         paint.setColor(Color.GRAY);
