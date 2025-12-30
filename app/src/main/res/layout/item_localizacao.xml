@@ -40,7 +40,7 @@
         android:layout_width="4dp"
         android:layout_height="4dp"
         android:layout_marginStart="6dp"
-        android:background="@drawable/circle_separator"
+        android:background="@drawable/ic_circle_separator"
         app:layout_constraintStart_toEndOf="@id/cidade_text"
         app:layout_constraintTop_toTopOf="@id/cidade_text"
         app:layout_constraintBottom_toBottomOf="@id/cidade_text" />

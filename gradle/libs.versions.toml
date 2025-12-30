@@ -8,7 +8,6 @@ material = "1.13.0"
 activity = "1.12.1"
 constraintlayout = "2.2.1"
 room = "2.8.4"
-roomRuntime = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.2.0"
 kotlinAndroid = "2.3.0"
@@ -23,8 +22,8 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 

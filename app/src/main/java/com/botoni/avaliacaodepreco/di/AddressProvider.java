@@ -44,8 +44,4 @@ public interface AddressProvider {
     default String code(@Nullable Address address) {
         return address != null ? address.getCountryCode() : null;
     }
-
-    default List<Address> emptyList() {
-        return Collections.emptyList();
-    }
 }

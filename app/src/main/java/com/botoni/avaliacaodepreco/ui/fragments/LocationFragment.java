@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.botoni.avaliacaodepreco.R;
 import com.botoni.avaliacaodepreco.di.DirectionsProvider;
-import com.botoni.avaliacaodepreco.domain.Directions;
+import com.botoni.avaliacaodepreco.domain.entities.Directions;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

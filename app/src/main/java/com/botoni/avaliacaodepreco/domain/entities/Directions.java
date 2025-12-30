@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco.domain;
+package com.botoni.avaliacaodepreco.domain.entities;
 
 import com.google.android.gms.maps.model.LatLng;
 

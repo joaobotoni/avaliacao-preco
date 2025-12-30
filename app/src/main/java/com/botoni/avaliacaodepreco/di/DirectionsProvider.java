@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.botoni.avaliacaodepreco.R;
-import com.botoni.avaliacaodepreco.domain.Directions;
+import com.botoni.avaliacaodepreco.domain.entities.Directions;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;

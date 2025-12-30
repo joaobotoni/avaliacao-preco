@@ -1,4 +1,4 @@
-package com.botoni.avaliacaodepreco.domain;
+package com.botoni.avaliacaodepreco.domain.entities;
 
 public class Recomendacao {
     private final int qtdeRecomendada;

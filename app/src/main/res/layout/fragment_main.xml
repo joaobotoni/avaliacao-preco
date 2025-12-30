@@ -362,13 +362,12 @@
                         android:layout_marginTop="@dimen/margin_medium"
                         android:layout_marginBottom="@dimen/margin_small"
                         android:contentDescription="@string/todo"
-                        android:src="@drawable/touch_app_24px"
+                        android:src="@drawable/ic_touch"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/localizacao_subtitulo"
                         app:tint="?attr/colorPrimary" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 

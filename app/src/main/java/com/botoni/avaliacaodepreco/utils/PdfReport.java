@@ -23,7 +23,6 @@ public class PdfReport {
     private static final int PAGE_WIDTH = 595;
     private static final int PAGE_HEIGHT = 842;
     private static final int MARGIN = 40;
-
     private String categoriaAnimal;
     private double precoArroba;
     private double percentualAgio;

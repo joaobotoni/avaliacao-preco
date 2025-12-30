@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.botoni.avaliacaodepreco.R;
-import com.botoni.avaliacaodepreco.domain.Recomendacao;
+import com.botoni.avaliacaodepreco.domain.entities.Recomendacao;
 
 import java.util.Collections;
 import java.util.List;
