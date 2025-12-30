@@ -175,5 +175,13 @@
     <string name="permissao_localizacao_negada">A permissão de localização é obrigatoria</string>
     <string name="permissao_localizacao_titulo_negada">Permissão de localização</string>
 
+    <string name="titulo_permissions">Permissões de Localização</string>
+    <string name="info_permissions_message">Para calcular rotas e fretes com precisão, precisamos de acesso à sua localização. Isso permite determinar origens e destinos automaticamente.</string>
+    <string name="titulo_permissions_denied">Permissão Negada</string>
+    <string name="info_permissions_denied">O aplicativo precisa da permissão de localização para funcionar corretamente. Sem ela, não será possível calcular rotas e fretes.</string>
+    <string name="titulo_permissions_required">Permissões Necessárias</string>
+    <string name="info_permissions_permanently_denied">As permissões foram negadas permanentemente. Para habilitar, acesse as configurações do aplicativo.</string>
+    <string name="btn_settings">Configurações</string>
+
     <string name="todo">TODO</string>
 </resources>

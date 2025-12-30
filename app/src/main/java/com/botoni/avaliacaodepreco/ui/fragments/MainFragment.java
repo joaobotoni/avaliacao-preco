@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -88,6 +90,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainFragment extends Fragment implements DirectionsProvider, AddressProvider {
 
@@ -95,6 +99,11 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private static final int TAMANHO_POOL_THREADS = 4;
     private static final int MAX_RESULTADOS_BUSCA = 10;
     private static final double DISTANCIA_MAXIMA_TABELA = 300.0;
+
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     private static final String CHAVE_ORIGEM = "origem";
     private static final String CHAVE_DESTINO = "destino";
@@ -142,6 +151,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private final AtomicBoolean estaNavegando = new AtomicBoolean(false);
     private final AtomicBoolean estaCalculandoRota = new AtomicBoolean(false);
     private final AtomicBoolean estaCalculandoRecomendacoes = new AtomicBoolean(false);
+
+    private boolean settingsOpened = false;
 
     private final List<Address> enderecos = Collections.synchronizedList(new ArrayList<>());
     private List<TipoVeiculoFrete> tiposVeiculo = new ArrayList<>();
@@ -204,12 +215,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private CardView cardValorFinal;
     private TextView textValorTotal;
     private TextView textValorFinalPorKg;
-
-    private BottomSheetBehavior<FrameLayout> bottomSheetCompartilhamento;
-    private ImageButton whatsapp;
-    private ImageButton telegram;
-    private ImageButton googleDrive;
-
     private Button buttonEnviarDoc;
 
     private File pdfFileAtual = null;
@@ -224,10 +229,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
-    private final ActivityResultLauncher<String[]> permissions = registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(),
-            this::processarResultadoPermissoes
-    );
+    private final ActivityResultLauncher<String[]> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::handlePermissionsResult);
 
     @Override
     public void onCreate(@Nullable Bundle estadoSalvo) {
@@ -257,6 +260,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         estaNavegando.set(false);
         if (getView() != null) {
             getView().post(this::sincronizarUIComEstado);
+        }
+        if (settingsOpened) {
+            settingsOpened = false;
+            checkPermissions();
         }
     }
 
@@ -376,76 +383,53 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     }
 
     private void vincularViewsBottonSheetToShare(View view) {
-        whatsapp = view.findViewById(R.id.button_whatsapp);
-        telegram = view.findViewById(R.id.button_telegram);
-        googleDrive = view.findViewById(R.id.buton_google_drive);
         buttonEnviarDoc = view.findViewById(R.id.material_button_enviar);
-        setOnClickListenerSendDoc(whatsapp, "com.whatsapp");
-        setOnClickListenerSendDoc(telegram, "org.telegram.messenger");
-        setOnClickListenerSendDoc(googleDrive, "com.google.android.apps.docs");
-        configurarBottomSheetCompartilhamento(view);
+        configurarBotaoEnviarDocumento();
         definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+    }
+
+    private void configurarBotaoEnviarDocumento() {
+        Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
+                botao.setOnClickListener(v -> {
+                    if (getContext() == null) return;
+                    if (!gerarPdfComDadosReais()) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        return;
+                    }
+                    if (pdfFileAtual == null || !pdfFileAtual.exists()) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        return;
+                    }
+                    try {
+                        Uri pdfUri = FileProvider.getUriForFile(
+                                requireContext(),
+                                "com.botoni.avaliacaodepreco.provider",
+                                pdfFileAtual
+                        );
+
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("application/pdf");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, "Compartilhar PDF"));
+                    } catch (Exception e) {
+                        exibirMensagemErro(R.string.erro_generico);
+                    }
+                })
+        );
     }
 
     private void configurarTodosComponentesUI(View view) {
         if (!estaFragmentoAtivo()) return;
-        solicitarPermissoesLocalizacao();
+        checkPermissions();
         configurarComponentesCalculo();
         configurarComponentesLocalizacao(view);
         configurarComponentesNavegacao();
         configurarCartaoValorFinal();
     }
 
-    private void configurarBottomSheetCompartilhamento(View view) {
-        FrameLayout bottomSheet = view.findViewById(R.id.share_bottom_sheet);
-        if (bottomSheet != null) {
-            bottomSheetCompartilhamento = BottomSheetBehavior.from(bottomSheet);
-            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_HIDDEN);
-            bottomSheetCompartilhamento.setHideable(true);
-            bottomSheetCompartilhamento.setPeekHeight(0);
 
-            Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
-                    botao.setOnClickListener(v -> {
-                        if (gerarPdfComDadosReais()) {
-                            expandirBottomSheetCompartilhamento();
-                        } else {
-                            exibirMensagemErro(R.string.erro_gerar_relatorio);
-                        }
-                    })
-            );
-        }
-    }
 
-    private void setOnClickListenerSendDoc(ImageButton button, String pack) {
-        button.setOnClickListener(v -> {
-            if (pdfFileAtual == null || !pdfFileAtual.exists()) {
-                if (!gerarPdfComDadosReais()) {
-                    exibirMensagemErro(R.string.erro_gerar_relatorio);
-                    return;
-                }
-            }
-
-            try {
-                Uri pdfUri = FileProvider.getUriForFile(
-                        requireContext(),
-                        "com.botoni.avaliacaodepreco.provider",
-                        pdfFileAtual
-                );
-
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("application/pdf");
-                intent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-                intent.putExtra(Intent.EXTRA_TEXT, "Aqui está o relatório de avaliação de preço 📄");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                startActivity(Intent.createChooser(intent, "Compartilhar PDF"));
-            } catch (IllegalArgumentException e) {
-                exibirMensagemErro(R.string.erro_gerar_relatorio);
-            } catch (ActivityNotFoundException e) {
-                exibirMensagemErro(R.string.erro_app_nao_instalado);
-            }
-        });
-    }
     private void configurarComponentesCalculo() {
         configurarSelecaoCategoria();
         anexarOuvintesCalculo();
@@ -1163,6 +1147,138 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         });
     }
 
+    private void configurarBotoesAjusteDistancia() {
+        configurarBotaoDistanciaFixa(btnAdd5Km, 5);
+        configurarBotaoDistanciaFixa(btnAdd10Km, 10);
+        configurarBotaoDistanciaFixa(btnAdd20Km, 20);
+        configurarBotaoDistanciaPersonalizada();
+    }
+
+    private void configurarBotaoDistanciaFixa(Button botao, double quilometros) {
+        Optional.ofNullable(botao).ifPresent(btn ->
+                btn.setOnClickListener(v -> ajustarDistanciaPor(quilometros)));
+    }
+
+    private void configurarBotaoDistanciaPersonalizada() {
+        Optional.ofNullable(btnConfirmarAjuste).ifPresent(botao ->
+                botao.setOnClickListener(v -> aplicarAjusteDistanciaPersonalizado()));
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private void ajustarDistanciaPor(double quilometros) {
+        if (quilometros <= 0) return;
+        distancia += quilometros;
+        configurarCartaoValorFinal();
+        String mensagem = getString(R.string.sucesso_distancia_atualizada, distancia);
+        exibirMensagemSucesso(mensagem);
+    }
+
+    private void aplicarAjusteDistanciaPersonalizado() {
+        String valorEntrada = extrairValorEditText(inputKmAdicional);
+
+        if (valorEntrada.isEmpty()) {
+            exibirMensagemErro(R.string.erro_campo_vazio);
+            return;
+        }
+
+        try {
+            double quilometros = Double.parseDouble(valorEntrada);
+            if (quilometros > 0) {
+                ajustarDistanciaPor(quilometros);
+                configurarCartaoValorFinal();
+                limparValorEditText(inputKmAdicional);
+            } else {
+                exibirMensagemErro(R.string.erro_valor_invalido);
+            }
+        } catch (NumberFormatException e) {
+            exibirMensagemErro(R.string.erro_valor_invalido);
+        }
+    }
+
+    private void configurarNavegacaoFragmentoLocalizacao() {
+        Optional.ofNullable(btnLocalizacao).ifPresent(botao ->
+                botao.setOnClickListener(v -> navegarParaDetalhesLocalizacao()));
+    }
+
+    private void navegarParaDetalhesLocalizacao() {
+        if (!podeNavegarParaLocalizacao()) return;
+
+        estaNavegando.set(true);
+        LocationFragment fragmento = LocationFragment.newInstance(enderecoOrigem, enderecoDestino);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view, fragmento)
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
+
+    private boolean podeNavegarParaLocalizacao() {
+        return estaFragmentoAtivo()
+                && possuiEnderecosRotaValidos()
+                && !estaNavegando.get();
+    }
+
+    private void aplicarEnderecoOrigemNaUI(Address endereco) {
+        if (!estaFragmentoAtivo()) return;
+
+        definirTextoCampoOrigem(format(endereco));
+        definirCampoOrigemHabilitado(false);
+        definirCampoOrigemFocavel(false);
+        definirVisibilidadeCursorCampoOrigem(false);
+        definirVisibilidadeBotaoLimparCampoOrigem(true);
+        limparFocoCampoOrigem();
+    }
+
+    private void sincronizarUIComEstado() {
+        if (!estaFragmentoAtivo()) return;
+
+        if (enderecoOrigem != null) {
+            aplicarEnderecoOrigemNaUI(enderecoOrigem);
+            atualizarVisibilidadeComponentesCondicionais();
+        }
+
+        limparTodosFocosInput();
+    }
+
+    private void limparTodosFocosInput() {
+        limparFocoCampoOrigem();
+        limparFocoCampoDestino();
+    }
+
+    private void atualizarVisibilidadeComponentesCondicionais() {
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+        boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
+        boolean temCategoria = categoriaAtual != null;
+        boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
+
+        boolean podeExibirComponentesRota = temQuantidadeValida && temCategoria;
+        atualizarVisibilidadeCartaoAdicionarLocalizacao(podeExibirComponentesRota);
+        definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
+        boolean podeCalcularValorFinal = (temEndereco || distancia > 0);
+        atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
+    }
+
+    private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
+        if (cardAddLocalizacao == null && getView() != null) {
+            cardAddLocalizacao = getView().findViewById(R.id.adicionar_localizacao_card);
+            if (cardAddLocalizacao != null) {
+                configurarCliqueCartaoAdicionarLocalizacao();
+            }
+        }
+
+        if (cardAddLocalizacao == null) {
+            return;
+        }
+        definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
+    }
+
+    private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
+        int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
+        definirVisibilidadeView(cardContainerRota, visibilidade);
+    }
+
     private void configurarCartaoValorFinal() {
         boolean temOrigem = enderecoOrigem != null;
         boolean temDestino = enderecoDestino != null;
@@ -1574,56 +1690,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         });
     }
 
-    private void configurarBotoesAjusteDistancia() {
-        configurarBotaoDistanciaFixa(btnAdd5Km, 5);
-        configurarBotaoDistanciaFixa(btnAdd10Km, 10);
-        configurarBotaoDistanciaFixa(btnAdd20Km, 20);
-        configurarBotaoDistanciaPersonalizada();
-    }
-
-    private void configurarBotaoDistanciaFixa(Button botao, double quilometros) {
-        Optional.ofNullable(botao).ifPresent(btn ->
-                btn.setOnClickListener(v -> ajustarDistanciaPor(quilometros)));
-    }
-
-    private void configurarBotaoDistanciaPersonalizada() {
-        Optional.ofNullable(btnConfirmarAjuste).ifPresent(botao ->
-                botao.setOnClickListener(v -> aplicarAjusteDistanciaPersonalizado()));
-    }
-
-    @SuppressLint("StringFormatMatches")
-    private void ajustarDistanciaPor(double quilometros) {
-        if (quilometros <= 0) return;
-        distancia += quilometros;
-        configurarCartaoValorFinal();
-        String mensagem = getString(R.string.sucesso_distancia_atualizada, distancia);
-        exibirMensagemSucesso(mensagem);
-    }
-
-    private void aplicarAjusteDistanciaPersonalizado() {
-        String valorEntrada = extrairValorEditText(inputKmAdicional);
-
-        if (valorEntrada.isEmpty()) {
-            exibirMensagemErro(R.string.erro_campo_vazio);
-            return;
-        }
-
-        try {
-            double quilometros = Double.parseDouble(valorEntrada);
-            if (quilometros > 0) {
-                ajustarDistanciaPor(quilometros);
-                configurarCartaoValorFinal();
-                limparValorEditText(inputKmAdicional);
-            } else {
-                exibirMensagemErro(R.string.erro_valor_invalido);
-            }
-        } catch (NumberFormatException e) {
-            exibirMensagemErro(R.string.erro_valor_invalido);
-        }
-    }
-
     private void solicitarPermissoesLocalizacao() {
-        locationPermissionProvider.request(permissions, requireContext());
+        if (getContext() != null) {
+            locationPermissionProvider.request(permissionLauncher, requireContext());
+        }
     }
 
     private void processarResultadoPermissoes(Map<String, Boolean> resultados) {
@@ -1642,17 +1712,43 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         );
     }
 
-    @RequiresPermission(allOf = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    })
+    @RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     private void obterLocalizacaoUsuario() {
-        if (locationPermissionProvider.isGranted(requireContext())) {
+        if (getContext() == null) return;
+
+        if (!locationPermissionProvider.isGranted(requireContext())) {
+            return;
+        }
+
+        try {
             clienteLocalizacao.getLastLocation()
                     .addOnSuccessListener(requireActivity(), this::tratarResultadoLocalizacaoUsuario);
+        } catch (SecurityException e) {
+            exibirMensagemErro(R.string.erro_permissao_negada);
         }
     }
 
+    private void tratarResultadoLocalizacaoUsuario(Location localizacao) {
+        if (localizacao == null || !estaFragmentoAtivo()) return;
+
+        realizarGeocodificacaoReversa(localizacao.getLatitude(), localizacao.getLongitude(),
+                this::extrairPaisUsuarioDaLocalizacao,
+                this::exibirMensagemErro);
+    }
+
+    private void extrairPaisUsuarioDaLocalizacao(List<Address> enderecos) {
+        codigoPaisUsuario = code(first(enderecos));
+    }
+
+    private void exibirMensagemPermissaoNegada() {
+        if (!estaFragmentoAtivo()) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.erro_titulo_permissao_negada)
+                .setMessage(R.string.erro_permissao_negada)
+                .setPositiveButton(R.string.btn_ok, (dialogo, qual) -> dialogo.dismiss())
+                .show();
+    }
 
     private boolean gerarPdfComDadosReais() {
         try {
@@ -1710,154 +1806,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             return false;
         }
     }
-    private void tratarResultadoLocalizacaoUsuario(Location localizacao) {
-        if (localizacao == null || !estaFragmentoAtivo()) return;
-
-        realizarGeocodificacaoReversa(localizacao.getLatitude(), localizacao.getLongitude(),
-                this::extrairPaisUsuarioDaLocalizacao,
-                this::exibirMensagemErro);
-    }
-
-    private void extrairPaisUsuarioDaLocalizacao(List<Address> enderecos) {
-        codigoPaisUsuario = code(first(enderecos));
-    }
-
-    private void exibirMensagemPermissaoNegada() {
-        if (!estaFragmentoAtivo()) return;
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.erro_titulo_permissao_negada)
-                .setMessage(R.string.erro_permissao_negada)
-                .setPositiveButton(R.string.btn_ok, (dialogo, qual) -> dialogo.dismiss())
-                .show();
-    }
-
-    private void configurarNavegacaoFragmentoLocalizacao() {
-        Optional.ofNullable(btnLocalizacao).ifPresent(botao ->
-                botao.setOnClickListener(v -> navegarParaDetalhesLocalizacao()));
-    }
-
-    private void navegarParaDetalhesLocalizacao() {
-        if (!podeNavegarParaLocalizacao()) return;
-
-        estaNavegando.set(true);
-        LocationFragment fragmento = LocationFragment.newInstance(enderecoOrigem, enderecoDestino);
-
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container_view, fragmento)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
-    }
-
-    private boolean podeNavegarParaLocalizacao() {
-        return estaFragmentoAtivo()
-                && possuiEnderecosRotaValidos()
-                && !estaNavegando.get();
-    }
-
-    private void aplicarEnderecoOrigemNaUI(Address endereco) {
-        if (!estaFragmentoAtivo()) return;
-
-        definirTextoCampoOrigem(format(endereco));
-        definirCampoOrigemHabilitado(false);
-        definirCampoOrigemFocavel(false);
-        definirVisibilidadeCursorCampoOrigem(false);
-        definirVisibilidadeBotaoLimparCampoOrigem(true);
-        limparFocoCampoOrigem();
-    }
-
-    private void sincronizarUIComEstado() {
-        if (!estaFragmentoAtivo()) return;
-
-        if (enderecoOrigem != null) {
-            aplicarEnderecoOrigemNaUI(enderecoOrigem);
-            atualizarVisibilidadeComponentesCondicionais();
-        }
-
-        limparTodosFocosInput();
-    }
-
-    private void limparTodosFocosInput() {
-        limparFocoCampoOrigem();
-        limparFocoCampoDestino();
-    }
-
-    private void atualizarVisibilidadeComponentesCondicionais() {
-        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
-        boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
-        boolean temCategoria = categoriaAtual != null;
-        boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
-
-        boolean podeExibirComponentesRota = temQuantidadeValida && temCategoria;
-        atualizarVisibilidadeCartaoAdicionarLocalizacao(podeExibirComponentesRota);
-        definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
-        definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
-        boolean podeCalcularValorFinal = (temEndereco || distancia > 0);
-        atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
-    }
-
-    private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
-        if (cardAddLocalizacao == null && getView() != null) {
-            cardAddLocalizacao = getView().findViewById(R.id.adicionar_localizacao_card);
-            if (cardAddLocalizacao != null) {
-                configurarCliqueCartaoAdicionarLocalizacao();
-            }
-        }
-
-        if (cardAddLocalizacao == null) {
-            return;
-        }
-        definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
-    }
-
-
-    private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
-        int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
-        definirVisibilidadeView(cardContainerRota, visibilidade);
-    }
-
-    private BigDecimal converterDecimalDeInput(TextInputEditText campo) {
-        return Optional.ofNullable(campo)
-                .map(TextInputEditText::getText)
-                .map(Object::toString)
-                .map(String::trim)
-                .filter(texto -> !texto.isEmpty())
-                .flatMap(this::analisarDecimalSeguro)
-                .orElse(null);
-    }
-
-    private Optional<BigDecimal> analisarDecimalSeguro(String valor) {
-        try {
-            BigDecimal analisado = new BigDecimal(valor);
-            return analisado.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(analisado) : Optional.empty();
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    private Integer converterInteiroDeInput(TextInputEditText campo) {
-        return Optional.ofNullable(campo)
-                .map(TextInputEditText::getText)
-                .map(Object::toString)
-                .map(String::trim)
-                .filter(texto -> !texto.isEmpty())
-                .flatMap(this::analisarInteiroSeguro)
-                .orElse(null);
-    }
-
-    private Optional<Integer> analisarInteiroSeguro(String valor) {
-        try {
-            int analisado = Integer.parseInt(valor);
-            return analisado > 0 ? Optional.of(analisado) : Optional.empty();
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    private Optional<Address> extrairEnderecoDoBundle(Bundle pacote, String chave) {
-        return Optional.ofNullable(pacote.getParcelable(chave, Address.class));
-    }
 
     private void notificarEnderecoOrigemSelecionado(Address endereco) {
         iniciarCalculoRota();
@@ -1890,12 +1838,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
 
     private void definirEstadoBottomSheet(int estado) {
         Optional.ofNullable(bottomSheetLocalizacao).ifPresent(sheet -> sheet.setState(estado));
-    }
-
-    private void expandirBottomSheetCompartilhamento() {
-        if (bottomSheetCompartilhamento != null) {
-            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_EXPANDED);
-        }
     }
 
     private void expandirBottomSheet() {
@@ -1965,6 +1907,48 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         Optional.ofNullable(campoEdicao).ifPresent(et -> et.setText(""));
     }
 
+    private BigDecimal converterDecimalDeInput(TextInputEditText campo) {
+        return Optional.ofNullable(campo)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(texto -> !texto.isEmpty())
+                .flatMap(this::analisarDecimalSeguro)
+                .orElse(null);
+    }
+
+    private Optional<BigDecimal> analisarDecimalSeguro(String valor) {
+        try {
+            BigDecimal analisado = new BigDecimal(valor);
+            return analisado.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(analisado) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Integer converterInteiroDeInput(TextInputEditText campo) {
+        return Optional.ofNullable(campo)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(texto -> !texto.isEmpty())
+                .flatMap(this::analisarInteiroSeguro)
+                .orElse(null);
+    }
+
+    private Optional<Integer> analisarInteiroSeguro(String valor) {
+        try {
+            int analisado = Integer.parseInt(valor);
+            return analisado > 0 ? Optional.of(analisado) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Address> extrairEnderecoDoBundle(Bundle pacote, String chave) {
+        return Optional.ofNullable(pacote.getParcelable(chave, Address.class));
+    }
+
     private void exibirMensagemSucesso(String mensagem) {
         exibirSnackbar(mensagem, Color.parseColor("#279958"), Color.WHITE);
     }
@@ -2019,7 +2003,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         adaptadorRecomendacoes = null;
 
         bottomSheetLocalizacao = null;
-        bottomSheetCompartilhamento = null;
 
         recyclerLocalizacoes = null;
         recyclerRecomendacoes = null;
@@ -2069,9 +2052,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         textValorFinalPorKg = null;
 
         buttonEnviarDoc = null;
-        whatsapp = null;
-        telegram = null;
-        googleDrive = null;
+
     }
 
     private void limparRecursos() {
@@ -2098,5 +2079,106 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private void limparCallbacksManipuladorPrincipal() {
         Optional.ofNullable(manipuladorPrincipal)
                 .ifPresent(manipulador -> manipulador.removeCallbacksAndMessages(null));
+    }
+
+    private void checkPermissions() {
+        if (needsPermissions()) {
+            showPermissionsDialog();
+        }
+    }
+
+    private boolean needsPermissions() {
+        if (getContext() == null) return false;
+        for (String permission : PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(requireContext(), permission) != PERMISSION_GRANTED) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void requestPermissions() {
+        permissionLauncher.launch(PERMISSIONS);
+    }
+
+    private void handlePermissionsResult(Map<String, Boolean> result) {
+        if (!allGranted(result)) {
+            if (shouldRetry(result)) {
+                showRetryDialog();
+            } else {
+                showSettingsDialog();
+            }
+        }
+    }
+
+    private boolean allGranted(Map<String, Boolean> result) {
+        for (Boolean granted : result.values()) {
+            if (!granted) return false;
+        }
+        return true;
+    }
+
+    private boolean shouldRetry(Map<String, Boolean> result) {
+        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+            if (!entry.getValue() && shouldShowRequestPermissionRationale(entry.getKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showPermissionsDialog() {
+        showDialog(
+                R.string.titulo_permissions,
+                R.string.info_permissions_message,
+                R.string.btn_ok,
+                this::requestPermissions,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showRetryDialog() {
+        showDialog(
+                R.string.titulo_permissions_denied,
+                R.string.info_permissions_denied,
+                R.string.btn_ok,
+                this::requestPermissions,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showSettingsDialog() {
+        showDialog(
+                R.string.titulo_permissions_required,
+                R.string.info_permissions_permanently_denied,
+                R.string.btn_settings,
+                this::openSettings,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showDialog(int title, int message, int positive, Runnable onPositive, int negative, Runnable onNegative) {
+        if (getContext() == null) return;
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positive, (d, w) -> onPositive.run())
+                .setNegativeButton(negative, (d, w) -> onNegative.run())
+                .setCancelable(false)
+                .show();
+    }
+
+    private void openSettings() {
+        settingsOpened = true;
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", requireContext().getPackageName(), null));
+        startActivity(intent);
+    }
+
+    private void close() {
+        requireActivity().finish();
     }
 }
