@@ -2,7 +2,6 @@ package com.botoni.avaliacaodepreco.ui.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +21,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -88,13 +88,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainFragment extends Fragment implements DirectionsProvider, AddressProvider {
+
+    // =================================================================
+    // SEÇÃO 1: CONSTANTES E CONFIGURAÇÕES
+    // =================================================================
 
     private static final String LOCALIZACAO_PADRAO = "Cuiabá";
     private static final int TAMANHO_POOL_THREADS = 4;
     private static final int MAX_RESULTADOS_BUSCA = 10;
     private static final double DISTANCIA_MAXIMA_TABELA = 300.0;
+
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     private static final String CHAVE_ORIGEM = "origem";
     private static final String CHAVE_DESTINO = "destino";
@@ -128,6 +139,19 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
 
     private static final Map<String, BigDecimal> TAXAS_KM_ADICIONAL = criarTaxasKmAdicional();
 
+    private static Map<String, BigDecimal> criarTaxasKmAdicional() {
+        Map<String, BigDecimal> taxas = new HashMap<>();
+        taxas.put("TRUK", new BigDecimal("9.30"));
+        taxas.put("CARRETA BAIXA", new BigDecimal("13.00"));
+        taxas.put("CARRETA ALTA", new BigDecimal("15.00"));
+        taxas.put("CARRETA TRES EIXOS", new BigDecimal("17.00"));
+        return taxas;
+    }
+
+    // =================================================================
+    // SEÇÃO 2: DECLARAÇÃO DE VARIÁVEIS DE INSTÂNCIA
+    // =================================================================
+
     private ExecutorService servicoExecutor;
     private Handler manipuladorPrincipal;
     private Geocoder geocodificador;
@@ -142,6 +166,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private final AtomicBoolean estaNavegando = new AtomicBoolean(false);
     private final AtomicBoolean estaCalculandoRota = new AtomicBoolean(false);
     private final AtomicBoolean estaCalculandoRecomendacoes = new AtomicBoolean(false);
+
+    private boolean settingsOpened = false;
 
     private final List<Address> enderecos = Collections.synchronizedList(new ArrayList<>());
     private List<TipoVeiculoFrete> tiposVeiculo = new ArrayList<>();
@@ -204,12 +230,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private CardView cardValorFinal;
     private TextView textValorTotal;
     private TextView textValorFinalPorKg;
-
-    private BottomSheetBehavior<FrameLayout> bottomSheetCompartilhamento;
-    private ImageButton whatsapp;
-    private ImageButton telegram;
-    private ImageButton googleDrive;
-
     private Button buttonEnviarDoc;
 
     private File pdfFileAtual = null;
@@ -224,10 +244,12 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
-    private final ActivityResultLauncher<String[]> permissions = registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(),
-            this::processarResultadoPermissoes
-    );
+    private final ActivityResultLauncher<String[]> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), this::handlePermissionsResult);
+
+    // =================================================================
+    // SEÇÃO 3: MÉTODOS DO CICLO DE VIDA
+    // =================================================================
 
     @Override
     public void onCreate(@Nullable Bundle estadoSalvo) {
@@ -258,6 +280,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         if (getView() != null) {
             getView().post(this::sincronizarUIComEstado);
         }
+        if (settingsOpened) {
+            settingsOpened = false;
+            checkPermissions();
+        }
     }
 
     @Override
@@ -283,14 +309,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         persistirEstadoAtual(estadoSaida);
     }
 
-    private static Map<String, BigDecimal> criarTaxasKmAdicional() {
-        Map<String, BigDecimal> taxas = new HashMap<>();
-        taxas.put("TRUK", new BigDecimal("9.30"));
-        taxas.put("CARRETA BAIXA", new BigDecimal("13.00"));
-        taxas.put("CARRETA ALTA", new BigDecimal("15.00"));
-        taxas.put("CARRETA TRES EIXOS", new BigDecimal("17.00"));
-        return taxas;
-    }
+    // =================================================================
+    // SEÇÃO 4: INICIALIZAÇÃO E CONFIGURAÇÃO BASE
+    // =================================================================
 
     private void inicializarDependenciasBase() {
         Context contexto = requireContext();
@@ -376,76 +397,51 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     }
 
     private void vincularViewsBottonSheetToShare(View view) {
-        whatsapp = view.findViewById(R.id.button_whatsapp);
-        telegram = view.findViewById(R.id.button_telegram);
-        googleDrive = view.findViewById(R.id.buton_google_drive);
         buttonEnviarDoc = view.findViewById(R.id.material_button_enviar);
-        setOnClickListenerSendDoc(whatsapp, "com.whatsapp");
-        setOnClickListenerSendDoc(telegram, "org.telegram.messenger");
-        setOnClickListenerSendDoc(googleDrive, "com.google.android.apps.docs");
-        configurarBottomSheetCompartilhamento(view);
+        configurarBotaoEnviarDocumento();
         definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+    }
+
+    private void configurarBotaoEnviarDocumento() {
+        Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
+                botao.setOnClickListener(v -> {
+                    if (getContext() == null) return;
+                    if (!gerarPdfComDadosReais()) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        return;
+                    }
+                    if (pdfFileAtual == null || !pdfFileAtual.exists()) {
+                        exibirMensagemErro(R.string.erro_gerar_relatorio);
+                        return;
+                    }
+                    try {
+                        Uri pdfUri = FileProvider.getUriForFile(
+                                requireContext(),
+                                "com.botoni.avaliacaodepreco.provider",
+                                pdfFileAtual
+                        );
+
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("application/pdf");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, "Compartilhar PDF"));
+                    } catch (Exception e) {
+                        exibirMensagemErro(R.string.erro_generico);
+                    }
+                })
+        );
     }
 
     private void configurarTodosComponentesUI(View view) {
         if (!estaFragmentoAtivo()) return;
-        solicitarPermissoesLocalizacao();
+        checkPermissions();
         configurarComponentesCalculo();
         configurarComponentesLocalizacao(view);
         configurarComponentesNavegacao();
         configurarCartaoValorFinal();
     }
 
-    private void configurarBottomSheetCompartilhamento(View view) {
-        FrameLayout bottomSheet = view.findViewById(R.id.share_bottom_sheet);
-        if (bottomSheet != null) {
-            bottomSheetCompartilhamento = BottomSheetBehavior.from(bottomSheet);
-            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_HIDDEN);
-            bottomSheetCompartilhamento.setHideable(true);
-            bottomSheetCompartilhamento.setPeekHeight(0);
-
-            Optional.ofNullable(buttonEnviarDoc).ifPresent(botao ->
-                    botao.setOnClickListener(v -> {
-                        if (gerarPdfComDadosReais()) {
-                            expandirBottomSheetCompartilhamento();
-                        } else {
-                            exibirMensagemErro(R.string.erro_gerar_relatorio);
-                        }
-                    })
-            );
-        }
-    }
-
-    private void setOnClickListenerSendDoc(ImageButton button, String pack) {
-        button.setOnClickListener(v -> {
-            if (pdfFileAtual == null || !pdfFileAtual.exists()) {
-                if (!gerarPdfComDadosReais()) {
-                    exibirMensagemErro(R.string.erro_gerar_relatorio);
-                    return;
-                }
-            }
-
-            try {
-                Uri pdfUri = FileProvider.getUriForFile(
-                        requireContext(),
-                        "com.botoni.avaliacaodepreco.provider",
-                        pdfFileAtual
-                );
-
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("application/pdf");
-                intent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-                intent.putExtra(Intent.EXTRA_TEXT, "Aqui está o relatório de avaliação de preço 📄");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                startActivity(Intent.createChooser(intent, "Compartilhar PDF"));
-            } catch (IllegalArgumentException e) {
-                exibirMensagemErro(R.string.erro_gerar_relatorio);
-            } catch (ActivityNotFoundException e) {
-                exibirMensagemErro(R.string.erro_app_nao_instalado);
-            }
-        });
-    }
     private void configurarComponentesCalculo() {
         configurarSelecaoCategoria();
         anexarOuvintesCalculo();
@@ -464,6 +460,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         configurarBotoesAjusteDistancia();
         configurarNavegacaoFragmentoLocalizacao();
     }
+
+    // =================================================================
+    // SEÇÃO 5: CARREGAMENTO DE DADOS E CACHE
+    // =================================================================
 
     private void carregarDadosBancoERestaurarEstado(@Nullable Bundle estadoSalvo) {
         executarEmBackground(() -> {
@@ -524,6 +524,17 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         cacheFretePorTipoVeiculo.values().forEach(lista ->
                 lista.sort(Comparator.comparingDouble(Frete::getKmInicial)));
     }
+
+    private void aplicarAdaptadorCategorias() {
+        if (autoCompleteCategoria != null && !categorias.isEmpty()) {
+            CategoriaAdapter adaptador = new CategoriaAdapter(requireContext(), categorias);
+            autoCompleteCategoria.setAdapter(adaptador);
+        }
+    }
+
+    // =================================================================
+    // SEÇÃO 6: PERSISTÊNCIA E RESTAURAÇÃO DE ESTADO
+    // =================================================================
 
     private void persistirEstadoAtual(@NonNull Bundle estadoSaida) {
         persistirValoresInput(estadoSaida);
@@ -622,55 +633,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                 });
     }
 
-    private void configurarSelecaoCategoria() {
-        Optional.ofNullable(autoCompleteCategoria).ifPresent(autoComplete ->
-                autoComplete.setOnItemClickListener((parent, view, posicao, id) -> {
-                    if (ehPosicaoCategoriaValida(posicao)) {
-                        processarSelecaoCategoria(posicao);
-                    }
-                }));
-    }
-
-    private boolean ehPosicaoCategoriaValida(int posicao) {
-        return posicao >= 0 && posicao < categorias.size();
-    }
-
-    private void processarSelecaoCategoria(int posicao) {
-        categoriaAtual = categorias.get(posicao);
-        atualizarTextoAutoCompleteCategoria(categoriaAtual.getDescricao());
-        atualizarVisibilidadeComponentesCondicionais();
-        atualizarRecomendacoesVeiculos();
-    }
-
-    private void atualizarTextoAutoCompleteCategoria(String descricao) {
-        Optional.ofNullable(autoCompleteCategoria)
-                .ifPresent(autoComplete -> autoComplete.setText(descricao, false));
-    }
-
-    private void aplicarAdaptadorCategorias() {
-        if (autoCompleteCategoria != null && !categorias.isEmpty()) {
-            CategoriaAdapter adaptador = new CategoriaAdapter(requireContext(), categorias);
-            autoCompleteCategoria.setAdapter(adaptador);
-        }
-    }
-
-    private void anexarOuvintesCalculo() {
-        anexarOuvinteInput(inputPrecoArroba, this::realizarCalculoBezerro);
-        anexarOuvinteInput(inputPesoAnimal, this::realizarCalculoBezerro);
-        anexarOuvinteInput(inputQuantidadeAnimais, this::processarMudancaQuantidade);
-        anexarOuvinteInput(inputPercentualAgio, this::realizarCalculoBezerro);
-
-    }
-
-    private void processarMudancaQuantidade() {
-        realizarCalculoBezerro();
-        atualizarRecomendacoesVeiculos();
-        atualizarVisibilidadeComponentesCondicionais();
-    }
-
-    private void anexarOuvinteInput(TextInputEditText campo, Runnable acao) {
-        Optional.ofNullable(campo).ifPresent(c -> c.addTextChangedListener(new InputWatchers(acao)));
-    }
+    // =================================================================
+    // SEÇÃO 7: LÓGICA DE NEGÓCIO - CÁLCULO DE BEZERRO
+    // =================================================================
 
     private void realizarCalculoBezerro() {
         BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
@@ -681,6 +646,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             executarCalculoEExibir(precoArroba, pesoAnimal, quantidade);
         } else {
             esconderResultadoCalculo();
+            atualizarVisibilidadeComponentesCondicionais();
+            configurarCartaoValorFinal();
         }
     }
 
@@ -839,6 +806,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private static boolean estaNoOuAcimaPesoBase(BigDecimal pesoKg) {
         return pesoKg.compareTo(PESO_BASE_KG) >= 0;
     }
+
+    // =================================================================
+    // SEÇÃO 8: LÓGICA DE NEGÓCIO - RECOMENDAÇÃO DE VEÍCULOS
+    // =================================================================
 
     private void atualizarRecomendacoesVeiculos() {
         if (!podeCalcularRecomendacoes()) {
@@ -1030,222 +1001,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         definirVisibilidadeView(cardRecomendacaoTransporte, View.GONE);
     }
 
-    private void registrarOuvintesResultadoFragment() {
-        registrarOuvinteResultadoOrigem();
-        registrarOuvinteResultadoDestino();
-        registrarOuvinteAtualizarOrigem();
-    }
-
-    private void registrarOuvinteResultadoOrigem() {
-        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_ORIGEM, this,
-                (chaveRequisicao, bundle) -> {
-                    if (!estaFragmentoAtivo() || getView() == null) return;
-
-                    extrairEnderecoDoBundle(bundle, CHAVE_ORIGEM).ifPresent(endereco -> {
-                        if (estaFragmentoAtivo() && getView() != null) {
-                            processarSelecaoOrigem(endereco);
-                        }
-                    });
-                });
-    }
-
-    private void registrarOuvinteResultadoDestino() {
-        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_DESTINO, this,
-                (chaveRequisicao, bundle) -> {
-                    if (!estaFragmentoAtivo() || getView() == null) return;
-
-                    extrairEnderecoDoBundle(bundle, CHAVE_DESTINO).ifPresent(endereco -> {
-                        if (estaFragmentoAtivo() && getView() != null) {
-                            processarSelecaoDestino(endereco);
-                        }
-                    });
-                });
-    }
-
-    private void registrarOuvinteAtualizarOrigem() {
-        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_ATUALIZAR_ORIGEM, this,
-                (chaveRequisicao, bundle) -> {
-                    if (!estaFragmentoAtivo() || getView() == null) return;
-                    boolean deveExpandir = bundle.getBoolean(CHAVE_ATUALIZAR_ORIGEM, false);
-                    if (deveExpandir) getView().post(() -> {
-                        if (estaFragmentoAtivo() && bottomSheetLocalizacao != null) {
-                            expandirBottomSheet();
-                        }
-                    });
-                });
-    }
-
-    private void processarSelecaoOrigem(Address endereco) {
-        enderecoOrigem = endereco;
-        aplicarEnderecoOrigemNaUI(endereco);
-        atualizarVisibilidadeComponentesCondicionais();
-        configurarCartaoValorFinal();
-        if (enderecoDestino != null) {
-            iniciarCalculoRota();
-        }
-    }
-
-    private void processarSelecaoDestino(Address endereco) {
-        enderecoDestino = endereco;
-
-        if (enderecoOrigem != null) {
-            iniciarCalculoRota();
-        }
-    }
-
-    private void configurarComportamentoBottomSheet(View view) {
-        FrameLayout container = view.findViewById(R.id.localizacao_bottom_sheet_container);
-        if (container != null) {
-            bottomSheetLocalizacao = BottomSheetBehavior.from(container);
-            definirEstadoBottomSheet(BottomSheetBehavior.STATE_HIDDEN);
-        }
-    }
-
-    private void configurarRecyclerViewLocalizacoes() {
-        Optional.ofNullable(recyclerLocalizacoes).ifPresent(rv -> {
-            adaptadorLocalizacoes = new LocationAdapter(enderecos, this::processarSelecaoEndereco);
-            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-            rv.setAdapter(adaptadorLocalizacoes);
-        });
-    }
-
-    private void configurarRecyclerViewRecomendacoes() {
-        Optional.ofNullable(recyclerRecomendacoes).ifPresent(rv -> {
-            adaptadorRecomendacoes = new RecomendacaoAdapter(new ArrayList<>());
-            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-            rv.setAdapter(adaptadorRecomendacoes);
-        });
-    }
-
-    private void configurarCliqueCartaoAdicionarLocalizacao() {
-        Optional.ofNullable(cardAddLocalizacao).ifPresent(cartao ->
-                cartao.setOnClickListener(v -> expandirBottomSheet()));
-    }
-
-    private void configurarComportamentoCampoOrigem() {
-        if (inputOrigem == null || layoutOrigem == null) return;
-
-        configurarTratamentoFocoCampoOrigem();
-        configurarBuscaCampoOrigem();
-        configurarBotaoLimparCampoOrigem();
-    }
-
-    private void configurarTratamentoFocoCampoOrigem() {
-        Optional.ofNullable(inputOrigem).ifPresent(campo ->
-                campo.setOnFocusChangeListener((v, temFoco) -> processarMudancaFocoCampoOrigem(temFoco)));
-    }
-
-    private void processarMudancaFocoCampoOrigem(boolean temFoco) {
-        definirEstadoBottomSheet(temFoco ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_HIDDEN);
-        definirVisibilidadeCursorCampoOrigem(temFoco);
-    }
-
-    @SuppressLint("PrivateResource")
-    private void configurarBotaoLimparCampoOrigem() {
-        Optional.ofNullable(layoutOrigem).ifPresent(layout -> {
-            layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-            layout.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
-            definirVisibilidadeBotaoLimparCampoOrigem(false);
-            layout.setEndIconOnClickListener(v -> resetarEnderecoOrigem());
-        });
-    }
-
-    private void configurarBuscaCampoOrigem() {
-        Optional.ofNullable(inputOrigem).ifPresent(campo ->
-                campo.addTextChangedListener(new SearchWatcher(this::realizarBuscaEndereco)));
-    }
-
-    private void configurarComportamentoCampoDestino() {
-        Optional.ofNullable(inputDestino).ifPresent(campo -> {
-            campo.setHint(LOCALIZACAO_PADRAO);
-            campo.setEnabled(false);
-            campo.setCursorVisible(false);
-        });
-    }
-
-    private void configurarCartaoValorFinal() {
-        boolean temOrigem = enderecoOrigem != null;
-        boolean temDestino = enderecoDestino != null;
-        boolean temRotaCompleta = temOrigem && temDestino;
-        boolean temDistancia = distancia > 0;
-        boolean temRecomendacoes = !recomendacoes.isEmpty();
-
-        definirVisibilidadeView(cardOrigemRota, temOrigem ? View.VISIBLE : View.GONE);
-        definirVisibilidadeView(cardDestinoRota, temDestino ? View.VISIBLE : View.GONE);
-        definirVisibilidadeView(containerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
-
-        definirVisibilidadeView(cardContainerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
-
-        if (temRotaCompleta && temDistancia) {
-            atualizarTextoDistancia(textValorDistanciaInside, distancia);
-            definirVisibilidadeView(cardDistanciaInside, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardDistanciaInside, View.GONE);
-        }
-
-        if (temDistancia && !temRotaCompleta) {
-            atualizarTextoDistancia(textValorDistanciaOutside, distancia);
-            definirVisibilidadeView(cardDistanciaOutside, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardDistanciaOutside, View.GONE);
-        }
-
-        if (temOrigem) {
-            processarEnderecoCartaoFinal(enderecoOrigem, textValorOrigem);
-        }
-        if (temDestino) {
-            processarEnderecoCartaoFinal(enderecoDestino, textValorDestino);
-        }
-
-        if (temDistancia && temRecomendacoes) {
-            BigDecimal valorFrete = calcularValorFreteTotal();
-            BigDecimal valorTotalBezerro = obterValorTotalBezerro();
-            BigDecimal valorTotalComFrete = valorTotalBezerro.add(valorFrete);
-
-            definirValorTextView(textValorFrete, formatarParaMoeda(valorFrete));
-            definirValorTextView(textValorTotal, formatarParaMoeda(valorTotalBezerro));
-            definirValorTextView(textValorTotalFinal, formatarParaMoeda(valorTotalComFrete));
-
-            calcularValorFinalPorKg(valorTotalComFrete,
-                    converterInteiroDeInput(inputQuantidadeAnimais),
-                    converterDecimalDeInput(inputPesoAnimal),
-                    textValorFinalPorKg);
-
-            definirVisibilidadeView(cardValorFinal, View.VISIBLE);
-            definirVisibilidadeView(buttonEnviarDoc, View.VISIBLE);
-        } else {
-            definirVisibilidadeView(cardValorFinal, View.GONE);
-            definirVisibilidadeView(buttonEnviarDoc, View.GONE);
-        }
-    }
-
-    private void atualizarTextoDistancia(TextView textView, double distancia) {
-        if (textView != null) {
-            String texto = String.format(Locale.getDefault(), "%.2f km", distancia);
-            textView.setText(texto);
-        }
-    }
-
-    private void calcularValorFinalPorKg(BigDecimal valorTotal, Integer quantidade, BigDecimal pesoAnimal, TextView textView) {
-        if (textView == null || valorTotal == null || quantidade == null || pesoAnimal == null) {
-            return;
-        }
-
-        if (valorTotal.compareTo(BigDecimal.ZERO) <= 0 || quantidade <= 0 || pesoAnimal.compareTo(BigDecimal.ZERO) <= 0) {
-            definirValorTextView(textView, formatarParaMoeda(BigDecimal.ZERO));
-            return;
-        }
-
-        BigDecimal quantidadeBD = new BigDecimal(quantidade);
-        BigDecimal pesoTotal = quantidadeBD.multiply(pesoAnimal);
-        BigDecimal resultado = valorTotal.divide(pesoTotal, ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
-
-        definirValorTextView(textView, formatarParaMoeda(resultado));
-    }
-
-    private void processarEnderecoCartaoFinal(Address endereco, TextView campoTexto) {
-        Optional.ofNullable(endereco).ifPresent(e -> campoTexto.setText(format(e)));
-    }
+    // =================================================================
+    // SEÇÃO 9: LÓGICA DE NEGÓCIO - CÁLCULO DE FRETE
+    // =================================================================
 
     private BigDecimal calcularValorFreteTotal() {
         if (recomendacoes.isEmpty() || distancia <= 0) {
@@ -1323,45 +1081,18 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         }
     }
 
-    private void processarSelecaoEndereco(Address endereco) {
-        if (!estaFragmentoAtivo()) return;
+    // =================================================================
+    // SEÇÃO 10: GEOLOCALIZAÇÃO E ENDEREÇOS
+    // =================================================================
 
-        enderecoOrigem = endereco;
-        notificarEnderecoOrigemSelecionado(endereco);
-        aplicarEnderecoOrigemNaUI(endereco);
-        colapsarBottomSheet();
-        atualizarVisibilidadeComponentesCondicionais();
-        configurarCartaoValorFinal();
-        if (enderecoDestino != null) {
-            iniciarCalculoRota();
+    @Override
+    public List<Address> search(String consulta) {
+        try {
+            List<Address> resultados = geocodificador.getFromLocationName(consulta, MAX_RESULTADOS_BUSCA);
+            return resultados != null ? resultados : new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<>();
         }
-    }
-
-    private void inicializarDestinoPadrao() {
-        realizarGeocodificacao(LOCALIZACAO_PADRAO, null,
-                this::tratarResultadoDestinoPadrao,
-                this::exibirMensagemErro);
-    }
-
-    private void tratarResultadoDestinoPadrao(List<Address> enderecos) {
-        enderecoDestino = first(enderecos);
-        notificarEnderecoDestinoSelecionado(enderecoDestino);
-    }
-
-    private void resetarEnderecoOrigem() {
-        enderecoOrigem = null;
-        distancia = 0;
-        limparEstadoCampoOrigem();
-        atualizarVisibilidadeComponentesCondicionais();
-        configurarCartaoValorFinal();
-    }
-
-    private void limparEstadoCampoOrigem() {
-        definirTextoCampoOrigem("");
-        definirDicaCampoOrigem(getString(R.string.rotulo_endereco_origem));
-        definirCampoOrigemHabilitado(true);
-        definirCampoOrigemFocavel(true);
-        definirVisibilidadeBotaoLimparCampoOrigem(false);
     }
 
     private void realizarBuscaEndereco(String consulta) {
@@ -1478,6 +1209,111 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         });
     }
 
+    private void processarSelecaoEndereco(Address endereco) {
+        if (!estaFragmentoAtivo()) return;
+
+        enderecoOrigem = endereco;
+        notificarEnderecoOrigemSelecionado(endereco);
+        aplicarEnderecoOrigemNaUI(endereco);
+        colapsarBottomSheet();
+        atualizarVisibilidadeComponentesCondicionais();
+        configurarCartaoValorFinal();
+        if (enderecoDestino != null) {
+            iniciarCalculoRota();
+        }
+    }
+
+    private void inicializarDestinoPadrao() {
+        realizarGeocodificacao(LOCALIZACAO_PADRAO, null,
+                this::tratarResultadoDestinoPadrao,
+                this::exibirMensagemErro);
+    }
+
+    private void tratarResultadoDestinoPadrao(List<Address> enderecos) {
+        enderecoDestino = first(enderecos);
+        notificarEnderecoDestinoSelecionado(enderecoDestino);
+    }
+
+    private void resetarEnderecoOrigem() {
+        enderecoOrigem = null;
+        distancia = 0;
+        limparEstadoCampoOrigem();
+        atualizarVisibilidadeComponentesCondicionais();
+        configurarCartaoValorFinal();
+    }
+
+    private void limparEstadoCampoOrigem() {
+        definirTextoCampoOrigem("");
+        definirDicaCampoOrigem(getString(R.string.rotulo_endereco_origem));
+        definirCampoOrigemHabilitado(true);
+        definirCampoOrigemFocavel(true);
+        definirVisibilidadeBotaoLimparCampoOrigem(false);
+    }
+
+    private void solicitarPermissoesLocalizacao() {
+        if (getContext() != null) {
+            locationPermissionProvider.request(permissionLauncher, requireContext());
+        }
+    }
+
+    private void processarResultadoPermissoes(Map<String, Boolean> resultados) {
+        locationPermissionProvider.onResult(
+                resultados,
+                true,
+                this::obterLocalizacaoUsuario,
+                this::exibirMensagemPermissaoNegada
+        );
+
+        storagePermissionProvider.onResult(
+                resultados,
+                true,
+                () -> {},
+                this::exibirMensagemPermissaoNegada
+        );
+    }
+
+    @RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    private void obterLocalizacaoUsuario() {
+        if (getContext() == null) return;
+
+        if (!locationPermissionProvider.isGranted(requireContext())) {
+            return;
+        }
+
+        try {
+            clienteLocalizacao.getLastLocation()
+                    .addOnSuccessListener(requireActivity(), this::tratarResultadoLocalizacaoUsuario);
+        } catch (SecurityException e) {
+            exibirMensagemErro(R.string.erro_permissao_negada);
+        }
+    }
+
+    private void tratarResultadoLocalizacaoUsuario(Location localizacao) {
+        if (localizacao == null || !estaFragmentoAtivo()) return;
+
+        realizarGeocodificacaoReversa(localizacao.getLatitude(), localizacao.getLongitude(),
+                this::extrairPaisUsuarioDaLocalizacao,
+                this::exibirMensagemErro);
+    }
+
+    private void extrairPaisUsuarioDaLocalizacao(List<Address> enderecos) {
+        codigoPaisUsuario = code(first(enderecos));
+    }
+
+    private void exibirMensagemPermissaoNegada() {
+        if (!estaFragmentoAtivo()) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.erro_titulo_permissao_negada)
+                .setMessage(R.string.erro_permissao_negada)
+                .setPositiveButton(R.string.btn_ok, (dialogo, qual) -> dialogo.dismiss())
+                .show();
+    }
+
+    // =================================================================
+    // SEÇÃO 11: CÁLCULO DE ROTAS E DISTÂNCIAS
+    // =================================================================
+
     private void iniciarCalculoRota() {
         if (!podeCalcularRota()) return;
         if (!estaCalculandoRota.compareAndSet(false, true)) return;
@@ -1574,23 +1410,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         });
     }
 
-    private void configurarBotoesAjusteDistancia() {
-        configurarBotaoDistanciaFixa(btnAdd5Km, 5);
-        configurarBotaoDistanciaFixa(btnAdd10Km, 10);
-        configurarBotaoDistanciaFixa(btnAdd20Km, 20);
-        configurarBotaoDistanciaPersonalizada();
-    }
-
-    private void configurarBotaoDistanciaFixa(Button botao, double quilometros) {
-        Optional.ofNullable(botao).ifPresent(btn ->
-                btn.setOnClickListener(v -> ajustarDistanciaPor(quilometros)));
-    }
-
-    private void configurarBotaoDistanciaPersonalizada() {
-        Optional.ofNullable(btnConfirmarAjuste).ifPresent(botao ->
-                botao.setOnClickListener(v -> aplicarAjusteDistanciaPersonalizado()));
-    }
-
     @SuppressLint("StringFormatMatches")
     private void ajustarDistanciaPor(double quilometros) {
         if (quilometros <= 0) return;
@@ -1622,37 +1441,525 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         }
     }
 
-    private void solicitarPermissoesLocalizacao() {
-        locationPermissionProvider.request(permissions, requireContext());
+    private void configurarBotaoDistanciaFixa(Button botao, double quilometros) {
+        Optional.ofNullable(botao).ifPresent(btn ->
+                btn.setOnClickListener(v -> ajustarDistanciaPor(quilometros)));
     }
 
-    private void processarResultadoPermissoes(Map<String, Boolean> resultados) {
-        locationPermissionProvider.onResult(
-                resultados,
-                true,
-                this::obterLocalizacaoUsuario,
-                this::exibirMensagemPermissaoNegada
-        );
-
-        storagePermissionProvider.onResult(
-                resultados,
-                true,
-                () -> {},
-                this::exibirMensagemPermissaoNegada
-        );
+    private void configurarBotaoDistanciaPersonalizada() {
+        Optional.ofNullable(btnConfirmarAjuste).ifPresent(botao ->
+                botao.setOnClickListener(v -> aplicarAjusteDistanciaPersonalizado()));
     }
 
-    @RequiresPermission(allOf = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    })
-    private void obterLocalizacaoUsuario() {
-        if (locationPermissionProvider.isGranted(requireContext())) {
-            clienteLocalizacao.getLastLocation()
-                    .addOnSuccessListener(requireActivity(), this::tratarResultadoLocalizacaoUsuario);
+    private void configurarBotoesAjusteDistancia() {
+        configurarBotaoDistanciaFixa(btnAdd5Km, 5);
+        configurarBotaoDistanciaFixa(btnAdd10Km, 10);
+        configurarBotaoDistanciaFixa(btnAdd20Km, 20);
+        configurarBotaoDistanciaPersonalizada();
+    }
+
+    // =================================================================
+    // SEÇÃO 12: CONFIGURAÇÃO DE COMPONENTES UI
+    // =================================================================
+
+    private void configurarSelecaoCategoria() {
+        Optional.ofNullable(autoCompleteCategoria).ifPresent(autoComplete ->
+                autoComplete.setOnItemClickListener((parent, view, posicao, id) -> {
+                    if (ehPosicaoCategoriaValida(posicao)) {
+                        processarSelecaoCategoria(posicao);
+                    }
+                }));
+    }
+
+    private boolean ehPosicaoCategoriaValida(int posicao) {
+        return posicao >= 0 && posicao < categorias.size();
+    }
+
+    private void processarSelecaoCategoria(int posicao) {
+        categoriaAtual = categorias.get(posicao);
+        atualizarTextoAutoCompleteCategoria(categoriaAtual.getDescricao());
+        atualizarVisibilidadeComponentesCondicionais();
+        atualizarRecomendacoesVeiculos();
+        configurarCartaoValorFinal();
+    }
+
+    private void atualizarTextoAutoCompleteCategoria(String descricao) {
+        Optional.ofNullable(autoCompleteCategoria)
+                .ifPresent(autoComplete -> autoComplete.setText(descricao, false));
+    }
+
+    private void anexarOuvintesCalculo() {
+        anexarOuvinteInput(inputPrecoArroba, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputPesoAnimal, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputQuantidadeAnimais, this::processarMudancaQuantidade);
+        anexarOuvinteInput(inputPercentualAgio, this::realizarCalculoBezerro);
+
+    }
+
+    private void processarMudancaQuantidade() {
+        realizarCalculoBezerro();
+        atualizarRecomendacoesVeiculos();
+        atualizarVisibilidadeComponentesCondicionais();
+        configurarCartaoValorFinal();
+    }
+
+    private void anexarOuvinteInput(TextInputEditText campo, Runnable acao) {
+        Optional.ofNullable(campo).ifPresent(c -> c.addTextChangedListener(new InputWatchers(acao)));
+    }
+
+    private void configurarComportamentoBottomSheet(View view) {
+        FrameLayout container = view.findViewById(R.id.localizacao_bottom_sheet_container);
+        if (container != null) {
+            bottomSheetLocalizacao = BottomSheetBehavior.from(container);
+            definirEstadoBottomSheet(BottomSheetBehavior.STATE_HIDDEN);
         }
     }
 
+    private void configurarRecyclerViewLocalizacoes() {
+        Optional.ofNullable(recyclerLocalizacoes).ifPresent(rv -> {
+            adaptadorLocalizacoes = new LocationAdapter(enderecos, this::processarSelecaoEndereco);
+            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rv.setAdapter(adaptadorLocalizacoes);
+        });
+    }
+
+    private void configurarRecyclerViewRecomendacoes() {
+        Optional.ofNullable(recyclerRecomendacoes).ifPresent(rv -> {
+            adaptadorRecomendacoes = new RecomendacaoAdapter(new ArrayList<>());
+            rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rv.setAdapter(adaptadorRecomendacoes);
+        });
+    }
+
+    private void configurarCliqueCartaoAdicionarLocalizacao() {
+        Optional.ofNullable(cardAddLocalizacao).ifPresent(cartao ->
+                cartao.setOnClickListener(v -> expandirBottomSheet()));
+    }
+
+    private void configurarComportamentoCampoOrigem() {
+        if (inputOrigem == null || layoutOrigem == null) return;
+
+        configurarTratamentoFocoCampoOrigem();
+        configurarBuscaCampoOrigem();
+        configurarBotaoLimparCampoOrigem();
+    }
+
+    private void configurarTratamentoFocoCampoOrigem() {
+        Optional.ofNullable(inputOrigem).ifPresent(campo ->
+                campo.setOnFocusChangeListener((v, temFoco) -> processarMudancaFocoCampoOrigem(temFoco)));
+    }
+
+    private void processarMudancaFocoCampoOrigem(boolean temFoco) {
+        definirEstadoBottomSheet(temFoco ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_HIDDEN);
+        definirVisibilidadeCursorCampoOrigem(temFoco);
+    }
+
+    @SuppressLint("PrivateResource")
+    private void configurarBotaoLimparCampoOrigem() {
+        Optional.ofNullable(layoutOrigem).ifPresent(layout -> {
+            layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            layout.setEndIconDrawable(com.google.android.material.R.drawable.mtrl_ic_cancel);
+            definirVisibilidadeBotaoLimparCampoOrigem(false);
+            layout.setEndIconOnClickListener(v -> resetarEnderecoOrigem());
+        });
+    }
+
+    private void configurarBuscaCampoOrigem() {
+        Optional.ofNullable(inputOrigem).ifPresent(campo ->
+                campo.addTextChangedListener(new SearchWatcher(this::realizarBuscaEndereco)));
+    }
+
+    private void configurarComportamentoCampoDestino() {
+        Optional.ofNullable(inputDestino).ifPresent(campo -> {
+            campo.setHint(LOCALIZACAO_PADRAO);
+            campo.setEnabled(false);
+            campo.setCursorVisible(false);
+        });
+    }
+
+    private void configurarNavegacaoFragmentoLocalizacao() {
+        Optional.ofNullable(btnLocalizacao).ifPresent(botao ->
+                botao.setOnClickListener(v -> navegarParaDetalhesLocalizacao()));
+    }
+
+    private void navegarParaDetalhesLocalizacao() {
+        if (!podeNavegarParaLocalizacao()) return;
+
+        estaNavegando.set(true);
+        LocationFragment fragmento = LocationFragment.newInstance(enderecoOrigem, enderecoDestino);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view, fragmento)
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
+
+    private boolean podeNavegarParaLocalizacao() {
+        return estaFragmentoAtivo()
+                && possuiEnderecosRotaValidos()
+                && !estaNavegando.get();
+    }
+
+    // =================================================================
+    // SEÇÃO 13: ATUALIZAÇÃO DE UI E VISIBILIDADE
+    // =================================================================
+
+    private void sincronizarUIComEstado() {
+        if (!estaFragmentoAtivo()) return;
+
+        if (enderecoOrigem != null) {
+            aplicarEnderecoOrigemNaUI(enderecoOrigem);
+            atualizarVisibilidadeComponentesCondicionais();
+        }
+
+        limparTodosFocosInput();
+    }
+
+    private void limparTodosFocosInput() {
+        limparFocoCampoOrigem();
+        limparFocoCampoDestino();
+    }
+
+    private void atualizarVisibilidadeComponentesCondicionais() {
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+        boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
+        boolean temCategoria = categoriaAtual != null;
+        boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
+
+        // Validação dos campos do bezerro
+        BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+        BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+        boolean todosOsCamposBezerroPreenchidos = saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade) && temCategoria;
+
+        boolean podeExibirComponentesRota = temQuantidadeValida && temCategoria;
+        atualizarVisibilidadeCartaoAdicionarLocalizacao(podeExibirComponentesRota);
+        definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
+
+        // Só pode calcular valor final se todos os campos do bezerro estiverem preenchidos
+        boolean podeCalcularValorFinal = (temEndereco || distancia > 0) && todosOsCamposBezerroPreenchidos;
+        atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
+    }
+
+    private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
+        if (cardAddLocalizacao == null && getView() != null) {
+            cardAddLocalizacao = getView().findViewById(R.id.adicionar_localizacao_card);
+            if (cardAddLocalizacao != null) {
+                configurarCliqueCartaoAdicionarLocalizacao();
+            }
+        }
+
+        if (cardAddLocalizacao == null) {
+            return;
+        }
+        definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
+    }
+
+    private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
+        int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
+        definirVisibilidadeView(cardContainerRota, visibilidade);
+    }
+
+    private void configurarCartaoValorFinal() {
+        BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+        BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+        boolean todosOsCamposBezerroPreenchidos = saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade) && categoriaAtual != null;
+
+        // Se os campos não estiverem preenchidos, esconde tudo e retorna
+        if (!todosOsCamposBezerroPreenchidos) {
+            definirVisibilidadeView(cardContainerRota, View.GONE);
+            definirVisibilidadeView(cardValorFinal, View.GONE);
+            definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+            definirVisibilidadeView(cardDistanciaOutside, View.GONE);
+            return;
+        }
+
+        boolean temOrigem = enderecoOrigem != null;
+        boolean temDestino = enderecoDestino != null;
+        boolean temRotaCompleta = temOrigem && temDestino;
+        boolean temDistancia = distancia > 0;
+        boolean temRecomendacoes = !recomendacoes.isEmpty();
+
+        definirVisibilidadeView(cardOrigemRota, temOrigem ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(cardDestinoRota, temDestino ? View.VISIBLE : View.GONE);
+        definirVisibilidadeView(containerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
+
+        definirVisibilidadeView(cardContainerRota, temRotaCompleta ? View.VISIBLE : View.GONE);
+
+        if (temRotaCompleta && temDistancia) {
+            atualizarTextoDistancia(textValorDistanciaInside, distancia);
+            definirVisibilidadeView(cardDistanciaInside, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDistanciaInside, View.GONE);
+        }
+
+        if (temDistancia && !temRotaCompleta) {
+            atualizarTextoDistancia(textValorDistanciaOutside, distancia);
+            definirVisibilidadeView(cardDistanciaOutside, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardDistanciaOutside, View.GONE);
+        }
+
+        if (temOrigem) {
+            processarEnderecoCartaoFinal(enderecoOrigem, textValorOrigem);
+        }
+        if (temDestino) {
+            processarEnderecoCartaoFinal(enderecoDestino, textValorDestino);
+        }
+
+        if (temDistancia && temRecomendacoes) {
+            BigDecimal valorFrete = calcularValorFreteTotal();
+            BigDecimal valorTotalBezerro = obterValorTotalBezerro();
+            BigDecimal valorTotalComFrete = valorTotalBezerro.add(valorFrete);
+
+            definirValorTextView(textValorFrete, formatarParaMoeda(valorFrete));
+            definirValorTextView(textValorTotal, formatarParaMoeda(valorTotalBezerro));
+            definirValorTextView(textValorTotalFinal, formatarParaMoeda(valorTotalComFrete));
+
+            calcularValorFinalPorKg(valorTotalComFrete,
+                    quantidade,
+                    pesoAnimal,
+                    textValorFinalPorKg);
+
+            definirVisibilidadeView(cardValorFinal, View.VISIBLE);
+            definirVisibilidadeView(buttonEnviarDoc, View.VISIBLE);
+        } else {
+            definirVisibilidadeView(cardValorFinal, View.GONE);
+            definirVisibilidadeView(buttonEnviarDoc, View.GONE);
+        }
+    }
+
+    private void atualizarTextoDistancia(TextView textView, double distancia) {
+        if (textView != null) {
+            String texto = String.format(Locale.getDefault(), "%.2f km", distancia);
+            textView.setText(texto);
+        }
+    }
+
+    private void calcularValorFinalPorKg(BigDecimal valorTotal, Integer quantidade, BigDecimal pesoAnimal, TextView textView) {
+        if (textView == null || valorTotal == null || quantidade == null || pesoAnimal == null) {
+            return;
+        }
+
+        if (valorTotal.compareTo(BigDecimal.ZERO) <= 0 || quantidade <= 0 || pesoAnimal.compareTo(BigDecimal.ZERO) <= 0) {
+            definirValorTextView(textView, formatarParaMoeda(BigDecimal.ZERO));
+            return;
+        }
+
+        BigDecimal quantidadeBD = new BigDecimal(quantidade);
+        BigDecimal pesoTotal = quantidadeBD.multiply(pesoAnimal);
+        BigDecimal resultado = valorTotal.divide(pesoTotal, ESCALA_RESULTADO, MODO_ARREDONDAMENTO);
+
+        definirValorTextView(textView, formatarParaMoeda(resultado));
+    }
+
+    private void processarEnderecoCartaoFinal(Address endereco, TextView campoTexto) {
+        Optional.ofNullable(endereco).ifPresent(e -> campoTexto.setText(format(e)));
+    }
+
+    private void aplicarEnderecoOrigemNaUI(Address endereco) {
+        if (!estaFragmentoAtivo()) return;
+
+        definirTextoCampoOrigem(format(endereco));
+        definirCampoOrigemHabilitado(false);
+        definirCampoOrigemFocavel(false);
+        definirVisibilidadeCursorCampoOrigem(false);
+        definirVisibilidadeBotaoLimparCampoOrigem(true);
+        limparFocoCampoOrigem();
+    }
+
+    // =================================================================
+    // SEÇÃO 14: NAVEGAÇÃO E COMUNICAÇÃO ENTRE FRAGMENTS
+    // =================================================================
+
+    private void registrarOuvintesResultadoFragment() {
+        registrarOuvinteResultadoOrigem();
+        registrarOuvinteResultadoDestino();
+        registrarOuvinteAtualizarOrigem();
+    }
+
+    private void registrarOuvinteResultadoOrigem() {
+        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_ORIGEM, this,
+                (chaveRequisicao, bundle) -> {
+                    if (!estaFragmentoAtivo() || getView() == null) return;
+
+                    extrairEnderecoDoBundle(bundle, CHAVE_ORIGEM).ifPresent(endereco -> {
+                        if (estaFragmentoAtivo() && getView() != null) {
+                            processarSelecaoOrigem(endereco);
+                        }
+                    });
+                });
+    }
+
+    private void registrarOuvinteResultadoDestino() {
+        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_DESTINO, this,
+                (chaveRequisicao, bundle) -> {
+                    if (!estaFragmentoAtivo() || getView() == null) return;
+
+                    extrairEnderecoDoBundle(bundle, CHAVE_DESTINO).ifPresent(endereco -> {
+                        if (estaFragmentoAtivo() && getView() != null) {
+                            processarSelecaoDestino(endereco);
+                        }
+                    });
+                });
+    }
+
+    private void registrarOuvinteAtualizarOrigem() {
+        getParentFragmentManager().setFragmentResultListener(RESULTADO_CHAVE_ATUALIZAR_ORIGEM, this,
+                (chaveRequisicao, bundle) -> {
+                    if (!estaFragmentoAtivo() || getView() == null) return;
+                    boolean deveExpandir = bundle.getBoolean(CHAVE_ATUALIZAR_ORIGEM, false);
+                    if (deveExpandir) getView().post(() -> {
+                        if (estaFragmentoAtivo() && bottomSheetLocalizacao != null) {
+                            expandirBottomSheet();
+                        }
+                    });
+                });
+    }
+
+    private void processarSelecaoOrigem(Address endereco) {
+        enderecoOrigem = endereco;
+        aplicarEnderecoOrigemNaUI(endereco);
+        atualizarVisibilidadeComponentesCondicionais();
+        configurarCartaoValorFinal();
+        if (enderecoDestino != null) {
+            iniciarCalculoRota();
+        }
+    }
+
+    private void processarSelecaoDestino(Address endereco) {
+        enderecoDestino = endereco;
+
+        if (enderecoOrigem != null) {
+            iniciarCalculoRota();
+        }
+    }
+
+    private void notificarEnderecoOrigemSelecionado(Address endereco) {
+        iniciarCalculoRota();
+        publicarResultadoFragment(RESULTADO_CHAVE_ORIGEM, CHAVE_ORIGEM, endereco);
+    }
+
+    private void notificarEnderecoDestinoSelecionado(Address endereco) {
+        publicarResultadoFragment(RESULTADO_CHAVE_DESTINO, CHAVE_DESTINO, endereco);
+    }
+
+    private void publicarResultadoFragment(String chaveResultado, String chavePacote, Address endereco) {
+        Bundle pacote = new Bundle();
+        pacote.putParcelable(chavePacote, endereco);
+        getParentFragmentManager().setFragmentResult(chaveResultado, pacote);
+    }
+
+    // =================================================================
+    // SEÇÃO 15: PERMISSÕES E SERVIÇOS DE SISTEMA
+    // =================================================================
+
+    private void checkPermissions() {
+        if (needsPermissions()) {
+            showPermissionsDialog();
+        }
+    }
+
+    private boolean needsPermissions() {
+        if (getContext() == null) return false;
+        for (String permission : PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(requireContext(), permission) != PERMISSION_GRANTED) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void requestPermissions() {
+        permissionLauncher.launch(PERMISSIONS);
+    }
+
+    private void handlePermissionsResult(Map<String, Boolean> result) {
+        if (!allGranted(result)) {
+            if (shouldRetry(result)) {
+                showRetryDialog();
+            } else {
+                showSettingsDialog();
+            }
+        }
+    }
+
+    private boolean allGranted(Map<String, Boolean> result) {
+        for (Boolean granted : result.values()) {
+            if (!granted) return false;
+        }
+        return true;
+    }
+
+    private boolean shouldRetry(Map<String, Boolean> result) {
+        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+            if (!entry.getValue() && shouldShowRequestPermissionRationale(entry.getKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showPermissionsDialog() {
+        showDialog(
+                R.string.titulo_permissions,
+                R.string.info_permissions_message,
+                R.string.btn_ok,
+                this::requestPermissions,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showRetryDialog() {
+        showDialog(
+                R.string.titulo_permissions_denied,
+                R.string.info_permissions_denied,
+                R.string.btn_ok,
+                this::requestPermissions,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showSettingsDialog() {
+        showDialog(
+                R.string.titulo_permissions_required,
+                R.string.info_permissions_permanently_denied,
+                R.string.btn_settings,
+                this::openSettings,
+                R.string.btn_cancelar,
+                this::close
+        );
+    }
+
+    private void showDialog(int title, int message, int positive, Runnable onPositive, int negative, Runnable onNegative) {
+        if (getContext() == null) return;
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positive, (d, w) -> onPositive.run())
+                .setNegativeButton(negative, (d, w) -> onNegative.run())
+                .setCancelable(false)
+                .show();
+    }
+
+    private void openSettings() {
+        settingsOpened = true;
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", requireContext().getPackageName(), null));
+        startActivity(intent);
+    }
+
+    private void close() {
+        requireActivity().finish();
+    }
+
+    // =================================================================
+    // SEÇÃO 16: GERAÇÃO DE PDF E COMPARTILHAMENTO
+    // =================================================================
 
     private boolean gerarPdfComDadosReais() {
         try {
@@ -1710,179 +2017,10 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             return false;
         }
     }
-    private void tratarResultadoLocalizacaoUsuario(Location localizacao) {
-        if (localizacao == null || !estaFragmentoAtivo()) return;
 
-        realizarGeocodificacaoReversa(localizacao.getLatitude(), localizacao.getLongitude(),
-                this::extrairPaisUsuarioDaLocalizacao,
-                this::exibirMensagemErro);
-    }
-
-    private void extrairPaisUsuarioDaLocalizacao(List<Address> enderecos) {
-        codigoPaisUsuario = code(first(enderecos));
-    }
-
-    private void exibirMensagemPermissaoNegada() {
-        if (!estaFragmentoAtivo()) return;
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.erro_titulo_permissao_negada)
-                .setMessage(R.string.erro_permissao_negada)
-                .setPositiveButton(R.string.btn_ok, (dialogo, qual) -> dialogo.dismiss())
-                .show();
-    }
-
-    private void configurarNavegacaoFragmentoLocalizacao() {
-        Optional.ofNullable(btnLocalizacao).ifPresent(botao ->
-                botao.setOnClickListener(v -> navegarParaDetalhesLocalizacao()));
-    }
-
-    private void navegarParaDetalhesLocalizacao() {
-        if (!podeNavegarParaLocalizacao()) return;
-
-        estaNavegando.set(true);
-        LocationFragment fragmento = LocationFragment.newInstance(enderecoOrigem, enderecoDestino);
-
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container_view, fragmento)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
-    }
-
-    private boolean podeNavegarParaLocalizacao() {
-        return estaFragmentoAtivo()
-                && possuiEnderecosRotaValidos()
-                && !estaNavegando.get();
-    }
-
-    private void aplicarEnderecoOrigemNaUI(Address endereco) {
-        if (!estaFragmentoAtivo()) return;
-
-        definirTextoCampoOrigem(format(endereco));
-        definirCampoOrigemHabilitado(false);
-        definirCampoOrigemFocavel(false);
-        definirVisibilidadeCursorCampoOrigem(false);
-        definirVisibilidadeBotaoLimparCampoOrigem(true);
-        limparFocoCampoOrigem();
-    }
-
-    private void sincronizarUIComEstado() {
-        if (!estaFragmentoAtivo()) return;
-
-        if (enderecoOrigem != null) {
-            aplicarEnderecoOrigemNaUI(enderecoOrigem);
-            atualizarVisibilidadeComponentesCondicionais();
-        }
-
-        limparTodosFocosInput();
-    }
-
-    private void limparTodosFocosInput() {
-        limparFocoCampoOrigem();
-        limparFocoCampoDestino();
-    }
-
-    private void atualizarVisibilidadeComponentesCondicionais() {
-        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
-        boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
-        boolean temCategoria = categoriaAtual != null;
-        boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
-
-        boolean podeExibirComponentesRota = temQuantidadeValida && temCategoria;
-        atualizarVisibilidadeCartaoAdicionarLocalizacao(podeExibirComponentesRota);
-        definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
-        definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
-        boolean podeCalcularValorFinal = (temEndereco || distancia > 0);
-        atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
-    }
-
-    private void atualizarVisibilidadeCartaoAdicionarLocalizacao(boolean deveExibir) {
-        if (cardAddLocalizacao == null && getView() != null) {
-            cardAddLocalizacao = getView().findViewById(R.id.adicionar_localizacao_card);
-            if (cardAddLocalizacao != null) {
-                configurarCliqueCartaoAdicionarLocalizacao();
-            }
-        }
-
-        if (cardAddLocalizacao == null) {
-            return;
-        }
-        definirVisibilidadeView(cardAddLocalizacao, deveExibir ? View.VISIBLE : View.GONE);
-    }
-
-
-    private void atualizarVisibilidadeCartaoValorFinal(boolean deveExibir) {
-        int visibilidade = deveExibir ? View.VISIBLE : View.GONE;
-        definirVisibilidadeView(cardContainerRota, visibilidade);
-    }
-
-    private BigDecimal converterDecimalDeInput(TextInputEditText campo) {
-        return Optional.ofNullable(campo)
-                .map(TextInputEditText::getText)
-                .map(Object::toString)
-                .map(String::trim)
-                .filter(texto -> !texto.isEmpty())
-                .flatMap(this::analisarDecimalSeguro)
-                .orElse(null);
-    }
-
-    private Optional<BigDecimal> analisarDecimalSeguro(String valor) {
-        try {
-            BigDecimal analisado = new BigDecimal(valor);
-            return analisado.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(analisado) : Optional.empty();
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    private Integer converterInteiroDeInput(TextInputEditText campo) {
-        return Optional.ofNullable(campo)
-                .map(TextInputEditText::getText)
-                .map(Object::toString)
-                .map(String::trim)
-                .filter(texto -> !texto.isEmpty())
-                .flatMap(this::analisarInteiroSeguro)
-                .orElse(null);
-    }
-
-    private Optional<Integer> analisarInteiroSeguro(String valor) {
-        try {
-            int analisado = Integer.parseInt(valor);
-            return analisado > 0 ? Optional.of(analisado) : Optional.empty();
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    private Optional<Address> extrairEnderecoDoBundle(Bundle pacote, String chave) {
-        return Optional.ofNullable(pacote.getParcelable(chave, Address.class));
-    }
-
-    private void notificarEnderecoOrigemSelecionado(Address endereco) {
-        iniciarCalculoRota();
-        publicarResultadoFragment(RESULTADO_CHAVE_ORIGEM, CHAVE_ORIGEM, endereco);
-    }
-
-    private void notificarEnderecoDestinoSelecionado(Address endereco) {
-        publicarResultadoFragment(RESULTADO_CHAVE_DESTINO, CHAVE_DESTINO, endereco);
-    }
-
-    private void publicarResultadoFragment(String chaveResultado, String chavePacote, Address endereco) {
-        Bundle pacote = new Bundle();
-        pacote.putParcelable(chavePacote, endereco);
-        getParentFragmentManager().setFragmentResult(chaveResultado, pacote);
-    }
-
-    @Override
-    public List<Address> search(String consulta) {
-        try {
-            List<Address> resultados = geocodificador.getFromLocationName(consulta, MAX_RESULTADOS_BUSCA);
-            return resultados != null ? resultados : new ArrayList<>();
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
-    }
+    // =================================================================
+    // SEÇÃO 17: MÉTODOS UTILITÁRIOS E AUXILIARES
+    // =================================================================
 
     private static String formatarParaMoeda(BigDecimal valor) {
         return "R$ " + FORMATADOR_MOEDA.format(valor);
@@ -1890,12 +2028,6 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
 
     private void definirEstadoBottomSheet(int estado) {
         Optional.ofNullable(bottomSheetLocalizacao).ifPresent(sheet -> sheet.setState(estado));
-    }
-
-    private void expandirBottomSheetCompartilhamento() {
-        if (bottomSheetCompartilhamento != null) {
-            bottomSheetCompartilhamento.setState(BottomSheetBehavior.STATE_EXPANDED);
-        }
     }
 
     private void expandirBottomSheet() {
@@ -1965,6 +2097,48 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         Optional.ofNullable(campoEdicao).ifPresent(et -> et.setText(""));
     }
 
+    private BigDecimal converterDecimalDeInput(TextInputEditText campo) {
+        return Optional.ofNullable(campo)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(texto -> !texto.isEmpty())
+                .flatMap(this::analisarDecimalSeguro)
+                .orElse(null);
+    }
+
+    private Optional<BigDecimal> analisarDecimalSeguro(String valor) {
+        try {
+            BigDecimal analisado = new BigDecimal(valor);
+            return analisado.compareTo(BigDecimal.ZERO) > 0 ? Optional.of(analisado) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Integer converterInteiroDeInput(TextInputEditText campo) {
+        return Optional.ofNullable(campo)
+                .map(TextInputEditText::getText)
+                .map(Object::toString)
+                .map(String::trim)
+                .filter(texto -> !texto.isEmpty())
+                .flatMap(this::analisarInteiroSeguro)
+                .orElse(null);
+    }
+
+    private Optional<Integer> analisarInteiroSeguro(String valor) {
+        try {
+            int analisado = Integer.parseInt(valor);
+            return analisado > 0 ? Optional.of(analisado) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Address> extrairEnderecoDoBundle(Bundle pacote, String chave) {
+        return Optional.ofNullable(pacote.getParcelable(chave, Address.class));
+    }
+
     private void exibirMensagemSucesso(String mensagem) {
         exibirSnackbar(mensagem, Color.parseColor("#279958"), Color.WHITE);
     }
@@ -2014,12 +2188,15 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         return isAdded() && !isRemoving() && !isDetached();
     }
 
+    // =================================================================
+    // SEÇÃO 18: LIMPEZA E GERENCIAMENTO DE RECURSOS
+    // =================================================================
+
     private void liberarReferenciasViews() {
         adaptadorLocalizacoes = null;
         adaptadorRecomendacoes = null;
 
         bottomSheetLocalizacao = null;
-        bottomSheetCompartilhamento = null;
 
         recyclerLocalizacoes = null;
         recyclerRecomendacoes = null;
@@ -2069,9 +2246,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         textValorFinalPorKg = null;
 
         buttonEnviarDoc = null;
-        whatsapp = null;
-        telegram = null;
-        googleDrive = null;
+
     }
 
     private void limparRecursos() {

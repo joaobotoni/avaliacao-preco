@@ -11,6 +11,9 @@
     <string name="titulo_recomendacao_transporte">Recomendação de Transporte</string>
     <string name="titulo_calculo_frete">Cálculo do Frete</string>
     <string name="titulo_selecao_localizacao">Adicionar Localização</string>
+    <string name="titulo_permissions">Permissões de Localização</string>
+    <string name="titulo_permissions_denied">Permissão Negada</string>
+    <string name="titulo_permissions_required">Permissões Necessárias</string>
 
     <string name="subtitulo_preencher_campos">Preencha os campos abaixo</string>
     <string name="subtitulo_selecao_localizacao">Toque para selecionar a localização origem</string>
@@ -29,6 +32,9 @@
     <string name="info_ecomendacao_transporte_msg">Para %1$d %2$s(s), recomendamos %3$d veículo(s).</string>
     <string name="info_recomendacao_transporte_sem_msg">Nenhuma recomendação disponível para %1$d %2$s.</string>
     <string name="info_atalhos_rapidos">Atalhos rápidos</string>
+    <string name="info_permissions_message">Para calcular rotas e fretes com precisão, precisamos de acesso à sua localização. Isso permite determinar origens e destinos automaticamente.</string>
+    <string name="info_permissions_denied">O aplicativo precisa da permissão de localização para funcionar corretamente. Sem ela, não será possível calcular rotas e fretes.</string>
+    <string name="info_permissions_permanently_denied">As permissões foram negadas permanentemente. Para habilitar, acesse as configurações do aplicativo.</string>
 
     <string name="rotulo_distancia">Distância</string>
     <string name="rotulo_tempo">Tempo</string>
@@ -81,6 +87,7 @@
     <string name="btn_mais_opcoes">Mais opções</string>
     <string name="btn_ok">OK</string>
     <string name="btn_trocar_localizacoes">Trocar localizações</string>
+    <string name="btn_settings">Configurações</string>
 
     <string name="resultado_distancia">Distância</string>
     <string name="resultado_tipo_transporte">Tipo de Transporte</string>

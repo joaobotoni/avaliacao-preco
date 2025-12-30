@@ -72,12 +72,12 @@ public class PdfReport {
     }
 
     private File save(Context context, PdfDocument document) throws IOException {
-        File externalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        if (externalFilesDir == null) {
-            externalFilesDir = context.getFilesDir();
+        File cacheDir = new File(context.getCacheDir(), "pdfs");
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs();
         }
 
-        File file = new File(externalFilesDir, "report_" + System.currentTimeMillis() + ".pdf");
+        File file = new File(cacheDir, "relatorio_avaliacao_" + System.currentTimeMillis() + ".pdf");
         FileOutputStream outputStream = new FileOutputStream(file);
         document.writeTo(outputStream);
         outputStream.close();
