@@ -210,9 +210,9 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private CardView cardDestinoRota;
     private View cardDistanciaInside;
     private View cardDistanciaOutside;
-    private TextView textLabelOrigem;
+    TextView textLabelOrigem;
     private TextView textValorOrigem;
-    private TextView textLabelDestino;
+    TextView textLabelDestino;
     private TextView textValorDestino;
     private TextView textValorDistanciaInside;
     private TextView textValorDistanciaOutside;
@@ -393,7 +393,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
                     if (getContext() == null) return;
 
                     boolean temDadosFrete = distancia > 0 && !recomendacoes.isEmpty();
-                    boolean pdfGerado = false;
+                    boolean pdfGerado;
 
                     try {
                         if (temDadosFrete) {
