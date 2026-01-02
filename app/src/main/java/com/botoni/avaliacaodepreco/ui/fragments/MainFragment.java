@@ -153,7 +153,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private Address enderecoOrigem;
     private Address enderecoDestino;
     private String codigoPaisUsuario;
-    private volatile double distancia;
+    private double distancia;
 
     private final AtomicBoolean estaNavegando = new AtomicBoolean(false);
     private final AtomicBoolean estaCalculandoRota = new AtomicBoolean(false);
@@ -577,7 +577,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         if (possuiEnderecosRotaValidos() && distancia == 0) {
             iniciarCalculoRota();
         } else if (!possuiEnderecosRotaValidos() && distancia > 0) {
-            distancia = 0;
+            distancia = 0.0;
         }
     }
 
@@ -637,7 +637,26 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         if (saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade)) {
             executarCalculoEExibir(precoArroba, pesoAnimal, quantidade);
         } else {
+            distancia = 0.0;
             esconderResultadoCalculo();
+            atualizarVisibilidadeComponentesCondicionais();
+            configurarCartaoValorFinal();
+        }
+    }
+
+    private void validarCamposEResetarSePreciso() {
+        BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
+        BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
+        Integer quantidade = converterInteiroDeInput(inputQuantidadeAnimais);
+
+        boolean camposValidos = saoInputsCalculoValidos(precoArroba, pesoAnimal, quantidade)
+                && categoriaAtual != null;
+
+        if (!camposValidos && (distancia > 0 || enderecoOrigem != null)) {
+            distancia = 0.0;
+            enderecoOrigem = null;
+            recomendacoes = new ArrayList<>();
+            limparEstadoCampoOrigem();
             atualizarVisibilidadeComponentesCondicionais();
             configurarCartaoValorFinal();
         }
@@ -1216,7 +1235,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
 
     private void resetarEnderecoOrigem() {
         enderecoOrigem = null;
-        distancia = 0;
+        distancia = 0.0;
         limparEstadoCampoOrigem();
         atualizarVisibilidadeComponentesCondicionais();
         configurarCartaoValorFinal();
@@ -1386,8 +1405,8 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     }
 
     @SuppressLint("StringFormatMatches")
-    private void ajustarDistanciaPor(double quilometros) {
-        if (quilometros <= 0) return;
+    private void ajustarDistanciaPor(Double quilometros) {
+        if (quilometros == null || quilometros <= 0) return;
         distancia += quilometros;
         configurarCartaoValorFinal();
         String mensagem = getString(R.string.sucesso_distancia_atualizada, distancia);
@@ -1449,6 +1468,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     private void processarSelecaoCategoria(int posicao) {
         categoriaAtual = categorias.get(posicao);
         atualizarTextoAutoCompleteCategoria(categoriaAtual.getDescricao());
+        validarCamposEResetarSePreciso();
         atualizarVisibilidadeComponentesCondicionais();
         atualizarRecomendacoesVeiculos();
         configurarCartaoValorFinal();
@@ -1460,15 +1480,24 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
     }
 
     private void anexarOuvintesCalculo() {
-        anexarOuvinteInput(inputPrecoArroba, this::realizarCalculoBezerro);
-        anexarOuvinteInput(inputPesoAnimal, this::realizarCalculoBezerro);
+        anexarOuvinteInput(inputPrecoArroba, () -> {
+            realizarCalculoBezerro();
+            validarCamposEResetarSePreciso();
+        });
+        anexarOuvinteInput(inputPesoAnimal, () -> {
+            realizarCalculoBezerro();
+            validarCamposEResetarSePreciso();
+        });
         anexarOuvinteInput(inputQuantidadeAnimais, this::processarMudancaQuantidade);
-        anexarOuvinteInput(inputPercentualAgio, this::realizarCalculoBezerro);
-
+        anexarOuvinteInput(inputPercentualAgio, () -> {
+            realizarCalculoBezerro();
+            validarCamposEResetarSePreciso();
+        });
     }
 
     private void processarMudancaQuantidade() {
         realizarCalculoBezerro();
+        validarCamposEResetarSePreciso();
         atualizarRecomendacoesVeiculos();
         atualizarVisibilidadeComponentesCondicionais();
         configurarCartaoValorFinal();
@@ -1501,6 +1530,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
             rv.setAdapter(adaptadorRecomendacoes);
         });
     }
+
 
     private void configurarCliqueCartaoAdicionarLocalizacao() {
         Optional.ofNullable(cardAddLocalizacao).ifPresent(cartao ->
@@ -1593,6 +1623,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         boolean temQuantidadeValida = ehQuantidadeValida(quantidade);
         boolean temCategoria = categoriaAtual != null;
         boolean temEndereco = enderecoOrigem != null && enderecoDestino != null;
+        boolean temDistancia = distancia > 0.0;
 
         BigDecimal precoArroba = converterDecimalDeInput(inputPrecoArroba);
         BigDecimal pesoAnimal = converterDecimalDeInput(inputPesoAnimal);
@@ -1603,7 +1634,7 @@ public class MainFragment extends Fragment implements DirectionsProvider, Addres
         definirVisibilidadeView(cardAjusteKm, podeExibirComponentesRota ? View.VISIBLE : View.GONE);
         definirVisibilidadeView(btnLocalizacao, temEndereco ? View.VISIBLE : View.GONE);
 
-        boolean podeCalcularValorFinal = (temEndereco || distancia > 0) && todosOsCamposBezerroPreenchidos;
+        boolean podeCalcularValorFinal = (temEndereco || temDistancia) && todosOsCamposBezerroPreenchidos;
         atualizarVisibilidadeCartaoValorFinal(podeCalcularValorFinal);
     }
 
